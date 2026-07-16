@@ -10,7 +10,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
     <style>
         /* Modern CSS Reset & Variables */
-        :root {
+        /* Default / Midnight Cosmic theme variables */
+        body, body.theme-cosmic {
             --bg-gradient-start: #0f172a;
             --bg-gradient-end: #020617;
             --card-bg: rgba(30, 41, 59, 0.7);
@@ -22,6 +23,66 @@
             --btn-mul-start: #d946ef;
             --btn-mul-end: #8b5cf6;
             --shadow-glow: rgba(99, 102, 241, 0.15);
+        }
+
+        /* Cyberpunk Neon */
+        body.theme-cyberpunk {
+            --bg-gradient-start: #07070a;
+            --bg-gradient-end: #000000;
+            --card-bg: rgba(10, 10, 16, 0.85);
+            --card-border: rgba(255, 230, 0, 0.2);
+            --text-primary: #ffe600;
+            --text-secondary: #ff0055;
+            --btn-sum-start: #ff0055;
+            --btn-sum-end: #990033;
+            --btn-mul-start: #00f3ff;
+            --btn-mul-end: #008899;
+            --shadow-glow: rgba(255, 230, 0, 0.15);
+        }
+
+        /* Crimson Infernal (DMC Style) */
+        body.theme-infernal {
+            --bg-gradient-start: #1c0505;
+            --bg-gradient-end: #030000;
+            --card-bg: rgba(35, 10, 10, 0.8);
+            --card-border: rgba(239, 68, 68, 0.25);
+            --text-primary: #fca5a5;
+            --text-secondary: #f97316;
+            --btn-sum-start: #ef4444;
+            --btn-sum-end: #7f1d1d;
+            --btn-mul-start: #f59e0b;
+            --btn-mul-end: #78350f;
+            --shadow-glow: rgba(239, 68, 68, 0.2);
+        }
+
+        /* Synthwave Retro */
+        body.theme-synthwave {
+            --bg-gradient-start: #230644;
+            --bg-gradient-end: #080114;
+            --card-bg: rgba(35, 12, 60, 0.75);
+            --card-border: rgba(254, 76, 172, 0.25);
+            --text-primary: #f472b6;
+            --text-secondary: #38bdf8;
+            --btn-sum-start: #ec4899;
+            --btn-sum-end: #9d174d;
+            --btn-mul-start: #06b6d4;
+            --btn-mul-end: #015a68;
+            --shadow-glow: rgba(254, 76, 172, 0.2);
+        }
+
+        /* Golden Demiurge */
+        body.theme-gold {
+            --bg-gradient-start: #1a1610;
+            --bg-gradient-end: #080705;
+            --card-bg: rgba(26, 22, 16, 0.85);
+            --card-border: rgba(234, 179, 8, 0.25);
+            --text-primary: #fef08a;
+            --text-secondary: #ca8a04;
+            --btn-sum-start: #eab308;
+            --btn-sum-end: #713f12;
+            --btn-mul-start: #b45309;
+            --btn-mul-end: #451a03;
+            --shadow-glow: rgba(234, 179, 8, 0.15);
         }
 
         * {
@@ -289,7 +350,7 @@
         .counter-value {
             font-size: 5.5rem;
             font-weight: 800;
-            background: linear-gradient(135deg, #ffffff 30%, #cbd5e1 100%);
+            background: linear-gradient(135deg, #ffffff 30%, var(--text-primary) 100%);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
             line-height: 1;
@@ -642,6 +703,170 @@
             }
         }
 
+        /* Top controls for Themes & Sounds */
+        .top-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .theme-selector {
+            display: flex;
+            gap: 8px;
+        }
+
+        .theme-btn {
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: transform 0.2s ease, border-color 0.2s ease;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+        }
+
+        .theme-btn:hover {
+            transform: scale(1.2);
+        }
+
+        .theme-btn.active {
+            border-color: #ffffff;
+            transform: scale(1.2);
+        }
+
+        .theme-btn-cosmic { background: linear-gradient(135deg, #06b6d4, #8b5cf6); }
+        .theme-btn-cyberpunk { background: linear-gradient(135deg, #ffe600, #ff0055); }
+        .theme-btn-infernal { background: linear-gradient(135deg, #ef4444, #f59e0b); }
+        .theme-btn-synthwave { background: linear-gradient(135deg, #ec4899, #38bdf8); }
+        .theme-btn-gold { background: linear-gradient(135deg, #eab308, #1c1917); }
+
+        .btn-sound {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: color 0.2s ease, transform 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            padding: 0;
+        }
+
+        .btn-sound:hover {
+            color: var(--text-primary);
+            transform: scale(1.1);
+        }
+
+        .btn-sound svg {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
+
+        /* Tabs Navigation */
+        .tabs-nav {
+            display: flex;
+            background: rgba(15, 23, 42, 0.4);
+            border-radius: 12px;
+            padding: 4px;
+            margin-bottom: 25px;
+            border: 1px solid var(--card-border);
+        }
+
+        .tab-btn {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            padding: 10px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .tab-btn:hover {
+            color: var(--text-primary);
+        }
+
+        .tab-btn.active {
+            background: rgba(255, 255, 255, 0.08);
+            color: var(--text-primary);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeInTab 0.3s ease forwards;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeInTab {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Stats Grid styles */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .stat-card {
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid var(--card-border);
+            border-radius: 14px;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        .stat-label {
+            font-size: 0.65rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            font-weight: 700;
+        }
+
+        .stat-value {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: var(--text-primary);
+            word-break: break-all;
+        }
+
+        .stat-last-lie {
+            background: rgba(15, 23, 42, 0.5);
+            border: 1px solid var(--card-border);
+            border-radius: 14px;
+            padding: 12px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            text-align: center;
+        }
+
+        .stat-value-sub {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
         /* Media Queries for Responsive Design */
         @media (max-width: 480px) {
             .card {
@@ -668,6 +893,21 @@
 
     <div class="container">
         <div class="card">
+            <!-- Top Controls (Theme & Sound Selection) -->
+            <div class="top-controls">
+                <div class="theme-selector">
+                    <button class="theme-btn theme-btn-cosmic active" title="Midnight Cosmic" data-theme="cosmic"></button>
+                    <button class="theme-btn theme-btn-cyberpunk" title="Cyberpunk Neon" data-theme="cyberpunk"></button>
+                    <button class="theme-btn theme-btn-infernal" title="Crimson Infernal" data-theme="infernal"></button>
+                    <button class="theme-btn theme-btn-synthwave" title="Synthwave Retro" data-theme="synthwave"></button>
+                    <button class="theme-btn theme-btn-gold" title="Golden Demiurge" data-theme="gold"></button>
+                </div>
+                <button id="btn-sound" class="btn-sound" title="Alternar som">
+                    <svg viewBox="0 0 24 24" id="sound-icon-on"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+                    <svg viewBox="0 0 24 24" id="sound-icon-off" style="display:none;"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.21.05-.42.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>
+                </button>
+            </div>
+
             <h1 class="title">
                 Mandamau Counter
                 <span class="subtitle">for Bako The FurryGuy</span>
@@ -678,30 +918,65 @@
                 <span id="rank-badge" class="rank-badge">D</span>
                 <span id="rank-name" class="rank-name">Dull</span>
             </div>
-            
-            <div class="counter-container">
-                <span id="counter" class="counter-value">0</span>
-            </div>
 
-            <!-- Custom Multiplier Controls -->
-            <div class="multiplier-settings">
-                <label for="multiplier-input">Multiplicar por:</label>
-                <div class="input-wrapper">
-                    <button id="btn-dec-mult" class="btn-step">-</button>
-                    <input type="number" id="multiplier-input" value="2" min="1" step="1">
-                    <button id="btn-inc-mult" class="btn-step">+</button>
+            <!-- Tabs Navigation -->
+            <div class="tabs-nav">
+                <button id="tab-counter" class="tab-btn active">Contador</button>
+                <button id="tab-stats" class="tab-btn">Estatísticas</button>
+            </div>
+            
+            <!-- Tab Content: Counter -->
+            <div id="content-counter" class="tab-content active">
+                <div class="counter-container">
+                    <span id="counter" class="counter-value">0</span>
+                </div>
+
+                <!-- Custom Multiplier Controls -->
+                <div class="multiplier-settings">
+                    <label for="multiplier-input">Multiplicar por:</label>
+                    <div class="input-wrapper">
+                        <button id="btn-dec-mult" class="btn-step">-</button>
+                        <input type="number" id="multiplier-input" value="2" min="1" step="1">
+                        <button id="btn-inc-mult" class="btn-step">+</button>
+                    </div>
+                </div>
+
+                <div class="button-group">
+                    <button id="btn-sum" class="btn btn-sum">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                        Somar (+1)
+                    </button>
+                    <button id="btn-mul" class="btn btn-mul">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                        <span id="btn-mul-text">Multiplicar (x2)</span>
+                    </button>
                 </div>
             </div>
 
-            <div class="button-group">
-                <button id="btn-sum" class="btn btn-sum">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                    Somar (+1)
-                </button>
-                <button id="btn-mul" class="btn btn-mul">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                    <span id="btn-mul-text">Multiplicar (x2)</span>
-                </button>
+            <!-- Tab Content: Statistics -->
+            <div id="content-stats" class="tab-content">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <span class="stat-label">Recorde Máximo</span>
+                        <span id="stat-high-score" class="stat-value">0</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">Sem Mentiras Há</span>
+                        <span id="stat-time-since" class="stat-value">0s</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">Cliques Totais</span>
+                        <span id="stat-total-clicks" class="stat-value">0</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-label">Frequência (LPM)</span>
+                        <span id="stat-lpm" class="stat-value">0.0</span>
+                    </div>
+                </div>
+                <div class="stat-last-lie">
+                    <span class="stat-label">Última Mentira Registrada</span>
+                    <span id="stat-last-time" class="stat-value-sub">Nenhuma ainda</span>
+                </div>
             </div>
 
             <button id="btn-reset" class="btn-reset">
@@ -729,13 +1004,13 @@
     <script>
         // DMC Ranks Configuration
         const ranks = [
-            { min: 100000, letter: 'SSS', name: "você atingiu a gnose de tanto mentir e se tornou o demiurgo", class: 'rank-sss', idleClass: 'rank-idle-god', flashColor: 'rgba(255, 0, 127, 0.4)' },
-            { min: 50000, letter: 'SS', name: "mentiu tanto que transcendeu a materia", class: 'rank-ss', idleClass: 'rank-idle-high', flashColor: 'rgba(236, 72, 153, 0.4)' },
-            { min: 10000, letter: 'S', name: "Deus da mentira e desinformação", class: 'rank-s', idleClass: 'rank-idle-high', flashColor: 'rgba(168, 85, 247, 0.4)' },
-            { min: 5000, letter: 'A', name: "O ser mais mentiroso que já existiu", class: 'rank-a', idleClass: 'rank-idle-med', flashColor: 'rgba(245, 158, 11, 0.3)' },
-            { min: 1000, letter: 'B', name: "mentir pra você é como respirar", class: 'rank-b', idleClass: 'rank-idle-med', flashColor: 'rgba(6, 182, 212, 0.3)' },
-            { min: 500, letter: 'C', name: "você nasceu pra mentir", class: 'rank-c', idleClass: 'rank-idle-low', flashColor: 'rgba(16, 185, 129, 0.2)' },
-            { min: 100, letter: 'D', name: "mentiu bem", class: 'rank-d', idleClass: 'rank-idle-low', flashColor: 'rgba(148, 163, 184, 0.2)' }
+            { min: 100000, letter: 'SSS', name: "você atingiu a gnose de tanto mentir e se tornou o demiurgo", class: 'rank-sss', idleClass: 'rank-idle-god', flashColor: 'rgba(255, 0, 127, 0.4)', sound: 'rank_up_god' },
+            { min: 50000, letter: 'SS', name: "mentiu tanto que transcendeu a materia", class: 'rank-ss', idleClass: 'rank-idle-high', flashColor: 'rgba(236, 72, 153, 0.4)', sound: 'rank_up_high' },
+            { min: 10000, letter: 'S', name: "Deus da mentira e desinformação", class: 'rank-s', idleClass: 'rank-idle-high', flashColor: 'rgba(168, 85, 247, 0.4)', sound: 'rank_up_high' },
+            { min: 5000, letter: 'A', name: "O ser mais mentiroso que já existiu", class: 'rank-a', idleClass: 'rank-idle-med', flashColor: 'rgba(245, 158, 11, 0.3)', sound: 'rank_up_med' },
+            { min: 1000, letter: 'B', name: "mentir pra você é como respirar", class: 'rank-b', idleClass: 'rank-idle-med', flashColor: 'rgba(6, 182, 212, 0.3)', sound: 'rank_up_med' },
+            { min: 500, letter: 'C', name: "você nasceu pra mentir", class: 'rank-c', idleClass: 'rank-idle-low', flashColor: 'rgba(16, 185, 129, 0.2)', sound: 'rank_up_low' },
+            { min: 100, letter: 'D', name: "mentiu bem", class: 'rank-d', idleClass: 'rank-idle-low', flashColor: 'rgba(148, 163, 184, 0.2)', sound: 'rank_up_low' }
         ];
 
         // State Management
@@ -748,6 +1023,12 @@
             "O Bako ainda está mentindo, quer prosseguir?",
             "Se apagar você compactua com as mentiras e atrocidades do Bako, quer apagar mesmo?"
         ];
+
+        // Statistics State
+        let highScore = 0;
+        let totalClicks = 0;
+        let lastLieTimestamp = null;
+        let lieTimes = [];
 
         // Elements
         const counterEl = document.getElementById('counter');
@@ -765,18 +1046,270 @@
         const btnModalConfirm = document.getElementById('btn-modal-confirm');
         const btnModalCancel = document.getElementById('btn-modal-cancel');
 
-        // Format numbers to equations / scientific notation if too large (>= 1,000,000)
+        // Tab Elements
+        const tabCounter = document.getElementById('tab-counter');
+        const tabStats = document.getElementById('tab-stats');
+        const contentCounter = document.getElementById('content-counter');
+        const contentStats = document.getElementById('content-stats');
+
+        // Theme and Sound controls elements
+        const themeBtns = document.querySelectorAll('.theme-btn');
+        const btnSound = document.getElementById('btn-sound');
+        const soundIconOn = document.getElementById('sound-icon-on');
+        const soundIconOff = document.getElementById('sound-icon-off');
+
+        // Audio System (Web Audio Synth)
+        let audioCtx = null;
+        let isMuted = localStorage.getItem('mandamau_muted') === 'true';
+
+        function initAudio() {
+            if (!audioCtx) {
+                audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            }
+            if (audioCtx.state === 'suspended') {
+                audioCtx.resume();
+            }
+        }
+
+        function playSound(type) {
+            if (isMuted) return;
+            try {
+                initAudio();
+                const now = audioCtx.currentTime;
+                
+                if (type === 'click') {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(320, now);
+                    osc.frequency.exponentialRampToValueAtTime(750, now + 0.08);
+                    
+                    gain.gain.setValueAtTime(0.12, now);
+                    gain.gain.exponentialRampToValueAtTime(0.002, now + 0.08);
+                    
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    
+                    osc.start(now);
+                    osc.stop(now + 0.08);
+                } 
+                else if (type === 'multiply') {
+                    const duration = 0.2;
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    const filter = audioCtx.createBiquadFilter();
+                    
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(180, now);
+                    osc.frequency.exponentialRampToValueAtTime(1100, now + duration);
+                    
+                    filter.type = 'lowpass';
+                    filter.frequency.setValueAtTime(1000, now);
+                    
+                    gain.gain.setValueAtTime(0.08, now);
+                    gain.gain.exponentialRampToValueAtTime(0.002, now + duration);
+                    
+                    osc.connect(filter);
+                    filter.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    
+                    osc.start(now);
+                    osc.stop(now + duration);
+                }
+                else if (type === 'reset') {
+                    const duration = 0.55;
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(380, now);
+                    osc.frequency.linearRampToValueAtTime(50, now + duration);
+                    
+                    gain.gain.setValueAtTime(0.18, now);
+                    gain.gain.linearRampToValueAtTime(0.001, now + duration);
+                    
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    
+                    osc.start(now);
+                    osc.stop(now + duration);
+                }
+                else if (type === 'rank_up_low') {
+                    playArpeggio([440, 554, 659], 0.08);
+                }
+                else if (type === 'rank_up_med') {
+                    playArpeggio([523, 659, 784, 1046], 0.07);
+                }
+                else if (type === 'rank_up_high') {
+                    playArpeggio([587, 740, 880, 1175, 1480], 0.06);
+                }
+                else if (type === 'rank_up_god') {
+                    playArpeggio([261, 329, 392, 523, 659, 784, 1046, 1318, 1568, 2093, 2637, 3136, 4186], 0.035);
+                }
+            } catch (e) {
+                console.error("Audio Synthesis Error:", e);
+            }
+        }
+
+        function playArpeggio(notes, noteLength) {
+            initAudio();
+            const now = audioCtx.currentTime;
+            notes.forEach((freq, idx) => {
+                const noteTime = now + (idx * noteLength);
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(freq, noteTime);
+                
+                const vibrato = audioCtx.createOscillator();
+                const vibratoGain = audioCtx.createGain();
+                vibrato.frequency.value = 14; 
+                vibratoGain.gain.value = 6; 
+                
+                vibrato.connect(vibratoGain);
+                vibratoGain.connect(osc.frequency);
+                
+                gain.gain.setValueAtTime(0, noteTime);
+                gain.gain.linearRampToValueAtTime(0.12, noteTime + 0.02);
+                gain.gain.exponentialRampToValueAtTime(0.003, noteTime + noteLength * 1.8);
+                
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                
+                vibrato.start(noteTime);
+                osc.start(noteTime);
+                
+                vibrato.stop(noteTime + noteLength * 1.8);
+                osc.stop(noteTime + noteLength * 1.8);
+            });
+        }
+
+        function updateSoundUI() {
+            if (isMuted) {
+                soundIconOn.style.display = 'none';
+                soundIconOff.style.display = 'block';
+                btnSound.style.opacity = '0.5';
+            } else {
+                soundIconOn.style.display = 'block';
+                soundIconOff.style.display = 'none';
+                btnSound.style.opacity = '1';
+            }
+        }
+
+        btnSound.addEventListener('click', () => {
+            isMuted = !isMuted;
+            localStorage.setItem('mandamau_muted', isMuted);
+            updateSoundUI();
+            if (!isMuted) {
+                playSound('click');
+            }
+        });
+
+        // Theme Manager
+        function setTheme(themeName) {
+            document.body.classList.remove('theme-cosmic', 'theme-cyberpunk', 'theme-infernal', 'theme-synthwave', 'theme-gold');
+            document.body.classList.add(`theme-${themeName}`);
+            
+            themeBtns.forEach(btn => {
+                if (btn.getAttribute('data-theme') === themeName) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+            
+            localStorage.setItem('mandamau_theme', themeName);
+        }
+
+        themeBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const selected = btn.getAttribute('data-theme');
+                setTheme(selected);
+                playSound('click');
+            });
+        });
+
+        function initTheme() {
+            const saved = localStorage.getItem('mandamau_theme') || 'cosmic';
+            setTheme(saved);
+        }
+
+        // Tab Navigation
+        tabCounter.addEventListener('click', () => {
+            tabCounter.classList.add('active');
+            tabStats.classList.remove('active');
+            contentCounter.classList.add('active');
+            contentStats.classList.remove('active');
+            playSound('click');
+        });
+
+        tabStats.addEventListener('click', () => {
+            tabStats.classList.add('active');
+            tabCounter.classList.remove('active');
+            contentStats.classList.add('active');
+            contentCounter.classList.remove('active');
+            updateStatsUI();
+            playSound('click');
+        });
+
+        // Format static numbers (used in stats panel)
         function formatNumber(num) {
             const absNum = Math.abs(num);
             if (absNum < 1e6) {
                 return num.toLocaleString('pt-BR');
             } else {
-                // Convert to equation standard, e.g. 1.23 × 10⁶
                 const exponent = Math.floor(Math.log10(absNum));
                 const mantissa = num / Math.pow(10, exponent);
                 const roundedMantissa = Math.round(mantissa * 1000) / 1000;
                 return `${roundedMantissa} &times; 10<sup>${exponent}</sup>`;
             }
+        }
+
+        // Mathematical Equation Generator for large numbers
+        function generateMathEquation(num) {
+            const absNum = Math.abs(num);
+            if (absNum < 1e6) {
+                return num.toLocaleString('pt-BR');
+            }
+            
+            const equations = [
+                // Scientific Notation
+                () => {
+                    const exponent = Math.floor(Math.log10(absNum));
+                    const mantissa = num / Math.pow(10, exponent);
+                    const roundedMantissa = Math.round(mantissa * 1000) / 1000;
+                    return `${roundedMantissa} &times; 10<sup>${exponent}</sup>`;
+                },
+                // Factorization: (a * b) + c
+                () => {
+                    const a = Math.floor(Math.random() * 8) + 3; // 3 to 10
+                    const b = Math.floor(num / a);
+                    const c = Math.round((num % a) * 100) / 100;
+                    return `(${a} &times; ${b.toLocaleString('pt-BR')}) + ${c}`;
+                },
+                // Power of 2: 2^p + diff
+                () => {
+                    const p = Math.floor(Math.log2(num));
+                    const base2Val = Math.pow(2, p);
+                    const diff = Math.round((num - base2Val) * 100) / 100;
+                    return `2<sup>${p}</sup> + ${diff.toLocaleString('pt-BR')}`;
+                },
+                // Integral Calculus
+                () => {
+                    const half = Math.round((num / 2) * 100) / 100;
+                    return `&int;<sub>0</sub><sup>${half.toLocaleString('pt-BR')}</sup> 2 dt`;
+                },
+                // Limit to Infinity
+                () => {
+                    const formatted = num.toLocaleString('pt-BR');
+                    return `lim<sub>x&rarr;&infin;</sub> (${formatted}x + 42) / x`;
+                }
+            ];
+            
+            const randomIndex = Math.floor(Math.random() * equations.length);
+            return equations[randomIndex]();
         }
 
         // Dynamically adjust font size to prevent overflow
@@ -785,8 +1318,10 @@
             const len = visibleText.length;
             
             let fontSize = '5.5rem';
-            if (len > 12) {
-                fontSize = '2.5rem';
+            if (len > 16) {
+                fontSize = '1.8rem';
+            } else if (len > 12) {
+                fontSize = '2.4rem';
             } else if (len > 10) {
                 fontSize = '3.0rem';
             } else if (len > 8) {
@@ -795,16 +1330,17 @@
                 fontSize = '4.5rem';
             }
             
-            // Mobile adjustments
             if (window.innerWidth <= 480) {
-                if (len > 12) {
-                    fontSize = '2.0rem';
+                if (len > 16) {
+                    fontSize = '1.4rem';
+                } else if (len > 12) {
+                    fontSize = '1.8rem';
                 } else if (len > 10) {
-                    fontSize = '2.4rem';
+                    fontSize = '2.2rem';
                 } else if (len > 8) {
-                    fontSize = '2.8rem';
+                    fontSize = '2.6rem';
                 } else if (len > 6) {
-                    fontSize = '3.4rem';
+                    fontSize = '3.2rem';
                 } else {
                     fontSize = '4.0rem';
                 }
@@ -812,6 +1348,87 @@
             
             counterEl.style.fontSize = fontSize;
         }
+
+        // Statistics Handling
+        function loadStats() {
+            highScore = parseFloat(localStorage.getItem('mandamau_highscore')) || 0;
+            totalClicks = parseInt(localStorage.getItem('mandamau_totalclicks')) || 0;
+            const savedLast = localStorage.getItem('mandamau_lasttime');
+            if (savedLast) {
+                lastLieTimestamp = new Date(savedLast);
+            }
+            updateStatsUI();
+        }
+
+        function saveStats() {
+            localStorage.setItem('mandamau_highscore', highScore);
+            localStorage.setItem('mandamau_totalclicks', totalClicks);
+            if (lastLieTimestamp) {
+                localStorage.setItem('mandamau_lasttime', lastLieTimestamp.toISOString());
+            } else {
+                localStorage.removeItem('mandamau_lasttime');
+            }
+        }
+
+        function registerActivity() {
+            totalClicks++;
+            lastLieTimestamp = new Date();
+            
+            const now = Date.now();
+            lieTimes.push(now);
+            lieTimes = lieTimes.filter(t => now - t < 60000);
+            
+            if (count > highScore) {
+                highScore = count;
+            }
+            
+            saveStats();
+            updateStatsUI();
+        }
+
+        function updateLPM() {
+            const now = Date.now();
+            lieTimes = lieTimes.filter(t => now - t < 60000);
+            const lpm = lieTimes.length;
+            document.getElementById('stat-lpm').textContent = lpm.toFixed(1);
+        }
+
+        function updateStatsUI() {
+            document.getElementById('stat-high-score').innerHTML = formatNumber(highScore);
+            document.getElementById('stat-total-clicks').textContent = totalClicks.toLocaleString('pt-BR');
+            
+            if (lastLieTimestamp) {
+                const options = { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' };
+                document.getElementById('stat-last-time').textContent = lastLieTimestamp.toLocaleString('pt-BR', options);
+            } else {
+                document.getElementById('stat-last-time').textContent = 'Nenhuma ainda';
+            }
+            updateLPM();
+        }
+
+        // Active timer update interval
+        setInterval(() => {
+            if (lastLieTimestamp) {
+                const diffMs = Date.now() - lastLieTimestamp.getTime();
+                const diffSecs = Math.floor(diffMs / 1000);
+                
+                let displayStr = `${diffSecs}s`;
+                if (diffSecs >= 3600) {
+                    const hrs = Math.floor(diffSecs / 3600);
+                    const mins = Math.floor((diffSecs % 3600) / 60);
+                    const secs = diffSecs % 60;
+                    displayStr = `${hrs}h ${mins}m ${secs}s`;
+                } else if (diffSecs >= 60) {
+                    const mins = Math.floor(diffSecs / 60);
+                    const secs = diffSecs % 60;
+                    displayStr = `${mins}m ${secs}s`;
+                }
+                document.getElementById('stat-time-since').textContent = displayStr;
+            } else {
+                document.getElementById('stat-time-since').textContent = '---';
+            }
+            updateLPM();
+        }, 1000);
 
         // Load persisted state on startup
         function loadSavedState() {
@@ -828,25 +1445,19 @@
                 }
             }
             
-            // Set text & font size
-            counterEl.innerHTML = formatNumber(count);
+            counterEl.innerHTML = generateMathEquation(count);
             adjustFontSize();
-            
-            // Initial load update without entry animations
             updateStyleRank(true);
         }
 
-        // Get and validate multiplier value
-        // Supporting float multipliers gracefully
         function getMultiplier() {
             let val = parseFloat(multiplierInput.value);
             if (isNaN(val) || val <= 0) {
-                return 2; // default fallback
+                return 2; 
             }
             return val;
         }
 
-        // Update Multiply Button Label and persist multiplier
         function updateMultiplierUI() {
             let val = multiplierInput.value;
             if (val === '' || isNaN(parseFloat(val))) {
@@ -857,93 +1468,78 @@
             }
         }
 
-        // Functions
         function updateCounter(newValue) {
-            // Handle decimal rounding to prevent floating point display issues if multiplied by decimals
             if (!Number.isInteger(newValue)) {
                 count = Math.round(newValue * 100) / 100;
             } else {
                 count = newValue;
             }
             
-            // Persist value
             localStorage.setItem('mandamau_count', count);
             
-            // UI Update
-            counterEl.innerHTML = formatNumber(count);
+            counterEl.innerHTML = generateMathEquation(count);
             adjustFontSize();
             
-            // Pop Animation
             counterEl.classList.remove('counter-pop');
-            void counterEl.offsetWidth; // Trigger reflow
+            void counterEl.offsetWidth; 
             counterEl.classList.add('counter-pop');
             
-            // Remove animation class after it completes
             setTimeout(() => {
                 counterEl.classList.remove('counter-pop');
             }, 150);
 
-            // Update DMC Rank
             updateStyleRank();
         }
 
-        // Card shake animation trigger
         function triggerCardShake() {
             const card = document.querySelector('.card');
             card.classList.remove('card-shake');
-            void card.offsetWidth; // Trigger reflow
+            void card.offsetWidth; 
             card.classList.add('card-shake');
             setTimeout(() => {
                 card.classList.remove('card-shake');
             }, 300);
         }
 
-        // Screen Flash effect
         function triggerScreenFlash(flashColor) {
             const flash = document.getElementById('screen-flash');
             flash.style.background = flashColor;
             flash.style.opacity = '0.35';
             
-            // Fast transition reset
             flash.style.transition = 'none';
-            void flash.offsetWidth; // Reflow
+            void flash.offsetWidth; 
             
-            // Set animation transition back
             flash.style.transition = 'opacity 0.5s cubic-bezier(0.1, 0.8, 0.3, 1)';
             flash.style.opacity = '0';
         }
 
-        // Particles explosion on rank upgrade
         function triggerRankBurst(colorClass) {
             const badge = document.getElementById('rank-badge');
             const rect = badge.getBoundingClientRect();
             const x = rect.left + rect.width / 2;
             const y = rect.top + rect.height / 2;
-            const particleCount = 45; // More particles for extravagant feel!
+            const particleCount = 45; 
 
             for (let i = 0; i < particleCount; i++) {
                 const p = document.createElement('div');
                 p.classList.add('particle');
                 
-                // Set start position relative to viewport
                 p.style.left = `${x}px`;
                 p.style.top = `${y}px`;
                 p.style.position = 'fixed';
                 p.style.pointerEvents = 'none';
                 
-                // Random velocities
                 const angle = Math.random() * Math.PI * 2;
-                const distance = Math.random() * 140 + 60; // Faster/Further explosion
+                const distance = Math.random() * 140 + 60; 
                 const tx = Math.cos(angle) * distance;
                 const ty = Math.sin(angle) * distance;
                 
-                const size = Math.random() * 12 + 6; // Bigger particles
+                const size = Math.random() * 12 + 6; 
                 p.style.width = `${size}px`;
                 p.style.height = `${size}px`;
                 
-                // Color matching based on rank class
                 if (colorClass === 'rank-sss') {
-                    p.style.background = `hsl(${Math.random() * 360}, 100%, 65%)`; // Rainbow explosion for SSS
+                    p.style.background = `hsl(${Math.random() * 360}, 100%, 65%)`; 
                 } else if (colorClass === 'rank-ss') {
                     p.style.background = '#ec4899';
                 } else if (colorClass === 'rank-s') {
@@ -959,9 +1555,8 @@
                 }
                 
                 p.style.boxShadow = `0 0 15px currentColor`;
-                p.style.borderRadius = Math.random() > 0.5 ? '50%' : '0%'; // Stars and circles
+                p.style.borderRadius = Math.random() > 0.5 ? '50%' : '0%'; 
                 
-                // Animate expansion with rotation
                 const rot = Math.random() * 720 - 360;
                 const anim = p.animate([
                     { transform: 'translate(0, 0) scale(1.5) rotate(0deg)', opacity: 1 },
@@ -976,7 +1571,6 @@
             }
         }
 
-        // DMC Style Rank Update Logic
         function updateStyleRank(isInitialLoad = false) {
             const matchedIndex = ranks.findIndex(r => count >= r.min);
             const rankContainer = document.getElementById('rank-container');
@@ -993,22 +1587,16 @@
                     rankName.textContent = rank.name;
                     
                     if (isInitialLoad) {
-                        // Immediately apply active classes and idle state
                         rankBadge.className = `rank-badge ${rank.class} ${rank.idleClass}`;
                     } else {
-                        // Set entrance classes
                         rankBadge.className = `rank-badge ${rank.class} rank-bounce`;
-                        
-                        // Screen shake
                         triggerCardShake();
-                        
-                        // Sparkle particles
                         triggerRankBurst(rank.class);
-                        
-                        // Screen flash
                         triggerScreenFlash(rank.flashColor);
+                        if (rank.sound) {
+                            playSound(rank.sound);
+                        }
                         
-                        // Wait for bounce animation to finish, then set idle state
                         rankAnimTimeout = setTimeout(() => {
                             rankBadge.classList.remove('rank-bounce');
                             rankBadge.classList.add(rank.idleClass);
@@ -1026,7 +1614,6 @@
             }
         }
 
-        // Modal Logic
         function openResetModal() {
             resetStep = 0;
             modalQuestion.textContent = resetQuestions[resetStep];
@@ -1040,37 +1627,49 @@
         // Event Listeners
         btnSum.addEventListener('click', () => {
             updateCounter(count + 1);
+            registerActivity();
+            playSound('click');
         });
 
         btnMul.addEventListener('click', () => {
             const mult = getMultiplier();
             updateCounter(count * mult);
+            registerActivity();
+            playSound('multiply');
         });
 
         btnReset.addEventListener('click', () => {
             openResetModal();
+            playSound('click');
         });
 
         btnModalCancel.addEventListener('click', () => {
             closeResetModal();
+            playSound('click');
         });
 
         btnModalConfirm.addEventListener('click', () => {
             resetStep++;
             if (resetStep < resetQuestions.length) {
-                // Smooth transition for question text
                 modalQuestion.style.opacity = 0;
+                playSound('click');
                 setTimeout(() => {
                     modalQuestion.textContent = resetQuestions[resetStep];
                     modalQuestion.style.opacity = 1;
                 }, 150);
             } else {
                 updateCounter(0);
+                totalClicks = 0;
+                lastLieTimestamp = null;
+                lieTimes = [];
+                saveStats();
+                updateStatsUI();
+                
                 closeResetModal();
+                playSound('reset');
             }
         });
 
-        // Multiplier input controls
         multiplierInput.addEventListener('input', () => {
             updateMultiplierUI();
         });
@@ -1080,6 +1679,7 @@
             if (current > 1) {
                 multiplierInput.value = current - 1;
                 updateMultiplierUI();
+                playSound('click');
             }
         });
 
@@ -1087,16 +1687,19 @@
             let current = getMultiplier();
             multiplierInput.value = current + 1;
             updateMultiplierUI();
+            playSound('click');
         });
 
-        // Resize event listener to keep layout responsive
         window.addEventListener('resize', () => {
             adjustFontSize();
         });
 
         // Initialize UI & State
+        initTheme();
         loadSavedState();
+        loadStats();
         updateMultiplierUI();
+        updateSoundUI();
 
         // Background Particles Generator
         const particlesContainer = document.getElementById('particles');
@@ -1106,7 +1709,6 @@
             const particle = document.createElement('div');
             particle.classList.add('particle');
             
-            // Random styling
             const size = Math.random() * 6 + 2;
             const left = Math.random() * 100;
             const delay = Math.random() * 10;
@@ -1118,7 +1720,6 @@
             particle.style.animationDelay = `${delay}s`;
             particle.style.animationDuration = `${duration}s`;
             
-            // Gradient matching colors for some particles
             if (Math.random() > 0.5) {
                 particle.style.background = Math.random() > 0.5 ? 'rgba(6, 182, 212, 0.3)' : 'rgba(217, 70, 239, 0.3)';
                 particle.style.boxShadow = '0 0 8px currentColor';
