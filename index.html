@@ -56,6 +56,7 @@
             <div class="tabs-nav">
                 <button id="tab-counter" class="tab-btn active">Contador</button>
                 <button id="tab-stats" class="tab-btn">Estatísticas</button>
+                <button id="tab-duel" class="tab-btn">Duelo</button>
             </div>
             
             <!-- Tab Content: Counter -->
@@ -114,6 +115,49 @@
                     <span class="stat-label">Última Mentira Registrada</span>
                     <span id="stat-last-time" class="stat-value-sub">Nenhuma ainda</span>
                 </div>
+            </div>
+            
+            <!-- Tab Content: Duel (Cheating Minigame) -->
+            <div id="content-duel" class="tab-content">
+                <div class="duel-scoreboard">
+                    <div class="duel-score-card">
+                        <span class="duel-score-label">Você</span>
+                        <span id="duel-score-player" class="duel-score-value">0</span>
+                    </div>
+                    <div class="duel-vs">VS</div>
+                    <div class="duel-score-card">
+                        <span class="duel-score-label">Bako</span>
+                        <span id="duel-score-bako" class="duel-score-value">999</span>
+                    </div>
+                </div>
+                
+                <div class="bako-dialog">
+                    <div class="bako-dialog-bubble">
+                        <p id="bako-speech">Duvido você ganhar de mim no Jogo da Velha! Eu nunca perdi na minha vida.</p>
+                    </div>
+                    <div class="bako-dialog-avatar">
+                        <span class="bako-avatar-icon">🦊</span>
+                        <span class="bako-avatar-name">Bako</span>
+                    </div>
+                </div>
+
+                <div class="duel-grid-container">
+                    <div id="duel-grid" class="duel-grid">
+                        <div class="duel-cell" data-index="0"></div>
+                        <div class="duel-cell" data-index="1"></div>
+                        <div class="duel-cell" data-index="2"></div>
+                        <div class="duel-cell" data-index="3"></div>
+                        <div class="duel-cell" data-index="4"></div>
+                        <div class="duel-cell" data-index="5"></div>
+                        <div class="duel-cell" data-index="6"></div>
+                        <div class="duel-cell" data-index="7"></div>
+                        <div class="duel-cell" data-index="8"></div>
+                    </div>
+                </div>
+
+                <button id="btn-duel-reset" class="btn btn-sum" style="margin-top: 20px; width: 100%;">
+                    Recomeçar Duelo
+                </button>
             </div>
 
             <button id="btn-reset" class="btn-reset">

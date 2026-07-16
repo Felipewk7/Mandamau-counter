@@ -64,8 +64,17 @@ const btnModalCancel = document.getElementById('btn-modal-cancel');
 // Tab Elements
 const tabCounter = document.getElementById('tab-counter');
 const tabStats = document.getElementById('tab-stats');
+const tabDuel = document.getElementById('tab-duel');
 const contentCounter = document.getElementById('content-counter');
 const contentStats = document.getElementById('content-stats');
+const contentDuel = document.getElementById('content-duel');
+
+// Duel Elements
+const duelCells = document.querySelectorAll('.duel-cell');
+const bakoSpeech = document.getElementById('bako-speech');
+const btnDuelReset = document.getElementById('btn-duel-reset');
+const duelScorePlayer = document.getElementById('duel-score-player');
+const duelScoreBako = document.getElementById('duel-score-bako');
 
 // Theme, Sound, and Music controls elements
 const themeBtns = document.querySelectorAll('.theme-btn');
@@ -238,6 +247,26 @@ function triggerSynthSound(type) {
         }
         else if (type === 'rank_up_god') {
             playArpeggio([261, 329, 392, 523, 659, 784, 1046, 1318, 1568, 2093, 2637, 3136, 4186], 0.035);
+        }
+        else if (type === 'bako_cheat') {
+            const duration = 0.45;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(320, now);
+            osc.frequency.linearRampToValueAtTime(80, now + 0.1);
+            osc.frequency.linearRampToValueAtTime(700, now + 0.25);
+            osc.frequency.linearRampToValueAtTime(60, now + duration);
+            
+            gain.gain.setValueAtTime(0.12, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+            
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            
+            osc.start(now);
+            osc.stop(now + duration);
         }
     } catch (e) {
         console.warn("Synth Sound trigger failed:", e);
@@ -461,22 +490,28 @@ function initTheme() {
 }
 
 // Tab Navigation
-tabCounter.addEventListener('click', () => {
-    tabCounter.classList.add('active');
-    tabStats.classList.remove('active');
-    contentCounter.classList.add('active');
-    contentStats.classList.remove('active');
+function selectTab(tabName) {
+    [tabCounter, tabStats, tabDuel].forEach(t => t.classList.remove('active'));
+    [contentCounter, contentStats, contentDuel].forEach(c => c.classList.remove('active'));
+    
+    if (tabName === 'counter') {
+        tabCounter.classList.add('active');
+        contentCounter.classList.add('active');
+    } else if (tabName === 'stats') {
+        tabStats.classList.add('active');
+        contentStats.classList.add('active');
+        updateStatsUI();
+    } else if (tabName === 'duel') {
+        tabDuel.classList.add('active');
+        contentDuel.classList.add('active');
+        initDuel();
+    }
     playSound('click');
-});
+}
 
-tabStats.addEventListener('click', () => {
-    tabStats.classList.add('active');
-    tabCounter.classList.remove('active');
-    contentStats.classList.add('active');
-    contentCounter.classList.remove('active');
-    updateStatsUI();
-    playSound('click');
-});
+tabCounter.addEventListener('click', () => selectTab('counter'));
+tabStats.addEventListener('click', () => selectTab('stats'));
+tabDuel.addEventListener('click', () => selectTab('duel'));
 
 // Style Combo calculations
 function registerCombo() {
@@ -1008,3 +1043,347 @@ updateSoundUI();
 updateMusicUI();
 
 // Background Particles Generator is now managed via canvas in background.js
+
+// Duel State variables
+let duelBoard = Array(9).fill(null);
+let isDuelActive = true;
+let bakoScoreCount = 999;
+let playerScoreCount = 0;
+
+const bakoCheatQuotes = [
+    "Isso é coisa do Cláudio!",
+    "Eu não molestei os patinhos, e essa jogada também não é sua!",
+    "Meu navegador bugou, a minha jogada vale por duas.",
+    "O Cláudio disse que esse espaço agora é meu.",
+    "Eu joguei ali sim! Você que não viu.",
+    "Essa regra de alinhar 3 em diagonal foi inventada pela mídia.",
+    "Bako venceu! O juiz (que é o Cláudio) confirmou.",
+    "Você clicou errado, meu script corrigiu pra você.",
+    "Eu não sou terrorista, mas explodi o seu X do tabuleiro.",
+    "No Jogo da Velha do Bako, o O sempre ganha de primeira.",
+    "Eu gosto de mulheres e de ganhar no Jogo da Velha.",
+    "Você acha que sabe jogar? O Cláudio me treinou em segredo."
+];
+
+function initDuel() {
+    duelBoard = Array(9).fill(null);
+    isDuelActive = true;
+    
+    duelCells.forEach(cell => {
+        cell.textContent = '';
+        cell.className = 'duel-cell';
+    });
+    
+    bakoSpeech.textContent = "Duvido você ganhar de mim no Jogo da Velha! Eu nunca perdi na minha vida.";
+    document.querySelector('.bako-dialog-bubble').className = 'bako-dialog-bubble';
+    
+    duelScoreBako.textContent = bakoScoreCount.toLocaleString('pt-BR');
+    duelScorePlayer.textContent = playerScoreCount;
+}
+
+function triggerCellGlitch(cellEl) {
+    cellEl.classList.remove('cell-cheat-glitch');
+    void cellEl.offsetWidth;
+    cellEl.classList.add('cell-cheat-glitch');
+    setTimeout(() => {
+        cellEl.classList.remove('cell-cheat-glitch');
+    }, 400);
+}
+
+function triggerBakoCheatEffects(speech) {
+    const bubble = document.querySelector('.bako-dialog-bubble');
+    if (bubble) {
+        bubble.classList.remove('bako-cheat-bubble');
+        void bubble.offsetWidth;
+        bubble.classList.add('bako-cheat-bubble');
+    }
+    
+    bakoSpeech.textContent = speech || bakoCheatQuotes[Math.floor(Math.random() * bakoCheatQuotes.length)];
+    
+    triggerCardShake();
+}
+
+function checkWinnerSymbol(symbol) {
+    const winPatterns = [
+        [0, 1, 2], [3, 4, 5], [6, 7, 8],
+        [0, 3, 6], [1, 4, 7], [2, 5, 8],
+        [0, 4, 8], [2, 4, 6]
+    ];
+    for (let pattern of winPatterns) {
+        if (pattern.every(idx => duelBoard[idx] === symbol)) {
+            return pattern;
+        }
+    }
+    return null;
+}
+
+function triggerBakoWin(winningPattern, speech) {
+    isDuelActive = false;
+    
+    winningPattern.forEach(idx => {
+        const cell = document.querySelector(`.duel-cell[data-index="${idx}"]`);
+        if (cell) cell.classList.add('winning-cell');
+    });
+
+    triggerBakoCheatEffects(speech);
+    
+    bakoScoreCount++;
+    duelScoreBako.textContent = bakoScoreCount.toLocaleString('pt-BR');
+    playSound('rank_up_low');
+}
+
+function bakoPlay() {
+    if (!isDuelActive) return;
+
+    const winPatterns = [
+        [0, 1, 2], [3, 4, 5], [6, 7, 8],
+        [0, 3, 6], [1, 4, 7], [2, 5, 8],
+        [0, 4, 8], [2, 4, 6]
+    ];
+
+    // Check threat lines where player ('X') is about to win
+    let playerAboutToWin = false;
+    let playerThreatLines = [];
+    winPatterns.forEach(pattern => {
+        const symbols = pattern.map(idx => duelBoard[idx]);
+        const xCount = symbols.filter(s => s === 'X').length;
+        const emptyCount = symbols.filter(s => s === null).length;
+        if (xCount === 2 && emptyCount === 1) {
+            playerAboutToWin = true;
+            playerThreatLines.push(pattern);
+        }
+    });
+
+    let cheated = false;
+    let cheatSpeech = "";
+
+    // 1. Threat detected: Bako cheats to win/block
+    if (playerAboutToWin) {
+        cheated = true;
+        const cheatType = Math.random() > 0.5 ? 'steal' : 'double';
+        
+        if (cheatType === 'steal') {
+            const threatLine = playerThreatLines[0];
+            const xPositions = threatLine.filter(idx => duelBoard[idx] === 'X');
+            const targetIdx = xPositions[Math.floor(Math.random() * xPositions.length)];
+            
+            duelBoard[targetIdx] = 'O';
+            const cell = document.querySelector(`.duel-cell[data-index="${targetIdx}"]`);
+            cell.textContent = 'O';
+            cell.className = 'duel-cell o-played';
+            triggerCellGlitch(cell);
+            
+            const emptyIdx = threatLine.find(idx => duelBoard[idx] === null);
+            if (emptyIdx !== undefined) {
+                duelBoard[emptyIdx] = 'O';
+                const emptyCell = document.querySelector(`.duel-cell[data-index="${emptyIdx}"]`);
+                emptyCell.textContent = 'O';
+                emptyCell.className = 'duel-cell o-played';
+            }
+            
+            cheatSpeech = "O Cláudio cancelou sua jogada por suspeita de mentira deslavada. Esse X agora é um O.";
+        } else {
+            const threatLine = playerThreatLines[0];
+            const emptyIdx = threatLine.find(idx => duelBoard[idx] === null);
+            
+            duelBoard[emptyIdx] = 'O';
+            const cell1 = document.querySelector(`.duel-cell[data-index="${emptyIdx}"]`);
+            cell1.textContent = 'O';
+            cell1.className = 'duel-cell o-played';
+            
+            const emptySpots = [];
+            duelBoard.forEach((val, idx) => { if (val === null) emptySpots.push(idx); });
+            if (emptySpots.length > 0) {
+                const extraIdx = emptySpots[Math.floor(Math.random() * emptySpots.length)];
+                duelBoard[extraIdx] = 'O';
+                const cell2 = document.querySelector(`.duel-cell[data-index="${extraIdx}"]`);
+                cell2.textContent = 'O';
+                cell2.className = 'duel-cell o-played';
+                triggerCellGlitch(cell2);
+            }
+            
+            cheatSpeech = "Joguei duas vezes porque achei você meio lento. E o Cláudio permite nas regras dele.";
+        }
+    } 
+    // 2. Random cheat: Bako steals an X or claims win
+    else if (Math.random() < 0.3) {
+        cheated = true;
+        const cheatType = Math.random() > 0.5 ? 'steal_random' : 'triangle_win';
+        
+        if (cheatType === 'steal_random') {
+            const xSpots = [];
+            duelBoard.forEach((val, idx) => { if (val === 'X') xSpots.push(idx); });
+            if (xSpots.length > 0) {
+                const targetIdx = xSpots[Math.floor(Math.random() * xSpots.length)];
+                duelBoard[targetIdx] = 'O';
+                const cell = document.querySelector(`.duel-cell[data-index="${targetIdx}"]`);
+                cell.textContent = 'O';
+                cell.className = 'duel-cell o-played';
+                triggerCellGlitch(cell);
+                cheatSpeech = "Desculpe, esse espaço foi confiscado para fins de desinformação pública.";
+            } else {
+                cheated = false;
+            }
+        } else {
+            const emptySpots = [];
+            duelBoard.forEach((val, idx) => { if (val === null) emptySpots.push(idx); });
+            if (emptySpots.length > 0) {
+                const idx = emptySpots[Math.floor(Math.random() * emptySpots.length)];
+                duelBoard[idx] = 'O';
+                const cell = document.querySelector(`.duel-cell[data-index="${idx}"]`);
+                cell.textContent = 'O';
+                cell.className = 'duel-cell o-played';
+            }
+            
+            const oSpots = [];
+            duelBoard.forEach((val, i) => { if (val === 'O') oSpots.push(i); });
+            if (oSpots.length >= 2) {
+                const cellsToHighlight = [...oSpots];
+                while (cellsToHighlight.length < 3) {
+                    const randIdx = Math.floor(Math.random() * 9);
+                    if (!cellsToHighlight.includes(randIdx)) cellsToHighlight.push(randIdx);
+                }
+                triggerBakoWin(cellsToHighlight, "Ganhei com minha formação triangular secreta! Você não conhece as regras novas?");
+                return;
+            }
+        }
+    }
+
+    if (!cheated) {
+        let move = -1;
+        
+        // AI try to win
+        winPatterns.forEach(pattern => {
+            const symbols = pattern.map(idx => duelBoard[idx]);
+            const oCount = symbols.filter(s => s === 'O').length;
+            const emptyCount = symbols.filter(s => s === null).length;
+            if (oCount === 2 && emptyCount === 1) {
+                move = pattern.find(idx => duelBoard[idx] === null);
+            }
+        });
+
+        // AI try to block
+        if (move === -1) {
+            winPatterns.forEach(pattern => {
+                const symbols = pattern.map(idx => duelBoard[idx]);
+                const xCount = symbols.filter(s => s === 'X').length;
+                const emptyCount = symbols.filter(s => s === null).length;
+                if (xCount === 2 && emptyCount === 1) {
+                    move = pattern.find(idx => duelBoard[idx] === null);
+                }
+            });
+        }
+
+        // Center
+        if (move === -1 && duelBoard[4] === null) {
+            move = 4;
+        }
+
+        // Random
+        if (move === -1) {
+            const emptySpots = [];
+            duelBoard.forEach((val, idx) => { if (val === null) emptySpots.push(idx); });
+            if (emptySpots.length > 0) {
+                move = emptySpots[Math.floor(Math.random() * emptySpots.length)];
+            }
+        }
+
+        if (move !== -1) {
+            duelBoard[move] = 'O';
+            const cell = document.querySelector(`.duel-cell[data-index="${move}"]`);
+            cell.textContent = 'O';
+            cell.className = 'duel-cell o-played';
+        }
+    }
+
+    if (cheated) {
+        playSound('bako_cheat');
+        triggerBakoCheatEffects(cheatSpeech);
+    } else {
+        playSound('click');
+    }
+
+    const bakoWinnerPattern = checkWinnerSymbol('O');
+    if (bakoWinnerPattern) {
+        triggerBakoWin(bakoWinnerPattern, "Venci! Puro raciocínio lógico e velocidade. Habilidade pura.");
+        return;
+    }
+
+    const emptySpots = duelBoard.filter(s => s === null).length;
+    if (emptySpots === 0) {
+        const xSpots = [];
+        duelBoard.forEach((val, idx) => { if (val === 'X') xSpots.push(idx); });
+        const targetIdx = xSpots[Math.floor(Math.random() * xSpots.length)];
+        
+        duelBoard[targetIdx] = 'O';
+        const cell = document.querySelector(`.duel-cell[data-index="${targetIdx}"]`);
+        cell.textContent = 'O';
+        cell.className = 'duel-cell o-played';
+        
+        triggerCellGlitch(cell);
+        playSound('bako_cheat');
+        
+        triggerBakoWin([0, 4, 8], "Empate? Não toleramos empates. O Cláudio me declarou vencedor por WO técnico.");
+    }
+}
+
+function playerPlay(idx) {
+    if (!isDuelActive || duelBoard[idx] !== null) return;
+
+    duelBoard[idx] = 'X';
+    const cell = document.querySelector(`.duel-cell[data-index="${idx}"]`);
+    cell.textContent = 'X';
+    cell.className = 'duel-cell x-played';
+    playSound('click');
+
+    const playerWinnerPattern = checkWinnerSymbol('X');
+    if (playerWinnerPattern) {
+        isDuelActive = false;
+        setTimeout(() => {
+            const targetIdx = playerWinnerPattern[Math.floor(Math.random() * 3)];
+            duelBoard[targetIdx] = 'O';
+            const cellToSteal = document.querySelector(`.duel-cell[data-index="${targetIdx}"]`);
+            cellToSteal.textContent = 'O';
+            cellToSteal.className = 'duel-cell o-played';
+            
+            triggerCellGlitch(cellToSteal);
+            playSound('bako_cheat');
+            
+            playerWinnerPattern.forEach(i => {
+                duelBoard[i] = 'O';
+                const cell = document.querySelector(`.duel-cell[data-index="${i}"]`);
+                cell.textContent = 'O';
+                cell.className = 'duel-cell o-played';
+            });
+            
+            triggerBakoWin(playerWinnerPattern, "Achei que ia ganhar? Eu joguei ali no mesmo microssegundo. Mais um ponto pro Bako!");
+        }, 550);
+        return;
+    }
+
+    isDuelActive = false;
+    setTimeout(() => {
+        if (duelBoard.filter(s => s === null).length > 0) {
+            isDuelActive = true;
+            bakoPlay();
+        }
+    }, 450);
+}
+
+// Duel Event listeners setup
+duelCells.forEach(cell => {
+    cell.addEventListener('click', () => {
+        const idx = parseInt(cell.getAttribute('data-index'));
+        playerPlay(idx);
+    });
+});
+
+btnDuelReset.addEventListener('click', () => {
+    bakoScoreCount += 100;
+    initDuel();
+    triggerBakoCheatEffects("Reiniciou? Adicionei +100 vitórias para mim por conta do tempo que gastei esperando você.");
+    playSound('reset');
+});
+
+// Initialize Duel at startup
+initDuel();
