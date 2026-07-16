@@ -12,7 +12,7 @@ const ranks = [
 // Bako's Classic Lie Phrases
 const bakoPhrases = [
     "Foi só pra rir",
-    "Isso é coisa do Cláudio",
+    "Minha conta foi hackeada",
     "Eu não molestei os patinhos",
     "Eu não gosto de animais",
     "Eu não sou terrorista",
@@ -1051,18 +1051,18 @@ let bakoScoreCount = 999;
 let playerScoreCount = 0;
 
 const bakoCheatQuotes = [
-    "Isso é coisa do Cláudio!",
+    "Isso é coisa do navegador!",
     "Eu não molestei os patinhos, e essa jogada também não é sua!",
     "Meu navegador bugou, a minha jogada vale por duas.",
-    "O Cláudio disse que esse espaço agora é meu.",
+    "O juiz de inteligência artificial disse que esse espaço agora é meu.",
     "Eu joguei ali sim! Você que não viu.",
     "Essa regra de alinhar 3 em diagonal foi inventada pela mídia.",
-    "Bako venceu! O juiz (que é o Cláudio) confirmou.",
+    "Bako venceu! Eu mesmo confirmei.",
     "Você clicou errado, meu script corrigiu pra você.",
     "Eu não sou terrorista, mas explodi o seu X do tabuleiro.",
     "No Jogo da Velha do Bako, o O sempre ganha de primeira.",
     "Eu gosto de mulheres e de ganhar no Jogo da Velha.",
-    "Você acha que sabe jogar? O Cláudio me treinou em segredo."
+    "Você acha que sabe jogar? Eu treinei em segredo contra supercomputadores."
 ];
 
 function initDuel() {
@@ -1130,6 +1130,11 @@ function triggerBakoWin(winningPattern, speech) {
     bakoScoreCount++;
     duelScoreBako.textContent = bakoScoreCount.toLocaleString('pt-BR');
     playSound('rank_up_low');
+
+    // Automatically restart duel after 2.5 seconds
+    setTimeout(() => {
+        initDuel();
+    }, 2500);
 }
 
 function bakoPlay() {
@@ -1181,7 +1186,7 @@ function bakoPlay() {
                 emptyCell.className = 'duel-cell o-played';
             }
             
-            cheatSpeech = "O Cláudio cancelou sua jogada por suspeita de mentira deslavada. Esse X agora é um O.";
+            cheatSpeech = "O sistema cancelou sua jogada por suspeita de mentira deslavada. Esse X agora é um O.";
         } else {
             const threatLine = playerThreatLines[0];
             const emptyIdx = threatLine.find(idx => duelBoard[idx] === null);
@@ -1202,7 +1207,7 @@ function bakoPlay() {
                 triggerCellGlitch(cell2);
             }
             
-            cheatSpeech = "Joguei duas vezes porque achei você meio lento. E o Cláudio permite nas regras dele.";
+            cheatSpeech = "Joguei duas vezes porque achei você meio lento. E o sistema permite nas minhas regras.";
         }
     } 
     // 2. Random cheat: Bako steals an X or claims win
@@ -1323,7 +1328,7 @@ function bakoPlay() {
         triggerCellGlitch(cell);
         playSound('bako_cheat');
         
-        triggerBakoWin([0, 4, 8], "Empate? Não toleramos empates. O Cláudio me declarou vencedor por WO técnico.");
+        triggerBakoWin([0, 4, 8], "Empate? Não toleramos empates. Fui declarado vencedor por WO técnico.");
     }
 }
 
