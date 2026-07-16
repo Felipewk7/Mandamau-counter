@@ -601,46 +601,91 @@ function formatNumber(num) {
 // Mathematical Equation Generator for large numbers
 function generateMathEquation(num) {
     const absNum = Math.abs(num);
-    if (absNum < 1e6) {
+    
+    // Tier 1: Very Small (< 10) - Just the number
+    if (absNum < 10) {
         return num.toLocaleString('pt-BR');
     }
     
-    const equations = [
-        // Scientific Notation
-        () => {
-            const exponent = Math.floor(Math.log10(absNum));
-            const mantissa = num / Math.pow(10, exponent);
-            const roundedMantissa = Math.round(mantissa * 1000) / 1000;
-            return `${roundedMantissa} &times; 10<sup>${exponent}</sup>`;
-        },
-        // Factorization: (a * b) + c
-        () => {
-            const a = Math.floor(Math.random() * 8) + 3; // 3 to 10
-            const b = Math.floor(num / a);
-            const c = Math.round((num % a) * 100) / 100;
-            return `(${a} &times; ${b.toLocaleString('pt-BR')}) + ${c}`;
-        },
-        // Power of 2: 2^p + diff
-        () => {
-            const p = Math.floor(Math.log2(num));
-            const base2Val = Math.pow(2, p);
-            const diff = Math.round((num - base2Val) * 100) / 100;
-            return `2<sup>${p}</sup> + ${diff.toLocaleString('pt-BR')}`;
-        },
-        // Integral Calculus
-        () => {
-            const half = Math.round((num / 2) * 100) / 100;
-            return `&int;<sub>0</sub><sup>${half.toLocaleString('pt-BR')}</sup> 2 dt`;
-        },
-        // Limit to Infinity
-        () => {
-            const formatted = num.toLocaleString('pt-BR');
-            return `lim<sub>x&rarr;&infin;</sub> (${formatted}x + 42) / x`;
-        }
-    ];
+    const fmt = (n) => Number.isInteger(n) ? n.toLocaleString('pt-BR') : n.toFixed(2).replace('.', ',');
+
+    // Tier 2: Small (10 <= num < 100) - Arithmetic/Algebra
+    if (absNum < 100) {
+        const equations = [
+            () => `&radic;${fmt(num * num)}`,
+            () => {
+                const x = Math.floor(Math.random() * 20) + 5;
+                return `(${fmt(num + x)} - ${x})`;
+            },
+            () => {
+                const x = Math.floor(Math.random() * 3) + 2;
+                return `(${fmt(num * x)} / ${x})`;
+            },
+            () => {
+                const x = Math.floor(Math.random() * 8) + 2;
+                const y = num - x;
+                return `(${fmt(y)} + ${fmt(x)})`;
+            }
+        ];
+        return equations[Math.floor(Math.random() * equations.length)]();
+    }
     
-    const randomIndex = Math.floor(Math.random() * equations.length);
-    return equations[randomIndex]();
+    // Tier 3: Medium (100 <= num < 1000) - Basic Calculus & Logs
+    if (absNum < 1000) {
+        const equations = [
+            () => `&int;<sub>0</sub><sup>${fmt(num)}</sup> 1 dx`,
+            () => `log<sub>e</sub>(e<sup>${fmt(num)}</sup>)`,
+            () => `${fmt(num)} &times; (sin&sup2;(&theta;) + cos&sup2;(&theta;))`,
+            () => `&radic;(${fmt(num * num * 2)} / 2)`,
+            () => {
+                const base = Math.floor(Math.log2(num));
+                const diff = num - Math.pow(2, base);
+                return `2<sup>${base}</sup> + ${fmt(diff)}`;
+            }
+        ];
+        return equations[Math.floor(Math.random() * equations.length)]();
+    }
+    
+    // Tier 4: Large (1000 <= num < 10000) - Calculus & Limits
+    if (absNum < 10000) {
+        const equations = [
+            () => `lim<sub>x&rarr;&infin;</sub> (${fmt(num)}x&sup2; - 7) / (x&sup2; + 1)`,
+            () => `d/dx [ ${fmt(num)}x + &pi;&sup2; ]`,
+            () => `&int;<sub>0</sub><sup>1</sup> ${fmt(num * 2)}t dt`,
+            () => {
+                const val = num - 1;
+                return `e<sup>i&pi;</sup> + ${fmt(val + 2)}`;
+            },
+            () => {
+                const diff = num - 15;
+                return `(&sum;<sub>i=1</sub><sup>5</sup> i) + ${fmt(diff)}`;
+            }
+        ];
+        return equations[Math.floor(Math.random() * equations.length)]();
+    }
+    
+    // Tier 5: Very Large (10000 <= num < 100000) - Advanced Calculus & Matrix
+    if (absNum < 100000) {
+        const equations = [
+            () => `&int;<sub>0</sub><sup>&pi;</sup> (${fmt(num / 2)}) sin(&phi;) d&phi;`,
+            () => `det([[ ${fmt(num)}, 0, 0 ], [ 0, 1, 0 ], [ 0, 0, 1 ]])`,
+            () => `lim<sub>x&rarr;0</sub> [ ${fmt(num)} &times; sin(x)/x ]`,
+            () => `&int;<sub>1</sub><sup>e</sup> (${fmt(num)} / x) dx`,
+            () => `&sum;<sub>n=0</sub><sup>&infin;</sup> (${fmt(num)} / 2<sup>n+1</sup>)`
+        ];
+        return equations[Math.floor(Math.random() * equations.length)]();
+    }
+    
+    // Tier 6: Cosmic Absurdity (num >= 100000) - Quantum Mechanics & Chalkboard math
+    const equations = [
+        () => `[ &int;<sub>-&infin;</sub><sup>&infin;</sup> &Psi;*(x) H &Psi;(x) dx ] &times; ${fmt(num)}`,
+        () => `(&nabla; &times; E = -&part;B/&part;t) &rarr; ${fmt(num)}`,
+        () => `&int;<sub>0</sub><sup>1</sup>&int;<sub>0</sub><sup>2</sup> ${fmt(num)} xy dx dy`,
+        () => `[ R<sub>&mu;&nu;</sub> - 1/2 Rg<sub>&mu;&nu;</sub> + &Lambda;g<sub>&mu;&nu;</sub> ]<sub>eval</sub> &times; ${fmt(num)}`,
+        () => `Tr([ [${fmt(num)}, i], [-i, 0] ])`,
+        () => `[ -(&hbar;&sup2; / 2m) &nabla;&sup2;&Psi; + V&Psi; ] &rarr; E = ${fmt(num)}`
+    ];
+    return equations[Math.floor(Math.random() * equations.length)]();
 }
 
 // Dynamically adjust font size to prevent overflow
@@ -649,7 +694,11 @@ function adjustFontSize() {
     const len = visibleText.length;
     
     let fontSize = '5.5rem';
-    if (len > 16) {
+    if (len > 40) {
+        fontSize = '1.2rem';
+    } else if (len > 25) {
+        fontSize = '1.5rem';
+    } else if (len > 16) {
         fontSize = '1.8rem';
     } else if (len > 12) {
         fontSize = '2.4rem';
@@ -662,7 +711,11 @@ function adjustFontSize() {
     }
     
     if (window.innerWidth <= 480) {
-        if (len > 16) {
+        if (len > 40) {
+            fontSize = '0.9rem';
+        } else if (len > 25) {
+            fontSize = '1.1rem';
+        } else if (len > 16) {
             fontSize = '1.4rem';
         } else if (len > 12) {
             fontSize = '1.8rem';
