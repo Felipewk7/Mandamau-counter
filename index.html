@@ -1082,12 +1082,7 @@
             <p id="modal-question" class="modal-question">Tem certeza que quer apagar?</p>
             <div class="modal-buttons">
                 <button id="btn-modal-cancel" class="btn-modal btn-modal-secondary">Não</button>
-                <button id="btn-modal-confirm" class="btn-modal btn-modal-primary">Sim</button>
-            </div>
-        </div>
-    </div>
-
-    <script>
+<script>
         // DMC Ranks Configuration
         const ranks = [
             { min: 100000, letter: 'SSS', name: "você atingiu a gnose de tanto mentir e se tornou o demiurgo", class: 'rank-sss', idleClass: 'rank-idle-god', flashColor: 'rgba(255, 0, 127, 0.4)', sound: 'rank_up_god' },
@@ -1097,6 +1092,20 @@
             { min: 1000, letter: 'B', name: "mentir pra você é como respirar", class: 'rank-b', idleClass: 'rank-idle-med', flashColor: 'rgba(6, 182, 212, 0.3)', sound: 'rank_up_med' },
             { min: 500, letter: 'C', name: "você nasceu pra mentir", class: 'rank-c', idleClass: 'rank-idle-low', flashColor: 'rgba(16, 185, 129, 0.2)', sound: 'rank_up_low' },
             { min: 100, letter: 'D', name: "mentiu bem", class: 'rank-d', idleClass: 'rank-idle-low', flashColor: 'rgba(148, 163, 184, 0.2)', sound: 'rank_up_low' }
+        ];
+
+        // Bako's Classic Lie Phrases
+        const bakoPhrases = [
+            "Foi só pra rir",
+            "Isso é coisa do Cláudio",
+            "Eu não molestei os patinhos",
+            "Eu não gosto de animais",
+            "Eu não sou terrorista",
+            "Eu não dei a bunda pro molok",
+            "Eu não meti o pal num formigueiro",
+            "Eu não mijo em peixes",
+            "Eu gosto de mulheres",
+            "Eu não sou censurador"
         ];
 
         // State Management
@@ -1115,6 +1124,11 @@
         let totalClicks = 0;
         let lastLieTimestamp = null;
         let lieTimes = [];
+
+        // Combo State
+        let comboCount = 0;
+        let comboMultiplier = 1.0;
+        let comboTimer = null;
 
         // Elements
         const counterEl = document.getElementById('counter');
@@ -1138,15 +1152,30 @@
         const contentCounter = document.getElementById('content-counter');
         const contentStats = document.getElementById('content-stats');
 
-        // Theme and Sound controls elements
+        // Theme, Sound, and Music controls elements
         const themeBtns = document.querySelectorAll('.theme-btn');
         const btnSound = document.getElementById('btn-sound');
         const soundIconOn = document.getElementById('sound-icon-on');
         const soundIconOff = document.getElementById('sound-icon-off');
+        const btnMusic = document.getElementById('btn-music');
+        const musicIconOn = document.getElementById('music-icon-on');
+        const musicIconOff = document.getElementById('music-icon-off');
 
         // Audio System (Web Audio Synth)
         let audioCtx = null;
         let isMuted = localStorage.getItem('mandamau_muted') === 'true';
+        let isMusicPlaying = false;
+        let isMusicEnabled = localStorage.getItem('mandamau_music') === 'true';
+        let musicInterval = null;
+        let currentStep = 0;
+        let bpm = 100;
+        let lastScheduledTime = 0;
+        const lookahead = 25.0; // ms
+        const scheduleAheadTime = 0.1; // seconds
+        
+        // Procedural Scales (Bass & Melody loops)
+        const bassScale = [110.00, 110.00, 130.81, 146.83, 164.81, 164.81, 146.83, 130.81];
+        const melodyScale = [220.00, 0, 261.63, 293.66, 329.63, 0, 293.66, 261.63];
 
         function initAudio() {
             if (!audioCtx) {
@@ -1154,6 +1183,9 @@
             }
             if (audioCtx.state === 'suspended') {
                 audioCtx.resume();
+            }
+            if (isMusicEnabled && !isMusicPlaying) {
+                startMusic();
             }
         }
 
@@ -1272,6 +1304,98 @@
             });
         }
 
+        // BGM Procedural Sequencer Loops
+        function playStep(time, step) {
+            if (!isMusicEnabled) return;
+            
+            const stepDuration = 60.0 / bpm / 2; // eighth notes
+            
+            // Bassline (Square/Triangle wave)
+            const bassFreq = bassScale[step % bassScale.length];
+            if (bassFreq > 0) {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(bassFreq, time);
+                
+                gain.gain.setValueAtTime(0, time);
+                gain.gain.linearRampToValueAtTime(0.07, time + 0.02);
+                gain.gain.exponentialRampToValueAtTime(0.001, time + stepDuration - 0.01);
+                
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                
+                osc.start(time);
+                osc.stop(time + stepDuration);
+            }
+            
+            // Dynamic Melody (Plays if Rank >= C or Combo active >= 3)
+            const matchedRankIndex = ranks.findIndex(r => count >= r.min);
+            const isRankCPlus = matchedRankIndex !== -1 && ranks[matchedRankIndex].min >= 500;
+            const isComboActive = comboCount >= 3;
+            
+            if (isRankCPlus || isComboActive) {
+                const melodyFreq = melodyScale[step % melodyScale.length];
+                if (melodyFreq > 0) {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    
+                    osc.type = 'square';
+                    osc.frequency.setValueAtTime(melodyFreq, time);
+                    
+                    const filter = audioCtx.createBiquadFilter();
+                    filter.type = 'lowpass';
+                    filter.frequency.setValueAtTime(800, time);
+                    
+                    gain.gain.setValueAtTime(0, time);
+                    gain.gain.linearRampToValueAtTime(0.02, time + 0.015);
+                    gain.gain.exponentialRampToValueAtTime(0.001, time + stepDuration * 0.7);
+                    
+                    osc.connect(filter);
+                    filter.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    
+                    osc.start(time);
+                    osc.stop(time + stepDuration);
+                }
+            }
+        }
+
+        function scheduler() {
+            while (lastScheduledTime < audioCtx.currentTime + scheduleAheadTime) {
+                playStep(lastScheduledTime, currentStep);
+                
+                const stepDuration = 60.0 / bpm / 2; // eighth notes
+                lastScheduledTime += stepDuration;
+                currentStep = (currentStep + 1) % 16;
+            }
+        }
+
+        function startMusic() {
+            if (!isMusicEnabled) return;
+            initAudio();
+            
+            if (isMusicPlaying) return;
+            isMusicPlaying = true;
+            
+            lastScheduledTime = audioCtx.currentTime + 0.05;
+            musicInterval = setInterval(scheduler, lookahead);
+        }
+
+        function stopMusic() {
+            if (musicInterval) {
+                clearInterval(musicInterval);
+                musicInterval = null;
+            }
+            isMusicPlaying = false;
+        }
+
+        function updateMusicBPM() {
+            // bpm increases based on active combo (max x5.0 combo -> 160bpm)
+            bpm = 100 + (comboMultiplier - 1.0) * 15;
+        }
+
         function updateSoundUI() {
             if (isMuted) {
                 soundIconOn.style.display = 'none';
@@ -1284,6 +1408,22 @@
             }
         }
 
+        function updateMusicUI() {
+            if (isMusicEnabled) {
+                musicIconOn.style.display = 'block';
+                musicIconOff.style.display = 'none';
+                btnMusic.style.opacity = '1';
+                if (audioCtx && audioCtx.state !== 'suspended') {
+                    startMusic();
+                }
+            } else {
+                musicIconOn.style.display = 'none';
+                musicIconOff.style.display = 'block';
+                btnMusic.style.opacity = '0.5';
+                stopMusic();
+            }
+        }
+
         btnSound.addEventListener('click', () => {
             isMuted = !isMuted;
             localStorage.setItem('mandamau_muted', isMuted);
@@ -1291,6 +1431,12 @@
             if (!isMuted) {
                 playSound('click');
             }
+        });
+
+        btnMusic.addEventListener('click', () => {
+            isMusicEnabled = !isMusicEnabled;
+            localStorage.setItem('mandamau_music', isMusicEnabled);
+            updateMusicUI();
         });
 
         // Theme Manager
@@ -1339,6 +1485,79 @@
             updateStatsUI();
             playSound('click');
         });
+
+        // Style Combo calculations
+        function registerCombo() {
+            if (comboTimer) {
+                clearTimeout(comboTimer);
+            }
+            
+            comboCount++;
+            comboMultiplier = Math.min(5.0, 1.0 + (comboCount - 1) * 0.1);
+            
+            const comboContainer = document.getElementById('combo-container');
+            const comboBadge = document.getElementById('combo-badge');
+            
+            if (comboCount >= 2) {
+                comboContainer.style.display = 'flex';
+                comboBadge.textContent = `Combo x${comboMultiplier.toFixed(1)}`;
+                
+                comboBadge.classList.remove('combo-active');
+                void comboBadge.offsetWidth;
+                comboBadge.classList.add('combo-active');
+            }
+            
+            updateMusicBPM();
+            
+            comboTimer = setTimeout(() => {
+                resetCombo();
+            }, 1500);
+        }
+
+        function resetCombo() {
+            comboCount = 0;
+            comboMultiplier = 1.0;
+            
+            const comboContainer = document.getElementById('combo-container');
+            const comboBadge = document.getElementById('combo-badge');
+            
+            if (comboContainer) {
+                comboContainer.style.display = 'none';
+            }
+            if (comboBadge) {
+                comboBadge.classList.remove('combo-active');
+            }
+            
+            updateMusicBPM();
+        }
+
+        // Spawns a cômica frase flutuante do Bako
+        function triggerFloatingLie(event) {
+            const phrase = bakoPhrases[Math.floor(Math.random() * bakoPhrases.length)];
+            
+            const el = document.createElement('div');
+            el.className = 'floating-lie';
+            el.innerHTML = `Bako: "${phrase}"`;
+            
+            let x, y;
+            if (event && event.clientX && event.clientY) {
+                x = event.clientX;
+                y = event.clientY;
+            } else {
+                const counterRect = counterEl.getBoundingClientRect();
+                x = counterRect.left + counterRect.width / 2 + (Math.random() * 100 - 50);
+                y = counterRect.top + counterRect.height / 2 + (Math.random() * 40 - 20);
+            }
+            
+            el.style.left = `${x}px`;
+            el.style.top = `${y}px`;
+            
+            document.body.appendChild(el);
+            
+            setTimeout(() => {
+                el.remove();
+            }, 1400);
+        }
 
         // Format static numbers (used in stats panel)
         function formatNumber(num) {
@@ -1711,17 +1930,23 @@
         }
 
         // Event Listeners
-        btnSum.addEventListener('click', () => {
-            updateCounter(count + 1);
+        btnSum.addEventListener('click', (e) => {
+            registerCombo();
+            const addValue = 1 * comboMultiplier;
+            updateCounter(count + addValue);
             registerActivity();
             playSound('click');
+            triggerFloatingLie(e);
         });
 
-        btnMul.addEventListener('click', () => {
+        btnMul.addEventListener('click', (e) => {
+            registerCombo();
             const mult = getMultiplier();
-            updateCounter(count * mult);
+            const activeMult = mult * comboMultiplier;
+            updateCounter(count * activeMult);
             registerActivity();
             playSound('multiply');
+            triggerFloatingLie(e);
         });
 
         btnReset.addEventListener('click', () => {
@@ -1748,6 +1973,7 @@
                 totalClicks = 0;
                 lastLieTimestamp = null;
                 lieTimes = [];
+                resetCombo();
                 saveStats();
                 updateStatsUI();
                 
@@ -1786,6 +2012,7 @@
         loadStats();
         updateMultiplierUI();
         updateSoundUI();
+        updateMusicUI();
 
         // Background Particles Generator
         const particlesContainer = document.getElementById('particles');
