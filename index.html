@@ -312,6 +312,131 @@
             fill: currentColor;
         }
 
+        /* Modal Backdrop */
+        .modal-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(2, 6, 17, 0.85);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-container.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* Modal Card */
+        .modal-card {
+            background: rgba(30, 41, 59, 0.95);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 20px;
+            padding: 35px 30px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+            transform: scale(0.9);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .modal-container.active .modal-card {
+            transform: scale(1);
+        }
+
+        .modal-icon {
+            width: 60px;
+            height: 60px;
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px auto;
+            color: #ef4444;
+        }
+
+        .modal-icon svg {
+            width: 30px;
+            height: 30px;
+            fill: currentColor;
+        }
+
+        .modal-card h2 {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: #f8fafc;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        .modal-question {
+            font-size: 0.95rem;
+            color: #cbd5e1;
+            line-height: 1.5;
+            margin-bottom: 30px;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: opacity 0.15s ease;
+        }
+
+        .modal-buttons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .btn-modal {
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+        }
+
+        .btn-modal-primary {
+            background: linear-gradient(135deg, #ef4444, #dc2626);
+            color: white;
+            box-shadow: 0 4px 10px rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-modal-primary:hover {
+            box-shadow: 0 0 15px rgba(239, 68, 68, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .btn-modal-secondary {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #cbd5e1;
+        }
+
+        .btn-modal-secondary:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: #ffffff;
+            transform: translateY(-2px);
+        }
+
+        .btn-modal:active {
+            transform: translateY(1px);
+        }
+
         /* Particles decoration background */
         .particles {
             position: absolute;
@@ -404,9 +529,30 @@
         </div>
     </div>
 
+    <!-- Beautiful custom confirmation modal -->
+    <div id="modal-container" class="modal-container">
+        <div class="modal-card">
+            <div class="modal-icon">
+                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+            </div>
+            <h2>Confirmação</h2>
+            <p id="modal-question" class="modal-question">Tem certeza que quer apagar?</p>
+            <div class="modal-buttons">
+                <button id="btn-modal-cancel" class="btn-modal btn-modal-secondary">Não</button>
+                <button id="btn-modal-confirm" class="btn-modal btn-modal-primary">Sim</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         // State Management
         let count = 0;
+        let resetStep = 0;
+        const resetQuestions = [
+            "Tem certeza que quer apagar?",
+            "O Bako ainda está mentindo, quer prosseguir?",
+            "Se apagar você compactua com as mentiras e atrocidades do Bako, quer apagar mesmo?"
+        ];
 
         // Elements
         const counterEl = document.getElementById('counter');
@@ -417,6 +563,12 @@
         const multiplierInput = document.getElementById('multiplier-input');
         const btnDecMult = document.getElementById('btn-dec-mult');
         const btnIncMult = document.getElementById('btn-inc-mult');
+        
+        // Modal Elements
+        const modalContainer = document.getElementById('modal-container');
+        const modalQuestion = document.getElementById('modal-question');
+        const btnModalConfirm = document.getElementById('btn-modal-confirm');
+        const btnModalCancel = document.getElementById('btn-modal-cancel');
 
         // Get and validate multiplier value
         function getMultiplier() {
@@ -460,6 +612,17 @@
             }, 150);
         }
 
+        // Modal Logic
+        function openResetModal() {
+            resetStep = 0;
+            modalQuestion.textContent = resetQuestions[resetStep];
+            modalContainer.classList.add('active');
+        }
+
+        function closeResetModal() {
+            modalContainer.classList.remove('active');
+        }
+
         // Event Listeners
         btnSum.addEventListener('click', () => {
             updateCounter(count + 1);
@@ -471,7 +634,26 @@
         });
 
         btnReset.addEventListener('click', () => {
-            updateCounter(0);
+            openResetModal();
+        });
+
+        btnModalCancel.addEventListener('click', () => {
+            closeResetModal();
+        });
+
+        btnModalConfirm.addEventListener('click', () => {
+            resetStep++;
+            if (resetStep < resetQuestions.length) {
+                // Smooth transition for question text
+                modalQuestion.style.opacity = 0;
+                setTimeout(() => {
+                    modalQuestion.textContent = resetQuestions[resetStep];
+                    modalQuestion.style.opacity = 1;
+                }, 150);
+            } else {
+                updateCounter(0);
+                closeResetModal();
+            }
         });
 
         // Multiplier input controls
