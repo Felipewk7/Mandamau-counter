@@ -93,19 +93,35 @@ const bassScale = [110.00, 110.00, 130.81, 146.83, 164.81, 164.81, 146.83, 130.8
 const melodyScale = [220.00, 0, 261.63, 293.66, 329.63, 0, 293.66, 261.63];
 
 function initAudio() {
-    if (!audioCtx) {
-        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-    }
-    if (audioCtx.state === 'suspended') {
-        audioCtx.resume().then(() => {
-            if (isMusicEnabled && !isMusicPlaying) {
-                startMusic();
+    try {
+        if (!audioCtx) {
+            const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+            if (AudioContextClass) {
+                audioCtx = new AudioContextClass();
             }
-        });
-    } else {
-        if (isMusicEnabled && !isMusicPlaying) {
-            startMusic();
         }
+        if (audioCtx) {
+            if (audioCtx.state === 'suspended') {
+                const resumePromise = audioCtx.resume();
+                if (resumePromise && typeof resumePromise.then === 'function') {
+                    resumePromise.then(() => {
+                        if (isMusicEnabled && !isMusicPlaying) {
+                            startMusic();
+                        }
+                    }).catch(err => console.warn("Failed to resume AudioContext:", err));
+                } else {
+                    if (isMusicEnabled && !isMusicPlaying) {
+                        startMusic();
+                    }
+                }
+            } else {
+                if (isMusicEnabled && !isMusicPlaying) {
+                    startMusic();
+                }
+            }
+        }
+    } catch (e) {
+        console.warn("AudioContext initialization failed:", e);
     }
 }
 
@@ -113,15 +129,22 @@ function playSound(type) {
     if (isMuted) return;
     try {
         initAudio();
-        if (audioCtx && audioCtx.state === 'suspended') {
-            audioCtx.resume().then(() => {
+        if (audioCtx) {
+            if (audioCtx.state === 'suspended') {
+                const resumePromise = audioCtx.resume();
+                if (resumePromise && typeof resumePromise.then === 'function') {
+                    resumePromise.then(() => {
+                        triggerSynthSound(type);
+                    }).catch(err => console.warn("Failed to resume AudioContext in playSound:", err));
+                } else {
+                    triggerSynthSound(type);
+                }
+            } else {
                 triggerSynthSound(type);
-            });
-        } else {
-            triggerSynthSound(type);
+            }
         }
     } catch (e) {
-        console.error("Audio Synthesis Error:", e);
+        console.warn("Audio Synthesis Error:", e);
     }
 }
 
@@ -129,167 +152,196 @@ function triggerSynthSound(type) {
     if (!audioCtx || audioCtx.state !== 'running') return;
     const now = audioCtx.currentTime;
     
-    if (type === 'click') {
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(320, now);
-        osc.frequency.exponentialRampToValueAtTime(750, now + 0.08);
-        
-        gain.gain.setValueAtTime(0.12, now);
-        gain.gain.exponentialRampToValueAtTime(0.002, now + 0.08);
-        
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        
-        osc.start(now);
-        osc.stop(now + 0.08);
-    } 
-    else if (type === 'multiply') {
-        const duration = 0.2;
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        const filter = audioCtx.createBiquadFilter();
-        
-        osc.type = 'sawtooth';
-        osc.frequency.setValueAtTime(180, now);
-        osc.frequency.exponentialRampToValueAtTime(1100, now + duration);
-        
-        filter.type = 'lowpass';
-        filter.frequency.setValueAtTime(1000, now);
-        
-        gain.gain.setValueAtTime(0.08, now);
-        gain.gain.exponentialRampToValueAtTime(0.002, now + duration);
-        
-        osc.connect(filter);
-        filter.connect(gain);
-        gain.connect(audioCtx.destination);
-        
-        osc.start(now);
-        osc.stop(now + duration);
-    }
-    else if (type === 'reset') {
-        const duration = 0.55;
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
-        
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(380, now);
-        osc.frequency.linearRampToValueAtTime(50, now + duration);
-        
-        gain.gain.setValueAtTime(0.18, now);
-        gain.gain.linearRampToValueAtTime(0.001, now + duration);
-        
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        
-        osc.start(now);
-        osc.stop(now + duration);
-    }
-    else if (type === 'rank_up_low') {
-        playArpeggio([440, 554, 659], 0.08);
-    }
-    else if (type === 'rank_up_med') {
-        playArpeggio([523, 659, 784, 1046], 0.07);
-    }
-    else if (type === 'rank_up_high') {
-        playArpeggio([587, 740, 880, 1175, 1480], 0.06);
-    }
-    else if (type === 'rank_up_god') {
-        playArpeggio([261, 329, 392, 523, 659, 784, 1046, 1318, 1568, 2093, 2637, 3136, 4186], 0.035);
+    try {
+        if (type === 'click') {
+            const osc1 = audioCtx.createOscillator();
+            const osc2 = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            
+            osc1.type = 'sine';
+            osc1.frequency.setValueAtTime(200, now);
+            osc1.frequency.exponentialRampToValueAtTime(800, now + 0.06);
+            
+            osc2.type = 'triangle';
+            osc2.frequency.setValueAtTime(400, now);
+            osc2.frequency.exponentialRampToValueAtTime(100, now + 0.08);
+            
+            gain.gain.setValueAtTime(0.15, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+            
+            osc1.connect(gain);
+            osc2.connect(gain);
+            gain.connect(audioCtx.destination);
+            
+            osc1.start(now);
+            osc2.start(now);
+            osc1.stop(now + 0.08);
+            osc2.stop(now + 0.08);
+        } 
+        else if (type === 'multiply') {
+            const duration = 0.35;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            const filter = audioCtx.createBiquadFilter();
+            
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(120, now);
+            osc.frequency.exponentialRampToValueAtTime(1800, now + duration);
+            
+            filter.type = 'peaking';
+            filter.Q.value = 5;
+            filter.frequency.setValueAtTime(300, now);
+            filter.frequency.exponentialRampToValueAtTime(3000, now + duration);
+            
+            gain.gain.setValueAtTime(0.1, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+            
+            osc.connect(filter);
+            filter.connect(gain);
+            gain.connect(audioCtx.destination);
+            
+            osc.start(now);
+            osc.stop(now + duration);
+        }
+        else if (type === 'reset') {
+            const duration = 0.8;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            const filter = audioCtx.createBiquadFilter();
+            
+            osc.type = 'sawtooth';
+            osc.frequency.setValueAtTime(440, now);
+            osc.frequency.linearRampToValueAtTime(40, now + duration);
+            
+            filter.type = 'lowpass';
+            filter.frequency.setValueAtTime(1200, now);
+            filter.frequency.exponentialRampToValueAtTime(80, now + duration);
+            
+            gain.gain.setValueAtTime(0.15, now);
+            gain.gain.linearRampToValueAtTime(0.001, now + duration);
+            
+            osc.connect(filter);
+            filter.connect(gain);
+            gain.connect(audioCtx.destination);
+            
+            osc.start(now);
+            osc.stop(now + duration);
+        }
+        else if (type === 'rank_up_low') {
+            playArpeggio([440, 554, 659], 0.08);
+        }
+        else if (type === 'rank_up_med') {
+            playArpeggio([523, 659, 784, 1046], 0.07);
+        }
+        else if (type === 'rank_up_high') {
+            playArpeggio([587, 740, 880, 1175, 1480], 0.06);
+        }
+        else if (type === 'rank_up_god') {
+            playArpeggio([261, 329, 392, 523, 659, 784, 1046, 1318, 1568, 2093, 2637, 3136, 4186], 0.035);
+        }
+    } catch (e) {
+        console.warn("Synth Sound trigger failed:", e);
     }
 }
 
 function playArpeggio(notes, noteLength) {
     if (!audioCtx || audioCtx.state !== 'running') return;
     const now = audioCtx.currentTime;
-    notes.forEach((freq, idx) => {
-        const noteTime = now + (idx * noteLength);
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
+    
+    try {
+        const delay = audioCtx.createDelay(1.0);
+        const feedback = audioCtx.createGain();
+        delay.delayTime.value = 0.15;
+        feedback.gain.value = 0.35;
         
-        osc.type = 'sine';
-        osc.frequency.setValueAtTime(freq, noteTime);
+        delay.connect(feedback);
+        feedback.connect(delay);
+        delay.connect(audioCtx.destination);
         
-        const vibrato = audioCtx.createOscillator();
-        const vibratoGain = audioCtx.createGain();
-        vibrato.frequency.value = 14; 
-        vibratoGain.gain.value = 6; 
-        
-        vibrato.connect(vibratoGain);
-        vibratoGain.connect(osc.frequency);
-        
-        gain.gain.setValueAtTime(0.001, noteTime);
-        gain.gain.linearRampToValueAtTime(0.12, noteTime + 0.02);
-        gain.gain.exponentialRampToValueAtTime(0.003, noteTime + noteLength * 1.8);
-        
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        
-        vibrato.start(noteTime);
-        osc.start(noteTime);
-        
-        vibrato.stop(noteTime + noteLength * 1.8);
-        osc.stop(noteTime + noteLength * 1.8);
-    });
+        notes.forEach((freq, idx) => {
+            const noteTime = now + (idx * noteLength);
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(freq, noteTime);
+            
+            gain.gain.setValueAtTime(0.001, noteTime);
+            gain.gain.linearRampToValueAtTime(0.1, noteTime + 0.02);
+            gain.gain.exponentialRampToValueAtTime(0.001, noteTime + noteLength * 1.5);
+            
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            gain.connect(delay);
+            
+            osc.start(noteTime);
+            osc.stop(noteTime + noteLength * 1.8);
+        });
+    } catch (e) {
+        console.warn("Arpeggio playback failed:", e);
+    }
 }
 
 // BGM Procedural Sequencer Loops
 function playStep(time, step) {
     if (!isMusicEnabled) return;
+    if (!audioCtx) return;
     
-    const stepDuration = 60.0 / bpm / 2; // eighth notes
-    
-    // Bassline (Square/Triangle wave)
-    const bassFreq = bassScale[step % bassScale.length];
-    if (bassFreq > 0) {
-        const osc = audioCtx.createOscillator();
-        const gain = audioCtx.createGain();
+    try {
+        const stepDuration = 60.0 / bpm / 2; // eighth notes
         
-        osc.type = 'triangle';
-        osc.frequency.setValueAtTime(bassFreq, time);
-        
-        gain.gain.setValueAtTime(0.001, time);
-        gain.gain.linearRampToValueAtTime(0.07, time + 0.02);
-        gain.gain.exponentialRampToValueAtTime(0.001, time + stepDuration - 0.01);
-        
-        osc.connect(gain);
-        gain.connect(audioCtx.destination);
-        
-        osc.start(time);
-        osc.stop(time + stepDuration);
-    }
-    
-    // Dynamic Melody (Plays if Rank >= C or Combo active >= 3)
-    const matchedRankIndex = ranks.findIndex(r => count >= r.min);
-    const isRankCPlus = matchedRankIndex !== -1 && ranks[matchedRankIndex].min >= 500;
-    const isComboActive = comboCount >= 3;
-    
-    if (isRankCPlus || isComboActive) {
-        const melodyFreq = melodyScale[step % melodyScale.length];
-        if (melodyFreq > 0) {
+        // Bassline (Square/Triangle wave)
+        const bassFreq = bassScale[step % bassScale.length];
+        if (bassFreq > 0) {
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             
-            osc.type = 'square';
-            osc.frequency.setValueAtTime(melodyFreq, time);
-            
-            const filter = audioCtx.createBiquadFilter();
-            filter.type = 'lowpass';
-            filter.frequency.setValueAtTime(800, time);
+            osc.type = 'triangle';
+            osc.frequency.setValueAtTime(bassFreq, time);
             
             gain.gain.setValueAtTime(0.001, time);
-            gain.gain.linearRampToValueAtTime(0.02, time + 0.015);
-            gain.gain.exponentialRampToValueAtTime(0.001, time + stepDuration * 0.7);
+            gain.gain.linearRampToValueAtTime(0.07, time + 0.02);
+            gain.gain.exponentialRampToValueAtTime(0.001, time + stepDuration - 0.01);
             
-            osc.connect(filter);
-            filter.connect(gain);
+            osc.connect(gain);
             gain.connect(audioCtx.destination);
             
             osc.start(time);
             osc.stop(time + stepDuration);
         }
+        
+        // Dynamic Melody (Plays if Rank >= C or Combo active >= 3)
+        const matchedRankIndex = ranks.findIndex(r => count >= r.min);
+        const isRankCPlus = matchedRankIndex !== -1 && ranks[matchedRankIndex].min >= 500;
+        const isComboActive = comboCount >= 3;
+        
+        if (isRankCPlus || isComboActive) {
+            const melodyFreq = melodyScale[step % melodyScale.length];
+            if (melodyFreq > 0) {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(melodyFreq, time);
+                
+                const filter = audioCtx.createBiquadFilter();
+                filter.type = 'lowpass';
+                filter.frequency.setValueAtTime(800, time);
+                
+                gain.gain.setValueAtTime(0.001, time);
+                gain.gain.linearRampToValueAtTime(0.02, time + 0.015);
+                gain.gain.exponentialRampToValueAtTime(0.001, time + stepDuration * 0.7);
+                
+                osc.connect(filter);
+                filter.connect(gain);
+                gain.connect(audioCtx.destination);
+                
+                osc.start(time);
+                osc.stop(time + stepDuration);
+            }
+        }
+    } catch (e) {
+        console.warn("BGM step playback failed:", e);
     }
 }
 
@@ -306,13 +358,18 @@ function scheduler() {
 
 function startMusic() {
     if (!isMusicEnabled) return;
-    initAudio();
-    
-    if (isMusicPlaying) return;
-    isMusicPlaying = true;
-    
-    lastScheduledTime = audioCtx.currentTime + 0.05;
-    musicInterval = setInterval(scheduler, lookahead);
+    try {
+        initAudio();
+        
+        if (isMusicPlaying) return;
+        if (!audioCtx) return;
+        isMusicPlaying = true;
+        
+        lastScheduledTime = audioCtx.currentTime + 0.05;
+        musicInterval = setInterval(scheduler, lookahead);
+    } catch (e) {
+        console.warn("Music playback start failed:", e);
+    }
 }
 
 function stopMusic() {
@@ -865,41 +922,41 @@ function closeResetModal() {
 
 // Event Listeners
 btnSum.addEventListener('click', () => {
-    initAudio();
+    try { initAudio(); } catch (e) {}
     registerCombo();
     const addValue = 1 * comboMultiplier;
     updateCounter(count + addValue);
     registerActivity();
-    playSound('click');
+    try { playSound('click'); } catch (e) {}
     triggerFloatingLie();
 });
 
 btnMul.addEventListener('click', () => {
-    initAudio();
+    try { initAudio(); } catch (e) {}
     registerCombo();
     const mult = getMultiplier();
     const activeMult = mult * comboMultiplier;
     updateCounter(count * activeMult);
     registerActivity();
-    playSound('multiply');
+    try { playSound('multiply'); } catch (e) {}
     triggerFloatingLie();
 });
 
 btnReset.addEventListener('click', () => {
     openResetModal();
-    playSound('click');
+    try { playSound('click'); } catch (e) {}
 });
 
 btnModalCancel.addEventListener('click', () => {
     closeResetModal();
-    playSound('click');
+    try { playSound('click'); } catch (e) {}
 });
 
 btnModalConfirm.addEventListener('click', () => {
     resetStep++;
     if (resetStep < resetQuestions.length) {
         modalQuestion.style.opacity = 0;
-        playSound('click');
+        try { playSound('click'); } catch (e) {}
         setTimeout(() => {
             modalQuestion.textContent = resetQuestions[resetStep];
             modalQuestion.style.opacity = 1;
@@ -914,7 +971,7 @@ btnModalConfirm.addEventListener('click', () => {
         updateStatsUI();
         
         closeResetModal();
-        playSound('reset');
+        try { playSound('reset'); } catch (e) {}
     }
 });
 
@@ -927,7 +984,7 @@ btnDecMult.addEventListener('click', () => {
     if (current > 1) {
         multiplierInput.value = current - 1;
         updateMultiplierUI();
-        playSound('click');
+        try { playSound('click'); } catch (e) {}
     }
 });
 
@@ -935,7 +992,7 @@ btnIncMult.addEventListener('click', () => {
     let current = getMultiplier();
     multiplierInput.value = current + 1;
     updateMultiplierUI();
-    playSound('click');
+    try { playSound('click'); } catch (e) {}
 });
 
 window.addEventListener('resize', () => {
