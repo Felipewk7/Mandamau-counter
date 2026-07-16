@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Super Contador Premium</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* Modern CSS Reset & Variables */
+        :root {
+            --bg-gradient-start: #0f172a;
+            --bg-gradient-end: #020617;
+            --card-bg: rgba(30, 41, 59, 0.7);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --btn-sum-start: #06b6d4;
+            --btn-sum-end: #0d9488;
+            --btn-mul-start: #d946ef;
+            --btn-mul-end: #8b5cf6;
+            --shadow-glow: rgba(99, 102, 241, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(circle at 50% 50%, var(--bg-gradient-start), var(--bg-gradient-end));
+            color: var(--text-primary);
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Subtle glowing background ambient light */
+        body::before {
+            content: '';
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, rgba(0,0,0,0) 70%);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .container {
+            z-index: 10;
+            width: 90%;
+            max-width: 440px;
+            perspective: 1000px;
+        }
+
+        /* Glassmorphism Card */
+        .card {
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--card-border);
+            border-radius: 24px;
+            padding: 40px 30px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3),
+                        0 0 50px rgba(99, 102, 241, 0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.4),
+                        0 0 60px rgba(99, 102, 241, 0.1);
+        }
+
+        .title {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        /* Animated Counter display */
+        .counter-container {
+            margin: 30px 0;
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .counter-value {
+            font-size: 5.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, #ffffff 30%, #cbd5e1 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1;
+            user-select: none;
+            transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: inline-block;
+        }
+
+        /* Animation when counter changes */
+        .counter-pop {
+            transform: scale(1.2);
+            filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.6));
+        }
+
+        /* Buttons layout */
+        .button-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            border: none;
+            padding: 16px 20px;
+            border-radius: 14px;
+            font-size: 1rem;
+            font-weight: 700;
+            color: #ffffff;
+            cursor: pointer;
+            outline: none;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-sum {
+            background: linear-gradient(135deg, var(--btn-sum-start), var(--btn-sum-end));
+            border: 1px solid rgba(6, 182, 212, 0.2);
+        }
+
+        .btn-sum:hover {
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.4), 
+                        0 4px 15px rgba(6, 182, 212, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .btn-mul {
+            background: linear-gradient(135deg, var(--btn-mul-start), var(--btn-mul-end));
+            border: 1px solid rgba(217, 70, 239, 0.2);
+        }
+
+        .btn-mul:hover {
+            box-shadow: 0 0 20px rgba(217, 70, 239, 0.4),
+                        0 4px 15px rgba(217, 70, 239, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .btn:active {
+            transform: translateY(1px) scale(0.97);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        /* Glow ripple effect */
+        .btn::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 120%;
+            height: 120%;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 50%;
+            transform: translate(-50%, -50%) scale(0);
+            transition: transform 0.5s ease-out;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .btn:active::after {
+            transform: translate(-50%, -50%) scale(1);
+            opacity: 1;
+            transition: 0s;
+        }
+
+        /* Reset button design */
+        .btn-reset {
+            margin-top: 25px;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 0.85rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: color 0.2s ease, transform 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            text-decoration: none;
+            opacity: 0.7;
+        }
+
+        .btn-reset:hover {
+            color: var(--text-primary);
+            opacity: 1;
+            transform: scale(1.05);
+        }
+
+        .btn-reset svg {
+            width: 14px;
+            height: 14px;
+            fill: currentColor;
+        }
+
+        /* Particles decoration background */
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            animation: float 15s infinite linear;
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) scale(0.5);
+                opacity: 0;
+            }
+            50% {
+                opacity: 0.5;
+            }
+            100% {
+                transform: translateY(-10vh) scale(1.2);
+                opacity: 0;
+            }
+        }
+
+        /* Media Queries for Responsive Design */
+        @media (max-width: 480px) {
+            .card {
+                padding: 30px 20px;
+                border-radius: 20px;
+            }
+            .counter-value {
+                font-size: 4.5rem;
+            }
+            .btn {
+                padding: 14px 16px;
+                font-size: 0.95rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Ambient particles -->
+    <div class="particles" id="particles"></div>
+
+    <div class="container">
+        <div class="card">
+            <h1 class="title">Contador Inteligente</h1>
+            
+            <div class="counter-container">
+                <span id="counter" class="counter-value">0</span>
+            </div>
+
+            <div class="button-group">
+                <button id="btn-sum" class="btn btn-sum">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                    Somar (+1)
+                </button>
+                <button id="btn-mul" class="btn btn-mul">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+                    Multiplicar (x2)
+                </button>
+            </div>
+
+            <button id="btn-reset" class="btn-reset">
+                <svg viewBox="0 0 24 24"><path d="M12 5V1L7 6l5 5V7c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6H4c0 4.42 3.58 8 8 8s8-3.58 8-8-3.58-8-8-8z"/></svg>
+                Zerar
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // State Management
+        let count = 0;
+
+        // Elements
+        const counterEl = document.getElementById('counter');
+        const btnSum = document.getElementById('btn-sum');
+        const btnMul = document.getElementById('btn-mul');
+        const btnReset = document.getElementById('btn-reset');
+
+        // Functions
+        function updateCounter(newValue) {
+            count = newValue;
+            
+            // UI Update
+            counterEl.textContent = count;
+            
+            // Pop Animation
+            counterEl.classList.remove('counter-pop');
+            void counterEl.offsetWidth; // Trigger reflow
+            counterEl.classList.add('counter-pop');
+            
+            // Remove animation class after it completes
+            setTimeout(() => {
+                counterEl.classList.remove('counter-pop');
+            }, 150);
+        }
+
+        // Event Listeners
+        btnSum.addEventListener('click', () => {
+            updateCounter(count + 1);
+        });
+
+        btnMul.addEventListener('click', () => {
+            updateCounter(count * 2);
+        });
+
+        btnReset.addEventListener('click', () => {
+            updateCounter(0);
+        });
+
+        // Background Particles Generator
+        const particlesContainer = document.getElementById('particles');
+        const particleCount = 15;
+
+        for (let i = 0; i < particleCount; i++) {
+            const particle = document.createElement('div');
+            particle.classList.add('particle');
+            
+            // Random styling
+            const size = Math.random() * 6 + 2;
+            const left = Math.random() * 100;
+            const delay = Math.random() * 10;
+            const duration = Math.random() * 10 + 10;
+            
+            particle.style.width = `${size}px`;
+            particle.style.height = `${size}px`;
+            particle.style.left = `${left}%`;
+            particle.style.animationDelay = `${delay}s`;
+            particle.style.animationDuration = `${duration}s`;
+            
+            // Gradient matching colors for some particles
+            if (Math.random() > 0.5) {
+                particle.style.background = Math.random() > 0.5 ? 'rgba(6, 182, 212, 0.3)' : 'rgba(217, 70, 239, 0.3)';
+                particle.style.boxShadow = '0 0 8px currentColor';
+            }
+            
+            particlesContainer.appendChild(particle);
+        }
+    </script>
+</body>
+</html>
