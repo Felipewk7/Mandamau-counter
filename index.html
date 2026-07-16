@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Super Contador Premium</title>
+    <title>Mandamau Counter</title>
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -86,17 +86,31 @@
         }
 
         .title {
-            font-size: 0.9rem;
+            font-size: 1.35rem;
             text-transform: uppercase;
             letter-spacing: 2px;
-            color: var(--text-secondary);
+            color: var(--text-primary);
             margin-bottom: 20px;
-            font-weight: 700;
+            font-weight: 800;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .subtitle {
+            font-size: 0.85rem;
+            text-transform: none;
+            letter-spacing: 0.5px;
+            color: var(--text-secondary);
+            font-weight: 600;
+            background: linear-gradient(135deg, #d946ef, #8b5cf6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         /* Animated Counter display */
         .counter-container {
-            margin: 30px 0;
+            margin: 25px 0;
             height: 120px;
             display: flex;
             align-items: center;
@@ -122,19 +136,90 @@
             filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.6));
         }
 
+        /* Multiplier settings panel */
+        .multiplier-settings {
+            margin: 15px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .multiplier-settings label {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 700;
+        }
+
+        .input-wrapper {
+            display: flex;
+            align-items: center;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 4px;
+        }
+
+        .input-wrapper input {
+            background: transparent;
+            border: none;
+            color: var(--text-primary);
+            font-size: 1.1rem;
+            font-weight: 700;
+            width: 70px;
+            text-align: center;
+            outline: none;
+        }
+
+        /* Hide number arrows */
+        .input-wrapper input::-webkit-outer-spin-button,
+        .input-wrapper input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+        .input-wrapper input[type=number] {
+            -moz-appearance: textfield;
+        }
+
+        .btn-step {
+            background: rgba(255, 255, 255, 0.05);
+            border: none;
+            color: var(--text-primary);
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s ease, transform 0.1s ease;
+        }
+
+        .btn-step:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-step:active {
+            transform: scale(0.95);
+        }
+
         /* Buttons layout */
         .button-group {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 16px;
-            margin-top: 30px;
+            margin-top: 20px;
         }
 
         .btn {
             border: none;
             padding: 16px 20px;
             border-radius: 14px;
-            font-size: 1rem;
+            font-size: 0.95rem;
             font-weight: 700;
             color: #ffffff;
             cursor: pointer;
@@ -270,7 +355,7 @@
             }
             .btn {
                 padding: 14px 16px;
-                font-size: 0.95rem;
+                font-size: 0.9rem;
             }
         }
     </style>
@@ -282,10 +367,23 @@
 
     <div class="container">
         <div class="card">
-            <h1 class="title">Contador Inteligente</h1>
+            <h1 class="title">
+                Mandamau Counter
+                <span class="subtitle">for Bako The FurryGuy</span>
+            </h1>
             
             <div class="counter-container">
                 <span id="counter" class="counter-value">0</span>
+            </div>
+
+            <!-- Custom Multiplier Controls -->
+            <div class="multiplier-settings">
+                <label for="multiplier-input">Multiplicar por:</label>
+                <div class="input-wrapper">
+                    <button id="btn-dec-mult" class="btn-step">-</button>
+                    <input type="number" id="multiplier-input" value="2" min="1" step="1">
+                    <button id="btn-inc-mult" class="btn-step">+</button>
+                </div>
             </div>
 
             <div class="button-group">
@@ -295,7 +393,7 @@
                 </button>
                 <button id="btn-mul" class="btn btn-mul">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-                    Multiplicar (x2)
+                    <span id="btn-mul-text">Multiplicar (x2)</span>
                 </button>
             </div>
 
@@ -314,11 +412,39 @@
         const counterEl = document.getElementById('counter');
         const btnSum = document.getElementById('btn-sum');
         const btnMul = document.getElementById('btn-mul');
+        const btnMulText = document.getElementById('btn-mul-text');
         const btnReset = document.getElementById('btn-reset');
+        const multiplierInput = document.getElementById('multiplier-input');
+        const btnDecMult = document.getElementById('btn-dec-mult');
+        const btnIncMult = document.getElementById('btn-inc-mult');
+
+        // Get and validate multiplier value
+        function getMultiplier() {
+            let val = parseFloat(multiplierInput.value);
+            if (isNaN(val) || val <= 0) {
+                return 2; // default fallback
+            }
+            return val;
+        }
+
+        // Update Multiply Button Label
+        function updateMultiplierUI() {
+            let val = multiplierInput.value;
+            if (val === '' || isNaN(parseFloat(val))) {
+                btnMulText.textContent = `Multiplicar (x2)`;
+            } else {
+                btnMulText.textContent = `Multiplicar (x${val})`;
+            }
+        }
 
         // Functions
         function updateCounter(newValue) {
-            count = newValue;
+            // Handle decimal rounding to prevent floating point display issues if multiplied by decimals
+            if (!Number.isInteger(newValue)) {
+                count = Math.round(newValue * 100) / 100;
+            } else {
+                count = newValue;
+            }
             
             // UI Update
             counterEl.textContent = count;
@@ -340,12 +466,35 @@
         });
 
         btnMul.addEventListener('click', () => {
-            updateCounter(count * 2);
+            const mult = getMultiplier();
+            updateCounter(count * mult);
         });
 
         btnReset.addEventListener('click', () => {
             updateCounter(0);
         });
+
+        // Multiplier input controls
+        multiplierInput.addEventListener('input', () => {
+            updateMultiplierUI();
+        });
+
+        btnDecMult.addEventListener('click', () => {
+            let current = getMultiplier();
+            if (current > 1) {
+                multiplierInput.value = current - 1;
+                updateMultiplierUI();
+            }
+        });
+
+        btnIncMult.addEventListener('click', () => {
+            let current = getMultiplier();
+            multiplierInput.value = current + 1;
+            updateMultiplierUI();
+        });
+
+        // Initialize UI
+        updateMultiplierUI();
 
         // Background Particles Generator
         const particlesContainer = document.getElementById('particles');
