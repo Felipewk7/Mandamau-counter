@@ -296,6 +296,11 @@
             user-select: none;
             transition: transform 0.15s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             display: inline-block;
+            max-width: 100%;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            text-align: center;
         }
 
         /* Animation when counter changes */
@@ -439,14 +444,14 @@
             height: 120%;
             background: rgba(255, 255, 255, 0.15);
             border-radius: 50%;
-            transform: translate(-50%, -50%) scale(0);
-            transition: transform 0.5s ease-out;
+            transform: translate(-50%, -50%) scale(1);
             opacity: 0;
+            transition: transform 0.5s ease-out;
             pointer-events: none;
         }
 
         .btn:active::after {
-            transform: translate(-50%, -50%) scale(1);
+            transform: translate(-50%, -50%) scale(0);
             opacity: 1;
             transition: 0s;
         }
@@ -760,27 +765,79 @@
         const btnModalConfirm = document.getElementById('btn-modal-confirm');
         const btnModalCancel = document.getElementById('btn-modal-cancel');
 
+        // Format numbers to equations / scientific notation if too large (>= 1,000,000)
+        function formatNumber(num) {
+            const absNum = Math.abs(num);
+            if (absNum < 1e6) {
+                return num.toLocaleString('pt-BR');
+            } else {
+                // Convert to equation standard, e.g. 1.23 × 10⁶
+                const exponent = Math.floor(Math.log10(absNum));
+                const mantissa = num / Math.pow(10, exponent);
+                const roundedMantissa = Math.round(mantissa * 1000) / 1000;
+                return `${roundedMantissa} &times; 10<sup>${exponent}</sup>`;
+            }
+        }
+
+        // Dynamically adjust font size to prevent overflow
+        function adjustFontSize() {
+            const visibleText = counterEl.textContent || counterEl.innerText || "";
+            const len = visibleText.length;
+            
+            let fontSize = '5.5rem';
+            if (len > 12) {
+                fontSize = '2.5rem';
+            } else if (len > 10) {
+                fontSize = '3.0rem';
+            } else if (len > 8) {
+                fontSize = '3.6rem';
+            } else if (len > 6) {
+                fontSize = '4.5rem';
+            }
+            
+            // Mobile adjustments
+            if (window.innerWidth <= 480) {
+                if (len > 12) {
+                    fontSize = '2.0rem';
+                } else if (len > 10) {
+                    fontSize = '2.4rem';
+                } else if (len > 8) {
+                    fontSize = '2.8rem';
+                } else if (len > 6) {
+                    fontSize = '3.4rem';
+                } else {
+                    fontSize = '4.0rem';
+                }
+            }
+            
+            counterEl.style.fontSize = fontSize;
+        }
+
         // Load persisted state on startup
         function loadSavedState() {
+            const savedMultiplier = localStorage.getItem('mandamau_multiplier');
+            if (savedMultiplier !== null) {
+                multiplierInput.value = savedMultiplier;
+            }
+
             const savedCount = localStorage.getItem('mandamau_count');
             if (savedCount !== null) {
                 const parsed = parseFloat(savedCount);
                 if (!isNaN(parsed)) {
                     count = parsed;
-                    counterEl.textContent = count;
                 }
             }
-
-            const savedMultiplier = localStorage.getItem('mandamau_multiplier');
-            if (savedMultiplier !== null) {
-                multiplierInput.value = savedMultiplier;
-            }
+            
+            // Set text & font size
+            counterEl.innerHTML = formatNumber(count);
+            adjustFontSize();
             
             // Initial load update without entry animations
             updateStyleRank(true);
         }
 
         // Get and validate multiplier value
+        // Supporting float multipliers gracefully
         function getMultiplier() {
             let val = parseFloat(multiplierInput.value);
             if (isNaN(val) || val <= 0) {
@@ -813,7 +870,8 @@
             localStorage.setItem('mandamau_count', count);
             
             // UI Update
-            counterEl.textContent = count;
+            counterEl.innerHTML = formatNumber(count);
+            adjustFontSize();
             
             // Pop Animation
             counterEl.classList.remove('counter-pop');
@@ -1029,6 +1087,11 @@
             let current = getMultiplier();
             multiplierInput.value = current + 1;
             updateMultiplierUI();
+        });
+
+        // Resize event listener to keep layout responsive
+        window.addEventListener('resize', () => {
+            adjustFontSize();
         });
 
         // Initialize UI & State
