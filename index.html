@@ -871,12 +871,14 @@
 
         /* Combo Badge Style */
         .combo-container {
+            position: absolute;
+            top: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 15;
             display: flex;
             justify-content: center;
-            margin-top: -10px;
-            margin-bottom: -15px;
             perspective: 800px;
-            z-index: 10;
         }
 
         .combo-badge {
@@ -1009,11 +1011,11 @@
             
             <!-- Tab Content: Counter -->
             <div id="content-counter" class="tab-content active">
-                <!-- Combo Style Badge -->
-                <div id="combo-container" class="combo-container" style="display: none;">
-                    <span id="combo-badge" class="combo-badge">Combo x1.0</span>
-                </div>
                 <div class="counter-container">
+                    <!-- Combo Style Badge -->
+                    <div id="combo-container" class="combo-container" style="display: none;">
+                        <span id="combo-badge" class="combo-badge">Combo x1.0</span>
+                    </div>
                     <span id="counter" class="counter-value">0</span>
                 </div>
 
@@ -1182,10 +1184,15 @@
                 audioCtx = new (window.AudioContext || window.webkitAudioContext)();
             }
             if (audioCtx.state === 'suspended') {
-                audioCtx.resume();
-            }
-            if (isMusicEnabled && !isMusicPlaying) {
-                startMusic();
+                audioCtx.resume().then(() => {
+                    if (isMusicEnabled && !isMusicPlaying) {
+                        startMusic();
+                    }
+                });
+            } else {
+                if (isMusicEnabled && !isMusicPlaying) {
+                    startMusic();
+                }
             }
         }
 
@@ -1193,85 +1200,96 @@
             if (isMuted) return;
             try {
                 initAudio();
-                const now = audioCtx.currentTime;
-                
-                if (type === 'click') {
-                    const osc = audioCtx.createOscillator();
-                    const gain = audioCtx.createGain();
-                    
-                    osc.type = 'triangle';
-                    osc.frequency.setValueAtTime(320, now);
-                    osc.frequency.exponentialRampToValueAtTime(750, now + 0.08);
-                    
-                    gain.gain.setValueAtTime(0.12, now);
-                    gain.gain.exponentialRampToValueAtTime(0.002, now + 0.08);
-                    
-                    osc.connect(gain);
-                    gain.connect(audioCtx.destination);
-                    
-                    osc.start(now);
-                    osc.stop(now + 0.08);
-                } 
-                else if (type === 'multiply') {
-                    const duration = 0.2;
-                    const osc = audioCtx.createOscillator();
-                    const gain = audioCtx.createGain();
-                    const filter = audioCtx.createBiquadFilter();
-                    
-                    osc.type = 'sawtooth';
-                    osc.frequency.setValueAtTime(180, now);
-                    osc.frequency.exponentialRampToValueAtTime(1100, now + duration);
-                    
-                    filter.type = 'lowpass';
-                    filter.frequency.setValueAtTime(1000, now);
-                    
-                    gain.gain.setValueAtTime(0.08, now);
-                    gain.gain.exponentialRampToValueAtTime(0.002, now + duration);
-                    
-                    osc.connect(filter);
-                    filter.connect(gain);
-                    gain.connect(audioCtx.destination);
-                    
-                    osc.start(now);
-                    osc.stop(now + duration);
-                }
-                else if (type === 'reset') {
-                    const duration = 0.55;
-                    const osc = audioCtx.createOscillator();
-                    const gain = audioCtx.createGain();
-                    
-                    osc.type = 'sine';
-                    osc.frequency.setValueAtTime(380, now);
-                    osc.frequency.linearRampToValueAtTime(50, now + duration);
-                    
-                    gain.gain.setValueAtTime(0.18, now);
-                    gain.gain.linearRampToValueAtTime(0.001, now + duration);
-                    
-                    osc.connect(gain);
-                    gain.connect(audioCtx.destination);
-                    
-                    osc.start(now);
-                    osc.stop(now + duration);
-                }
-                else if (type === 'rank_up_low') {
-                    playArpeggio([440, 554, 659], 0.08);
-                }
-                else if (type === 'rank_up_med') {
-                    playArpeggio([523, 659, 784, 1046], 0.07);
-                }
-                else if (type === 'rank_up_high') {
-                    playArpeggio([587, 740, 880, 1175, 1480], 0.06);
-                }
-                else if (type === 'rank_up_god') {
-                    playArpeggio([261, 329, 392, 523, 659, 784, 1046, 1318, 1568, 2093, 2637, 3136, 4186], 0.035);
+                if (audioCtx && audioCtx.state === 'suspended') {
+                    audioCtx.resume().then(() => {
+                        triggerSynthSound(type);
+                    });
+                } else {
+                    triggerSynthSound(type);
                 }
             } catch (e) {
                 console.error("Audio Synthesis Error:", e);
             }
         }
 
+        function triggerSynthSound(type) {
+            if (!audioCtx || audioCtx.state !== 'running') return;
+            const now = audioCtx.currentTime;
+            
+            if (type === 'click') {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(320, now);
+                osc.frequency.exponentialRampToValueAtTime(750, now + 0.08);
+                
+                gain.gain.setValueAtTime(0.12, now);
+                gain.gain.exponentialRampToValueAtTime(0.002, now + 0.08);
+                
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                
+                osc.start(now);
+                osc.stop(now + 0.08);
+            } 
+            else if (type === 'multiply') {
+                const duration = 0.2;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                const filter = audioCtx.createBiquadFilter();
+                
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(180, now);
+                osc.frequency.exponentialRampToValueAtTime(1100, now + duration);
+                
+                filter.type = 'lowpass';
+                filter.frequency.setValueAtTime(1000, now);
+                
+                gain.gain.setValueAtTime(0.08, now);
+                gain.gain.exponentialRampToValueAtTime(0.002, now + duration);
+                
+                osc.connect(filter);
+                filter.connect(gain);
+                gain.connect(audioCtx.destination);
+                
+                osc.start(now);
+                osc.stop(now + duration);
+            }
+            else if (type === 'reset') {
+                const duration = 0.55;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(380, now);
+                osc.frequency.linearRampToValueAtTime(50, now + duration);
+                
+                gain.gain.setValueAtTime(0.18, now);
+                gain.gain.linearRampToValueAtTime(0.001, now + duration);
+                
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                
+                osc.start(now);
+                osc.stop(now + duration);
+            }
+            else if (type === 'rank_up_low') {
+                playArpeggio([440, 554, 659], 0.08);
+            }
+            else if (type === 'rank_up_med') {
+                playArpeggio([523, 659, 784, 1046], 0.07);
+            }
+            else if (type === 'rank_up_high') {
+                playArpeggio([587, 740, 880, 1175, 1480], 0.06);
+            }
+            else if (type === 'rank_up_god') {
+                playArpeggio([261, 329, 392, 523, 659, 784, 1046, 1318, 1568, 2093, 2637, 3136, 4186], 0.035);
+            }
+        }
+
         function playArpeggio(notes, noteLength) {
-            initAudio();
+            if (!audioCtx || audioCtx.state !== 'running') return;
             const now = audioCtx.currentTime;
             notes.forEach((freq, idx) => {
                 const noteTime = now + (idx * noteLength);
@@ -1289,7 +1307,7 @@
                 vibrato.connect(vibratoGain);
                 vibratoGain.connect(osc.frequency);
                 
-                gain.gain.setValueAtTime(0, noteTime);
+                gain.gain.setValueAtTime(0.001, noteTime);
                 gain.gain.linearRampToValueAtTime(0.12, noteTime + 0.02);
                 gain.gain.exponentialRampToValueAtTime(0.003, noteTime + noteLength * 1.8);
                 
@@ -1319,7 +1337,7 @@
                 osc.type = 'triangle';
                 osc.frequency.setValueAtTime(bassFreq, time);
                 
-                gain.gain.setValueAtTime(0, time);
+                gain.gain.setValueAtTime(0.001, time);
                 gain.gain.linearRampToValueAtTime(0.07, time + 0.02);
                 gain.gain.exponentialRampToValueAtTime(0.001, time + stepDuration - 0.01);
                 
@@ -1348,7 +1366,7 @@
                     filter.type = 'lowpass';
                     filter.frequency.setValueAtTime(800, time);
                     
-                    gain.gain.setValueAtTime(0, time);
+                    gain.gain.setValueAtTime(0.001, time);
                     gain.gain.linearRampToValueAtTime(0.02, time + 0.015);
                     gain.gain.exponentialRampToValueAtTime(0.001, time + stepDuration * 0.7);
                     
@@ -1363,6 +1381,7 @@
         }
 
         function scheduler() {
+            if (!audioCtx || audioCtx.state !== 'running') return;
             while (lastScheduledTime < audioCtx.currentTime + scheduleAheadTime) {
                 playStep(lastScheduledTime, currentStep);
                 
@@ -1413,7 +1432,7 @@
                 musicIconOn.style.display = 'block';
                 musicIconOff.style.display = 'none';
                 btnMusic.style.opacity = '1';
-                if (audioCtx && audioCtx.state !== 'suspended') {
+                if (audioCtx && audioCtx.state === 'running') {
                     startMusic();
                 }
             } else {
@@ -1437,6 +1456,9 @@
             isMusicEnabled = !isMusicEnabled;
             localStorage.setItem('mandamau_music', isMusicEnabled);
             updateMusicUI();
+            if (isMusicEnabled) {
+                initAudio();
+            }
         });
 
         // Theme Manager
@@ -1532,22 +1554,20 @@
         }
 
         // Spawns a cômica frase flutuante do Bako
-        function triggerFloatingLie(event) {
+        function triggerFloatingLie() {
+            // 30% chance of appearing
+            if (Math.random() >= 0.3) return;
+
             const phrase = bakoPhrases[Math.floor(Math.random() * bakoPhrases.length)];
             
             const el = document.createElement('div');
             el.className = 'floating-lie';
             el.innerHTML = `Bako: "${phrase}"`;
             
-            let x, y;
-            if (event && event.clientX && event.clientY) {
-                x = event.clientX;
-                y = event.clientY;
-            } else {
-                const counterRect = counterEl.getBoundingClientRect();
-                x = counterRect.left + counterRect.width / 2 + (Math.random() * 100 - 50);
-                y = counterRect.top + counterRect.height / 2 + (Math.random() * 40 - 20);
-            }
+            // Random viewport position with safe margin
+            const margin = 80;
+            const x = margin + Math.random() * (window.innerWidth - margin * 2);
+            const y = margin + Math.random() * (window.innerHeight - margin * 2);
             
             el.style.left = `${x}px`;
             el.style.top = `${y}px`;
@@ -1930,23 +1950,25 @@
         }
 
         // Event Listeners
-        btnSum.addEventListener('click', (e) => {
+        btnSum.addEventListener('click', () => {
+            initAudio();
             registerCombo();
             const addValue = 1 * comboMultiplier;
             updateCounter(count + addValue);
             registerActivity();
             playSound('click');
-            triggerFloatingLie(e);
+            triggerFloatingLie();
         });
 
-        btnMul.addEventListener('click', (e) => {
+        btnMul.addEventListener('click', () => {
+            initAudio();
             registerCombo();
             const mult = getMultiplier();
             const activeMult = mult * comboMultiplier;
             updateCounter(count * activeMult);
             registerActivity();
             playSound('multiply');
-            triggerFloatingLie(e);
+            triggerFloatingLie();
         });
 
         btnReset.addEventListener('click', () => {
