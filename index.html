@@ -570,6 +570,23 @@
         const btnModalConfirm = document.getElementById('btn-modal-confirm');
         const btnModalCancel = document.getElementById('btn-modal-cancel');
 
+        // Load persisted state on startup
+        function loadSavedState() {
+            const savedCount = localStorage.getItem('mandamau_count');
+            if (savedCount !== null) {
+                const parsed = parseFloat(savedCount);
+                if (!isNaN(parsed)) {
+                    count = parsed;
+                    counterEl.textContent = count;
+                }
+            }
+
+            const savedMultiplier = localStorage.getItem('mandamau_multiplier');
+            if (savedMultiplier !== null) {
+                multiplierInput.value = savedMultiplier;
+            }
+        }
+
         // Get and validate multiplier value
         function getMultiplier() {
             let val = parseFloat(multiplierInput.value);
@@ -579,13 +596,14 @@
             return val;
         }
 
-        // Update Multiply Button Label
+        // Update Multiply Button Label and persist multiplier
         function updateMultiplierUI() {
             let val = multiplierInput.value;
             if (val === '' || isNaN(parseFloat(val))) {
                 btnMulText.textContent = `Multiplicar (x2)`;
             } else {
                 btnMulText.textContent = `Multiplicar (x${val})`;
+                localStorage.setItem('mandamau_multiplier', val);
             }
         }
 
@@ -597,6 +615,9 @@
             } else {
                 count = newValue;
             }
+            
+            // Persist value
+            localStorage.setItem('mandamau_count', count);
             
             // UI Update
             counterEl.textContent = count;
@@ -675,7 +696,8 @@
             updateMultiplierUI();
         });
 
-        // Initialize UI
+        // Initialize UI & State
+        loadSavedState();
         updateMultiplierUI();
 
         // Background Particles Generator
