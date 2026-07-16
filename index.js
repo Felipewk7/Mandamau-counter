@@ -818,7 +818,7 @@ function triggerRankBurst(colorClass) {
 
     for (let i = 0; i < particleCount; i++) {
         const p = document.createElement('div');
-        p.classList.add('particle');
+        p.classList.add('rank-burst-particle');
         
         p.style.left = `${x}px`;
         p.style.top = `${y}px`;
@@ -1007,29 +1007,4 @@ updateMultiplierUI();
 updateSoundUI();
 updateMusicUI();
 
-// Background Particles Generator
-const particlesContainer = document.getElementById('particles');
-const particleCount = 15;
-
-for (let i = 0; i < particleCount; i++) {
-    const particle = document.createElement('div');
-    particle.classList.add('particle');
-    
-    const size = Math.random() * 6 + 2;
-    const left = Math.random() * 100;
-    const delay = Math.random() * 10;
-    const duration = Math.random() * 10 + 10;
-    
-    particle.style.width = `${size}px`;
-    particle.style.height = `${size}px`;
-    particle.style.left = `${left}%`;
-    particle.style.animationDelay = `${delay}s`;
-    particle.style.animationDuration = `${duration}s`;
-    
-    if (Math.random() > 0.5) {
-        particle.style.background = Math.random() > 0.5 ? 'rgba(6, 182, 212, 0.3)' : 'rgba(217, 70, 239, 0.3)';
-        particle.style.boxShadow = '0 0 8px currentColor';
-    }
-    
-    particlesContainer.appendChild(particle);
-}
+// Background Particles Generator is now managed via canvas in background.js
