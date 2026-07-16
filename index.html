@@ -44,6 +44,18 @@
             position: relative;
         }
 
+        /* Flash effect overlay */
+        .screen-flash {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 99;
+            opacity: 0;
+        }
+
         /* Subtle glowing background ambient light */
         body::before {
             content: '';
@@ -116,11 +128,12 @@
             justify-content: center;
             margin-top: -10px;
             margin-bottom: 10px;
-            height: 90px;
+            min-height: 110px;
             opacity: 0;
             transform: scale(0.8);
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             pointer-events: none;
+            padding: 0 10px;
         }
 
         .rank-container.active {
@@ -134,18 +147,22 @@
             line-height: 1;
             font-style: italic;
             text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
-            transition: all 0.3s ease;
+            transition: color 0.3s ease, text-shadow 0.3s ease;
             user-select: none;
+            display: inline-block;
         }
 
         .rank-name {
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             font-weight: 800;
             text-transform: uppercase;
-            letter-spacing: 1.5px;
-            margin-top: 4px;
+            letter-spacing: 1.2px;
+            margin-top: 6px;
             color: var(--text-secondary);
             transition: all 0.3s ease;
+            max-width: 360px;
+            word-wrap: break-word;
+            line-height: 1.3;
         }
 
         /* Rank specific glow & colors */
@@ -172,24 +189,76 @@
             100% { background-position: 0% 50%; }
         }
 
-        /* Upgrade bounce animation */
+        /* Entrance Animation (Bounce/Pop) */
         .rank-bounce {
-            animation: dmc-rank-up 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            animation: dmc-rank-up 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
         }
 
         @keyframes dmc-rank-up {
             0% {
-                transform: scale(0.6) rotate(-15deg);
+                transform: scale(0.5) rotate(-25deg);
                 filter: brightness(3);
             }
             50% {
-                transform: scale(1.4) rotate(10deg);
-                filter: brightness(2) drop-shadow(0 0 25px currentColor);
+                transform: scale(1.5) rotate(15deg);
+                filter: brightness(2) drop-shadow(0 0 30px currentColor);
             }
             100% {
                 transform: scale(1) rotate(0deg);
                 filter: brightness(1);
             }
+        }
+
+        /* Continuous Idle Loops */
+        @keyframes float-idle {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-6px) rotate(1deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+
+        @keyframes wobble-idle {
+            0% { transform: translateY(0px) rotate(-2deg) scale(1); }
+            50% { transform: translateY(-4px) rotate(2deg) scale(1.04); }
+            100% { transform: translateY(0px) rotate(-2deg) scale(1); }
+        }
+
+        @keyframes vibrate-idle {
+            0% { transform: translate(0, 0) rotate(0deg) scale(1.02); filter: drop-shadow(0 0 10px currentColor); }
+            20% { transform: translate(-2px, 1px) rotate(-0.5deg); }
+            40% { transform: translate(1px, -1px) rotate(0.5deg); }
+            60% { transform: translate(-1px, 2px) rotate(0deg); }
+            80% { transform: translate(2px, 1px) rotate(0.5deg); }
+            100% { transform: translate(0, 0) rotate(0deg) scale(1.02); filter: drop-shadow(0 0 12px currentColor); }
+        }
+
+        @keyframes god-idle {
+            0% { transform: translate(0, 0) scale(1.05) skew(1deg); filter: drop-shadow(0 0 20px #ff007f); }
+            10% { transform: translate(-3px, 2px) scale(1.08) skew(-1deg); }
+            20% { transform: translate(3px, -2px) scale(1.05) skew(2deg); filter: drop-shadow(0 0 25px #ffaa00); }
+            30% { transform: translate(-2px, -3px) scale(1.1) skew(-2deg); }
+            40% { transform: translate(2px, 3px) scale(1.05) skew(1deg); }
+            50% { transform: translate(-3px, 1px) scale(1.08) skew(-1deg); filter: drop-shadow(0 0 20px #ff007f); }
+            60% { transform: translate(3px, -1px) scale(1.05) skew(2deg); }
+            70% { transform: translate(-1px, -2px) scale(1.1) skew(-2deg); }
+            80% { transform: translate(2px, 2px) scale(1.05) skew(1deg); filter: drop-shadow(0 0 25px #ffaa00); }
+            90% { transform: translate(-2px, -1px) scale(1.08) skew(-1deg); }
+            100% { transform: translate(0, 0) scale(1.05) skew(1deg); filter: drop-shadow(0 0 20px #ff007f); }
+        }
+
+        .rank-idle-low {
+            animation: float-idle 3s ease-in-out infinite;
+        }
+
+        .rank-idle-med {
+            animation: wobble-idle 2s ease-in-out infinite;
+        }
+
+        .rank-idle-high {
+            animation: vibrate-idle 0.3s linear infinite;
+        }
+
+        .rank-idle-god {
+            animation: god-idle 0.15s linear infinite;
         }
 
         /* Screen shake animation on card */
@@ -586,6 +655,9 @@
 </head>
 <body>
 
+    <!-- Flash effect backdrop -->
+    <div id="screen-flash" class="screen-flash"></div>
+
     <!-- Ambient particles -->
     <div class="particles" id="particles"></div>
 
@@ -652,19 +724,20 @@
     <script>
         // DMC Ranks Configuration
         const ranks = [
-            { min: 10000, letter: 'SSS', name: "Smokin' Sexy Style!!", class: 'rank-sss' },
-            { min: 5000, letter: 'SS', name: "Super Stylish", class: 'rank-ss' },
-            { min: 1000, letter: 'S', name: "Stylish", class: 'rank-s' },
-            { min: 500, letter: 'A', name: "Alright", class: 'rank-a' },
-            { min: 100, letter: 'B', name: "Blast", class: 'rank-b' },
-            { min: 50, letter: 'C', name: "Cool", class: 'rank-c' },
-            { min: 10, letter: 'D', name: "Dull", class: 'rank-d' }
+            { min: 100000, letter: 'SSS', name: "você atingiu a gnose de tanto mentir e se tornou o demiurgo", class: 'rank-sss', idleClass: 'rank-idle-god', flashColor: 'rgba(255, 0, 127, 0.4)' },
+            { min: 50000, letter: 'SS', name: "mentiu tanto que transcendeu a materia", class: 'rank-ss', idleClass: 'rank-idle-high', flashColor: 'rgba(236, 72, 153, 0.4)' },
+            { min: 10000, letter: 'S', name: "Deus da mentira e desinformação", class: 'rank-s', idleClass: 'rank-idle-high', flashColor: 'rgba(168, 85, 247, 0.4)' },
+            { min: 5000, letter: 'A', name: "O ser mais mentiroso que já existiu", class: 'rank-a', idleClass: 'rank-idle-med', flashColor: 'rgba(245, 158, 11, 0.3)' },
+            { min: 1000, letter: 'B', name: "mentir pra você é como respirar", class: 'rank-b', idleClass: 'rank-idle-med', flashColor: 'rgba(6, 182, 212, 0.3)' },
+            { min: 500, letter: 'C', name: "você nasceu pra mentir", class: 'rank-c', idleClass: 'rank-idle-low', flashColor: 'rgba(16, 185, 129, 0.2)' },
+            { min: 100, letter: 'D', name: "mentiu bem", class: 'rank-d', idleClass: 'rank-idle-low', flashColor: 'rgba(148, 163, 184, 0.2)' }
         ];
 
         // State Management
         let count = 0;
         let resetStep = 0;
         let currentRankIndex = -1;
+        let rankAnimTimeout = null;
         const resetQuestions = [
             "Tem certeza que quer apagar?",
             "O Bako ainda está mentindo, quer prosseguir?",
@@ -703,7 +776,7 @@
                 multiplierInput.value = savedMultiplier;
             }
             
-            // Initial load update without animations
+            // Initial load update without entry animations
             updateStyleRank(true);
         }
 
@@ -767,14 +840,30 @@
             }, 300);
         }
 
+        // Screen Flash effect
+        function triggerScreenFlash(flashColor) {
+            const flash = document.getElementById('screen-flash');
+            flash.style.background = flashColor;
+            flash.style.opacity = '0.35';
+            
+            // Fast transition reset
+            flash.style.transition = 'none';
+            void flash.offsetWidth; // Reflow
+            
+            // Set animation transition back
+            flash.style.transition = 'opacity 0.5s cubic-bezier(0.1, 0.8, 0.3, 1)';
+            flash.style.opacity = '0';
+        }
+
         // Particles explosion on rank upgrade
         function triggerRankBurst(colorClass) {
             const badge = document.getElementById('rank-badge');
             const rect = badge.getBoundingClientRect();
             const x = rect.left + rect.width / 2;
             const y = rect.top + rect.height / 2;
+            const particleCount = 45; // More particles for extravagant feel!
 
-            for (let i = 0; i < 20; i++) {
+            for (let i = 0; i < particleCount; i++) {
                 const p = document.createElement('div');
                 p.classList.add('particle');
                 
@@ -786,16 +875,17 @@
                 
                 // Random velocities
                 const angle = Math.random() * Math.PI * 2;
-                const distance = Math.random() * 80 + 40;
+                const distance = Math.random() * 140 + 60; // Faster/Further explosion
                 const tx = Math.cos(angle) * distance;
                 const ty = Math.sin(angle) * distance;
                 
-                p.style.width = `${Math.random() * 8 + 4}px`;
-                p.style.height = p.style.width;
+                const size = Math.random() * 12 + 6; // Bigger particles
+                p.style.width = `${size}px`;
+                p.style.height = `${size}px`;
                 
                 // Color matching based on rank class
                 if (colorClass === 'rank-sss') {
-                    p.style.background = `hsl(${Math.random() * 40 + 10}, 100%, 60%)`;
+                    p.style.background = `hsl(${Math.random() * 360}, 100%, 65%)`; // Rainbow explosion for SSS
                 } else if (colorClass === 'rank-ss') {
                     p.style.background = '#ec4899';
                 } else if (colorClass === 'rank-s') {
@@ -810,15 +900,16 @@
                     p.style.background = '#94a3b8';
                 }
                 
-                p.style.boxShadow = `0 0 10px currentColor`;
-                p.style.borderRadius = '50%';
+                p.style.boxShadow = `0 0 15px currentColor`;
+                p.style.borderRadius = Math.random() > 0.5 ? '50%' : '0%'; // Stars and circles
                 
-                // Animate expansion
+                // Animate expansion with rotation
+                const rot = Math.random() * 720 - 360;
                 const anim = p.animate([
-                    { transform: 'translate(0, 0) scale(1)', opacity: 1 },
-                    { transform: `translate(${tx}px, ${ty}px) scale(0)`, opacity: 0 }
+                    { transform: 'translate(0, 0) scale(1.5) rotate(0deg)', opacity: 1 },
+                    { transform: `translate(${tx}px, ${ty}px) scale(0) rotate(${rot}deg)`, opacity: 0 }
                 ], {
-                    duration: Math.random() * 400 + 400,
+                    duration: Math.random() * 600 + 400,
                     easing: 'cubic-bezier(0.1, 0.8, 0.3, 1)'
                 });
                 
@@ -838,23 +929,32 @@
                 const rank = ranks[matchedIndex];
                 
                 if (matchedIndex !== currentRankIndex) {
+                    if (rankAnimTimeout) clearTimeout(rankAnimTimeout);
+                    
                     rankBadge.textContent = rank.letter;
                     rankName.textContent = rank.name;
                     
-                    // Reset class list
-                    rankBadge.className = 'rank-badge ' + rank.class;
-                    
-                    if (!isInitialLoad) {
-                        // Add bounce animation
-                        rankBadge.classList.remove('rank-bounce');
-                        void rankBadge.offsetWidth;
-                        rankBadge.classList.add('rank-bounce');
+                    if (isInitialLoad) {
+                        // Immediately apply active classes and idle state
+                        rankBadge.className = `rank-badge ${rank.class} ${rank.idleClass}`;
+                    } else {
+                        // Set entrance classes
+                        rankBadge.className = `rank-badge ${rank.class} rank-bounce`;
                         
                         // Screen shake
                         triggerCardShake();
                         
                         // Sparkle particles
                         triggerRankBurst(rank.class);
+                        
+                        // Screen flash
+                        triggerScreenFlash(rank.flashColor);
+                        
+                        // Wait for bounce animation to finish, then set idle state
+                        rankAnimTimeout = setTimeout(() => {
+                            rankBadge.classList.remove('rank-bounce');
+                            rankBadge.classList.add(rank.idleClass);
+                        }, 500);
                     }
                     
                     currentRankIndex = matchedIndex;
@@ -862,6 +962,8 @@
                 rankContainer.classList.add('active');
             } else {
                 rankContainer.classList.remove('active');
+                if (rankAnimTimeout) clearTimeout(rankAnimTimeout);
+                rankBadge.className = 'rank-badge';
                 currentRankIndex = -1;
             }
         }
