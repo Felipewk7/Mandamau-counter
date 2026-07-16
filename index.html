@@ -108,6 +108,105 @@
             -webkit-text-fill-color: transparent;
         }
 
+        /* DMC Style Rank Container */
+        .rank-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-top: -10px;
+            margin-bottom: 10px;
+            height: 90px;
+            opacity: 0;
+            transform: scale(0.8);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            pointer-events: none;
+        }
+
+        .rank-container.active {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .rank-badge {
+            font-size: 3.2rem;
+            font-weight: 900;
+            line-height: 1;
+            font-style: italic;
+            text-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            transition: all 0.3s ease;
+            user-select: none;
+        }
+
+        .rank-name {
+            font-size: 0.8rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin-top: 4px;
+            color: var(--text-secondary);
+            transition: all 0.3s ease;
+        }
+
+        /* Rank specific glow & colors */
+        .rank-d { color: #94a3b8; text-shadow: 0 0 12px rgba(148, 163, 184, 0.5); }
+        .rank-c { color: #10b981; text-shadow: 0 0 12px rgba(16, 185, 129, 0.5); }
+        .rank-b { color: #06b6d4; text-shadow: 0 0 12px rgba(6, 182, 212, 0.5); }
+        .rank-a { color: #f59e0b; text-shadow: 0 0 12px rgba(245, 158, 11, 0.5); }
+        .rank-s { color: #a855f7; text-shadow: 0 0 15px rgba(168, 85, 247, 0.6); }
+        .rank-ss { color: #ec4899; text-shadow: 0 0 18px rgba(236, 72, 153, 0.7); }
+        
+        /* SSS flashy styling */
+        .rank-sss {
+            background: linear-gradient(135deg, #ff007f, #ffaa00, #ff007f);
+            background-size: 200% auto;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: sss-flash 1.5s infinite linear;
+            filter: drop-shadow(0 0 8px rgba(255, 0, 127, 0.6));
+        }
+
+        @keyframes sss-flash {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Upgrade bounce animation */
+        .rank-bounce {
+            animation: dmc-rank-up 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes dmc-rank-up {
+            0% {
+                transform: scale(0.6) rotate(-15deg);
+                filter: brightness(3);
+            }
+            50% {
+                transform: scale(1.4) rotate(10deg);
+                filter: brightness(2) drop-shadow(0 0 25px currentColor);
+            }
+            100% {
+                transform: scale(1) rotate(0deg);
+                filter: brightness(1);
+            }
+        }
+
+        /* Screen shake animation on card */
+        .card-shake {
+            animation: card-shake-anim 0.3s linear;
+        }
+
+        @keyframes card-shake-anim {
+            0% { transform: translate(0, 0); }
+            15% { transform: translate(-4px, 2px) rotate(-0.5deg); }
+            30% { transform: translate(4px, -2px) rotate(0.5deg); }
+            45% { transform: translate(-3px, -1px) rotate(-0.5deg); }
+            60% { transform: translate(3px, 2px) rotate(0.5deg); }
+            75% { transform: translate(-2px, -1px) rotate(0deg); }
+            100% { transform: translate(0, 0); }
+        }
+
         /* Animated Counter display */
         .counter-container {
             margin: 25px 0;
@@ -496,6 +595,12 @@
                 Mandamau Counter
                 <span class="subtitle">for Bako The FurryGuy</span>
             </h1>
+
+            <!-- DMC Style Rank Badge -->
+            <div id="rank-container" class="rank-container">
+                <span id="rank-badge" class="rank-badge">D</span>
+                <span id="rank-name" class="rank-name">Dull</span>
+            </div>
             
             <div class="counter-container">
                 <span id="counter" class="counter-value">0</span>
@@ -545,9 +650,21 @@
     </div>
 
     <script>
+        // DMC Ranks Configuration
+        const ranks = [
+            { min: 10000, letter: 'SSS', name: "Smokin' Sexy Style!!", class: 'rank-sss' },
+            { min: 5000, letter: 'SS', name: "Super Stylish", class: 'rank-ss' },
+            { min: 1000, letter: 'S', name: "Stylish", class: 'rank-s' },
+            { min: 500, letter: 'A', name: "Alright", class: 'rank-a' },
+            { min: 100, letter: 'B', name: "Blast", class: 'rank-b' },
+            { min: 50, letter: 'C', name: "Cool", class: 'rank-c' },
+            { min: 10, letter: 'D', name: "Dull", class: 'rank-d' }
+        ];
+
         // State Management
         let count = 0;
         let resetStep = 0;
+        let currentRankIndex = -1;
         const resetQuestions = [
             "Tem certeza que quer apagar?",
             "O Bako ainda está mentindo, quer prosseguir?",
@@ -585,6 +702,9 @@
             if (savedMultiplier !== null) {
                 multiplierInput.value = savedMultiplier;
             }
+            
+            // Initial load update without animations
+            updateStyleRank(true);
         }
 
         // Get and validate multiplier value
@@ -631,6 +751,119 @@
             setTimeout(() => {
                 counterEl.classList.remove('counter-pop');
             }, 150);
+
+            // Update DMC Rank
+            updateStyleRank();
+        }
+
+        // Card shake animation trigger
+        function triggerCardShake() {
+            const card = document.querySelector('.card');
+            card.classList.remove('card-shake');
+            void card.offsetWidth; // Trigger reflow
+            card.classList.add('card-shake');
+            setTimeout(() => {
+                card.classList.remove('card-shake');
+            }, 300);
+        }
+
+        // Particles explosion on rank upgrade
+        function triggerRankBurst(colorClass) {
+            const badge = document.getElementById('rank-badge');
+            const rect = badge.getBoundingClientRect();
+            const x = rect.left + rect.width / 2;
+            const y = rect.top + rect.height / 2;
+
+            for (let i = 0; i < 20; i++) {
+                const p = document.createElement('div');
+                p.classList.add('particle');
+                
+                // Set start position relative to viewport
+                p.style.left = `${x}px`;
+                p.style.top = `${y}px`;
+                p.style.position = 'fixed';
+                p.style.pointerEvents = 'none';
+                
+                // Random velocities
+                const angle = Math.random() * Math.PI * 2;
+                const distance = Math.random() * 80 + 40;
+                const tx = Math.cos(angle) * distance;
+                const ty = Math.sin(angle) * distance;
+                
+                p.style.width = `${Math.random() * 8 + 4}px`;
+                p.style.height = p.style.width;
+                
+                // Color matching based on rank class
+                if (colorClass === 'rank-sss') {
+                    p.style.background = `hsl(${Math.random() * 40 + 10}, 100%, 60%)`;
+                } else if (colorClass === 'rank-ss') {
+                    p.style.background = '#ec4899';
+                } else if (colorClass === 'rank-s') {
+                    p.style.background = '#a855f7';
+                } else if (colorClass === 'rank-a') {
+                    p.style.background = '#eab308';
+                } else if (colorClass === 'rank-b') {
+                    p.style.background = '#06b6d4';
+                } else if (colorClass === 'rank-c') {
+                    p.style.background = '#10b981';
+                } else {
+                    p.style.background = '#94a3b8';
+                }
+                
+                p.style.boxShadow = `0 0 10px currentColor`;
+                p.style.borderRadius = '50%';
+                
+                // Animate expansion
+                const anim = p.animate([
+                    { transform: 'translate(0, 0) scale(1)', opacity: 1 },
+                    { transform: `translate(${tx}px, ${ty}px) scale(0)`, opacity: 0 }
+                ], {
+                    duration: Math.random() * 400 + 400,
+                    easing: 'cubic-bezier(0.1, 0.8, 0.3, 1)'
+                });
+                
+                document.body.appendChild(p);
+                anim.onfinish = () => p.remove();
+            }
+        }
+
+        // DMC Style Rank Update Logic
+        function updateStyleRank(isInitialLoad = false) {
+            const matchedIndex = ranks.findIndex(r => count >= r.min);
+            const rankContainer = document.getElementById('rank-container');
+            const rankBadge = document.getElementById('rank-badge');
+            const rankName = document.getElementById('rank-name');
+
+            if (matchedIndex !== -1) {
+                const rank = ranks[matchedIndex];
+                
+                if (matchedIndex !== currentRankIndex) {
+                    rankBadge.textContent = rank.letter;
+                    rankName.textContent = rank.name;
+                    
+                    // Reset class list
+                    rankBadge.className = 'rank-badge ' + rank.class;
+                    
+                    if (!isInitialLoad) {
+                        // Add bounce animation
+                        rankBadge.classList.remove('rank-bounce');
+                        void rankBadge.offsetWidth;
+                        rankBadge.classList.add('rank-bounce');
+                        
+                        // Screen shake
+                        triggerCardShake();
+                        
+                        // Sparkle particles
+                        triggerRankBurst(rank.class);
+                    }
+                    
+                    currentRankIndex = matchedIndex;
+                }
+                rankContainer.classList.add('active');
+            } else {
+                rankContainer.classList.remove('active');
+                currentRankIndex = -1;
+            }
         }
 
         // Modal Logic
