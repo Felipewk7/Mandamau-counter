@@ -1701,3 +1701,65 @@ body::before {
         padding-top: 5px;
     }
 }
+
+/* Floating Journey Trigger Button (Map icon) */
+.btn-journey-trigger {
+    position: fixed;
+    bottom: 100px; /* Placed exactly above the phone trigger button */
+    right: 25px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: rgba(9, 13, 22, 0.85);
+    border: 1px solid rgba(234, 179, 8, 0.3); /* Gold neon accent */
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 15px rgba(234, 179, 8, 0.2);
+    cursor: pointer;
+    z-index: 999;
+    display: none; /* Hidden by default, activated via JS */
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    backdrop-filter: blur(8px);
+    animation: zoom-in-journey 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+.btn-journey-trigger.active {
+    display: flex;
+}
+
+.btn-journey-trigger:hover {
+    transform: scale(1.1) rotate(-5deg);
+    border-color: rgba(234, 179, 8, 0.6);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 20px rgba(234, 179, 8, 0.5);
+}
+
+.btn-journey-trigger:active {
+    transform: scale(0.95);
+}
+
+.journey-icon {
+    font-size: 1.5rem;
+    line-height: 1;
+    filter: drop-shadow(0 0 6px rgba(234, 179, 8, 0.4));
+}
+
+.journey-label {
+    font-size: 0.55rem;
+    font-weight: 800;
+    color: rgba(234, 179, 8, 0.9);
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+    margin-top: 2px;
+}
+
+@keyframes zoom-in-journey {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}

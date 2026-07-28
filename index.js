@@ -1552,7 +1552,11 @@ const btnClosePhone = document.getElementById('btn-close-phone');
 const chatMessagesContainer = document.getElementById('chat-messages-container');
 const chatTypingIndicator = document.getElementById('chat-typing-indicator');
 const chatOptionsPanel = document.getElementById('chat-options-panel');
-const chatOptBtns = document.querySelectorAll('.chat-opt-btn');
+const btnJourneyTrigger = document.getElementById('btn-journey-trigger');
+
+// Persisted State
+const askedQuestions = JSON.parse(localStorage.getItem('mandamau_asked_questions')) || { patinhos: false, terrorista: false, peixes: false };
+let chatCompleted = localStorage.getItem('mandamau_chat_completed') === 'true';
 
 btnPhoneTrigger.addEventListener('click', () => {
     smartphoneContainer.classList.toggle('active');
@@ -1565,6 +1569,11 @@ btnPhoneTrigger.addEventListener('click', () => {
 btnClosePhone.addEventListener('click', () => {
     smartphoneContainer.classList.remove('active');
     playSound('click');
+});
+
+btnJourneyTrigger.addEventListener('click', () => {
+    playSound('click');
+    alert("Jornada: Em breve você poderá desbravar a sede da GGOPA e enfrentar os desafios pelo Remédio Supremo!");
 });
 
 const bakoChats = {
@@ -1603,57 +1612,184 @@ function appendChatMessage(text, isPlayer = false, author = '') {
     chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
 }
 
-chatOptBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-        const qKey = btn.getAttribute('data-question');
-        const chat = bakoChats[qKey];
-        if (!chat) return;
+function renderChatOptions() {
+    chatOptionsPanel.innerHTML = '';
+    
+    if (chatCompleted) {
+        const titleSpan = document.createElement('span');
+        titleSpan.className = 'options-title';
+        titleSpan.textContent = 'Mapeamento Concluído';
+        chatOptionsPanel.appendChild(titleSpan);
+        return;
+    }
+    
+    const allInitialAsked = askedQuestions.patinhos && askedQuestions.terrorista && askedQuestions.peixes;
+    
+    if (allInitialAsked) {
+        const titleSpan = document.createElement('span');
+        titleSpan.className = 'options-title';
+        titleSpan.textContent = 'Pergunta Secreta Desbloqueada:';
+        chatOptionsPanel.appendChild(titleSpan);
         
-        playSound('click');
+        const btn = document.createElement('button');
+        btn.className = 'chat-opt-btn';
+        btn.style.borderColor = 'rgba(234, 179, 8, 0.5)';
+        btn.style.background = 'rgba(234, 179, 8, 0.05)';
+        btn.innerHTML = '❓ Bako ta tudo bem ?';
+        btn.addEventListener('click', () => {
+            triggerSecretConversation();
+        });
+        chatOptionsPanel.appendChild(btn);
+    } else {
+        const titleSpan = document.createElement('span');
+        titleSpan.className = 'options-title';
+        titleSpan.textContent = 'Selecione uma pergunta para enviar:';
+        chatOptionsPanel.appendChild(titleSpan);
         
-        // Disable options during conversation
-        chatOptionsPanel.style.pointerEvents = 'none';
-        chatOptionsPanel.style.opacity = '0.4';
-        
-        // 1. Send Player Question
-        appendChatMessage(chat.question, true, 'Você');
-        
-        // 2. Wait 800ms, then show typing indicator
-        setTimeout(() => {
-            chatTypingIndicator.style.display = 'flex';
-            chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
-            
-            // 3. Wait 1500ms of typing, then send Bako Answer
-            setTimeout(() => {
-                chatTypingIndicator.style.display = 'none';
-                appendChatMessage(chat.bakoAnswer, false, 'Bako');
-                playSound('rank_up_low'); // funny alert sound
-                
-                // 4. Wait 1200ms, then send Player Reply
-                setTimeout(() => {
-                    appendChatMessage(chat.playerReply, true, 'Você');
-                    
-                    // 5. Wait 3500ms, then reset chat to initial state
-                    setTimeout(() => {
-                        resetPhoneChat();
-                    }, 3500);
-                    
-                }, 1200);
-                
-            }, 1500);
-            
-        }, 800);
-    });
-});
-
-function resetPhoneChat() {
-    chatMessagesContainer.innerHTML = `
-        <div class="msg-bubble bako-msg">
-            <span class="msg-author">Bako</span>
-            <p>Diga lá, o que você quer me perguntar? Sem mentiras, hein! 😉</p>
-        </div>
-    `;
-    chatOptionsPanel.style.pointerEvents = 'all';
-    chatOptionsPanel.style.opacity = '1';
-    chatMessagesContainer.scrollTop = 0;
+        if (!askedQuestions.patinhos) {
+            const btn = document.createElement('button');
+            btn.className = 'chat-opt-btn';
+            btn.textContent = '🦆 Bako pq vc fez aquilo com os patinhos?';
+            btn.addEventListener('click', () => triggerConversation('patinhos'));
+            chatOptionsPanel.appendChild(btn);
+        }
+        if (!askedQuestions.terrorista) {
+            const btn = document.createElement('button');
+            btn.className = 'chat-opt-btn';
+            btn.textContent = '💣 bako vc é um terrorista?';
+            btn.addEventListener('click', () => triggerConversation('terrorista'));
+            chatOptionsPanel.appendChild(btn);
+        }
+        if (!askedQuestions.peixes) {
+            const btn = document.createElement('button');
+            btn.className = 'chat-opt-btn';
+            btn.textContent = '🐟 Bako pq vc gosta de mijar em peixes?';
+            btn.addEventListener('click', () => triggerConversation('peixes'));
+            chatOptionsPanel.appendChild(btn);
+        }
+    }
 }
+
+function triggerConversation(key) {
+    const chat = bakoChats[key];
+    if (!chat) return;
+    
+    // Disable options panel during dialogue
+    chatOptionsPanel.style.pointerEvents = 'none';
+    chatOptionsPanel.style.opacity = '0.4';
+    
+    // 1. Send Player Question
+    appendChatMessage(chat.question, true, 'Você');
+    
+    // 2. Typing indicator delay
+    setTimeout(() => {
+        chatTypingIndicator.style.display = 'flex';
+        chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
+        
+        // 3. Send Bako Answer
+        setTimeout(() => {
+            chatTypingIndicator.style.display = 'none';
+            appendChatMessage(chat.bakoAnswer, false, 'Bako');
+            playSound('rank_up_low');
+            
+            // 4. Send Player Reply
+            setTimeout(() => {
+                appendChatMessage(chat.playerReply, true, 'Você');
+                
+                // 5. Finalize this question and enable remaining options
+                setTimeout(() => {
+                    askedQuestions[key] = true;
+                    localStorage.setItem('mandamau_asked_questions', JSON.stringify(askedQuestions));
+                    
+                    chatOptionsPanel.style.pointerEvents = 'all';
+                    chatOptionsPanel.style.opacity = '1';
+                    renderChatOptions();
+                }, 2000);
+                
+            }, 1200);
+            
+        }, 1500);
+        
+    }, 800);
+}
+
+function triggerSecretConversation() {
+    chatOptionsPanel.style.pointerEvents = 'none';
+    chatOptionsPanel.style.opacity = '0.4';
+    
+    // 1. Player Question: Bako ta tudo bem ?
+    appendChatMessage("Bako ta tudo bem ?", true, 'Você');
+    
+    // 2. Typing indicator -> Bako Answer
+    setTimeout(() => {
+        chatTypingIndicator.style.display = 'flex';
+        chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
+        
+        setTimeout(() => {
+            chatTypingIndicator.style.display = 'none';
+            appendChatMessage("na real não , eu fui amaldiçoado pra sempre mentir , mas tem um jeito de me curar , vc precisa apenas pegar o remedio supremo", false, 'Bako');
+            playSound('rank_up_low');
+            
+            // 3. Player: onde consigo isso ?
+            setTimeout(() => {
+                appendChatMessage("onde consigo isso ?", true, 'Você');
+                
+                // 4. Typing indicator -> Bako: va ate a cede do GGOPA , depois que passar dos desafios vai conseguir
+                setTimeout(() => {
+                    chatTypingIndicator.style.display = 'flex';
+                    chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
+                    
+                    setTimeout(() => {
+                        chatTypingIndicator.style.display = 'none';
+                        appendChatMessage("va ate a cede do GGOPA , depois que passar dos desafios vai conseguir", false, 'Bako');
+                        playSound('rank_up_low');
+                        
+                        // 5. Player: ok , vamos tentar
+                        setTimeout(() => {
+                            appendChatMessage("ok , vamos tentar", true, 'Você');
+                            
+                            // 6. Complete and Unlock Map Icon (persisted)
+                            setTimeout(() => {
+                                chatCompleted = true;
+                                localStorage.setItem('mandamau_chat_completed', 'true');
+                                
+                                renderChatOptions();
+                                btnJourneyTrigger.classList.add('active');
+                            }, 2500);
+                            
+                        }, 1200);
+                        
+                    }, 1500);
+                    
+                }, 800);
+                
+            }, 1200);
+            
+        }, 2000);
+        
+    }, 800);
+}
+
+function initPhoneChat() {
+    if (chatCompleted) {
+        btnJourneyTrigger.classList.add('active');
+        chatMessagesContainer.innerHTML = `
+            <div class="msg-bubble bako-msg">
+                <span class="msg-author">Bako</span>
+                <p>Obrigado pela ajuda! Vá até a sede da GGOPA para conseguir o remédio supremo e quebrar a minha maldição!</p>
+            </div>
+        `;
+    } else {
+        btnJourneyTrigger.classList.remove('active');
+        chatMessagesContainer.innerHTML = `
+            <div class="msg-bubble bako-msg">
+                <span class="msg-author">Bako</span>
+                <p>Diga lá, o que você quer me perguntar? Sem mentiras, hein! 😉</p>
+            </div>
+        `;
+    }
+    renderChatOptions();
+}
+
+// Start Phone system
+initPhoneChat();
