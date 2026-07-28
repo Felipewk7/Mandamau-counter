@@ -902,7 +902,7 @@ body::before {
     white-space: nowrap;
     z-index: 9999;
     transform: translate(-50%, -50%);
-    animation: floatUpAndFade 1.4s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+    animation: floatUpAndFade 4s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
 }
 
 @keyframes floatUpAndFade {
@@ -910,12 +910,16 @@ body::before {
         transform: translate(-50%, 0) scale(0.7);
         opacity: 0;
     }
-    15% {
+    8% {
         opacity: 1;
         transform: translate(-50%, -20px) scale(1.05);
     }
+    85% {
+        opacity: 1;
+        transform: translate(-50%, -80px) scale(1.0);
+    }
     100% {
-        transform: translate(-50%, -120px) scale(0.9);
+        transform: translate(-50%, -110px) scale(0.8);
         opacity: 0;
     }
 }
@@ -1123,5 +1127,156 @@ body::before {
     }
     .bako-dialog-bubble p {
         font-size: 0.75rem;
+    }
+}
+
+/* Subtabs Navigation (Inside Stats Tab) */
+.subtabs-nav {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--card-border);
+    padding-bottom: 8px;
+}
+
+.subtab-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    padding: 6px 12px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    position: relative;
+}
+
+.subtab-btn:hover {
+    color: var(--text-primary);
+}
+
+.subtab-btn.active {
+    color: var(--text-primary);
+}
+
+.subtab-btn.active::after {
+    content: '';
+    position: absolute;
+    bottom: -9px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, var(--btn-sum-start), var(--btn-mul-start));
+    border-radius: 2px;
+}
+
+.subcontent-tab {
+    display: none;
+    animation: fadeInTab 0.3s ease forwards;
+}
+
+.subcontent-tab.active {
+    display: block;
+}
+
+/* Stats 2.0 styles */
+.stats-2-intro {
+    font-size: 0.8rem;
+    line-height: 1.5;
+    color: var(--text-secondary);
+    margin-bottom: 20px;
+    text-align: center;
+    background: rgba(15, 23, 42, 0.4);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    padding: 12px;
+}
+
+.stats-2-intro .highlight-m {
+    color: var(--text-primary);
+    font-weight: 800;
+    background: linear-gradient(135deg, var(--btn-sum-start), var(--btn-mul-start));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.stats-2-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    max-height: 230px;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+/* Custom Scrollbar for stats 2.0 grid to match theme */
+.stats-2-grid::-webkit-scrollbar {
+    width: 4px;
+}
+.stats-2-grid::-webkit-scrollbar-track {
+    background: rgba(15, 23, 42, 0.2);
+    border-radius: 10px;
+}
+.stats-2-grid::-webkit-scrollbar-thumb {
+    background: var(--card-border);
+    border-radius: 10px;
+}
+.stats-2-grid::-webkit-scrollbar-thumb:hover {
+    background: var(--text-secondary);
+}
+
+.stat-2-card {
+    background: rgba(15, 23, 42, 0.5);
+    border: 1px solid var(--card-border);
+    border-radius: 14px;
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.stat-2-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255, 255, 255, 0.15);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.stat-2-icon {
+    font-size: 1.4rem;
+    margin-bottom: 6px;
+}
+
+.stat-2-title {
+    font-size: 0.65rem;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.stat-2-val {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    word-break: break-all;
+    margin-bottom: 2px;
+}
+
+.stat-2-desc {
+    font-size: 0.6rem;
+    color: var(--text-secondary);
+    opacity: 0.7;
+}
+
+@media (max-width: 480px) {
+    .stats-2-grid {
+        grid-template-columns: 1fr;
+        max-height: 200px;
     }
 }

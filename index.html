@@ -93,27 +93,81 @@
 
             <!-- Tab Content: Statistics -->
             <div id="content-stats" class="tab-content">
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <span class="stat-label">Recorde Máximo</span>
-                        <span id="stat-high-score" class="stat-value">0</span>
+                <!-- Sub Tabs Navigation -->
+                <div class="subtabs-nav">
+                    <button id="subtab-stats-general" class="subtab-btn active">Geral</button>
+                    <button id="subtab-stats-2" class="subtab-btn">Estatísticas 2.0</button>
+                </div>
+
+                <!-- Sub Tab: General Stats -->
+                <div id="subcontent-stats-general" class="subcontent-tab active">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <span class="stat-label">Recorde Máximo</span>
+                            <span id="stat-high-score" class="stat-value">0</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-label">Sem Mentiras Há</span>
+                            <span id="stat-time-since" class="stat-value">0s</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-label">Cliques Totais</span>
+                            <span id="stat-total-clicks" class="stat-value">0</span>
+                        </div>
+                        <div class="stat-card">
+                            <span class="stat-label">Frequência (LPM)</span>
+                            <span id="stat-lpm" class="stat-value">0.0</span>
+                        </div>
                     </div>
-                    <div class="stat-card">
-                        <span class="stat-label">Sem Mentiras Há</span>
-                        <span id="stat-time-since" class="stat-value">0s</span>
-                    </div>
-                    <div class="stat-card">
-                        <span class="stat-label">Cliques Totais</span>
-                        <span id="stat-total-clicks" class="stat-value">0</span>
-                    </div>
-                    <div class="stat-card">
-                        <span class="stat-label">Frequência (LPM)</span>
-                        <span id="stat-lpm" class="stat-value">0.0</span>
+                    <div class="stat-last-lie">
+                        <span class="stat-label">Última Mentira Registrada</span>
+                        <span id="stat-last-time" class="stat-value-sub">Nenhuma ainda</span>
                     </div>
                 </div>
-                <div class="stat-last-lie">
-                    <span class="stat-label">Última Mentira Registrada</span>
-                    <span id="stat-last-time" class="stat-value-sub">Nenhuma ainda</span>
+
+                <!-- Sub Tab: Statistics 2.0 (Equivalents of Bako's lies in meters) -->
+                <div id="subcontent-stats-2" class="subcontent-tab">
+                    <div class="stats-2-intro">
+                        Se cada mentira do Bako corresponder a <span class="highlight-m">1 metro</span>, as suas <span id="stats-2-total-lies" class="highlight-m">0</span> mentiras equivaleriam a:
+                    </div>
+                    <div class="stats-2-grid">
+                        <div class="stat-2-card">
+                            <span class="stat-2-icon">🗽</span>
+                            <span class="stat-2-title">Cristos Redentores</span>
+                            <span id="stat-2-cristo" class="stat-2-val">0</span>
+                            <span class="stat-2-desc">(38 metros de altura)</span>
+                        </div>
+                        <div class="stat-2-card">
+                            <span class="stat-2-icon">🏔️</span>
+                            <span class="stat-2-title">Montes Everest</span>
+                            <span id="stat-2-everest" class="stat-2-val">0</span>
+                            <span class="stat-2-desc">(8.848 metros de altura)</span>
+                        </div>
+                        <div class="stat-2-card">
+                            <span class="stat-2-icon">🌉</span>
+                            <span class="stat-2-title">Pontes Rio-Niterói</span>
+                            <span id="stat-2-ponte" class="stat-2-val">0</span>
+                            <span class="stat-2-desc">(13.290 metros de extensão)</span>
+                        </div>
+                        <div class="stat-2-card">
+                            <span class="stat-2-icon">🧱</span>
+                            <span class="stat-2-title">Muralhas da China</span>
+                            <span id="stat-2-muralha" class="stat-2-val">0</span>
+                            <span class="stat-2-desc">(21.196.000 metros)</span>
+                        </div>
+                        <div class="stat-2-card">
+                            <span class="stat-2-icon">🌍</span>
+                            <span class="stat-2-title">Voltas à Terra</span>
+                            <span id="stat-2-terra" class="stat-2-val">0</span>
+                            <span class="stat-2-desc">(40.075.000 metros)</span>
+                        </div>
+                        <div class="stat-2-card">
+                            <span class="stat-2-icon">🚀</span>
+                            <span class="stat-2-title">Distância até a Lua</span>
+                            <span id="stat-2-lua" class="stat-2-val">0%</span>
+                            <span class="stat-2-desc">(384.400.000 metros)</span>
+                        </div>
+                    </div>
                 </div>
             </div>
             

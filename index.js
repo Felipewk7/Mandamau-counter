@@ -69,6 +69,12 @@ const contentCounter = document.getElementById('content-counter');
 const contentStats = document.getElementById('content-stats');
 const contentDuel = document.getElementById('content-duel');
 
+// Sub-Tab Elements
+const subtabStatsGeneral = document.getElementById('subtab-stats-general');
+const subtabStats2 = document.getElementById('subtab-stats-2');
+const subcontentStatsGeneral = document.getElementById('subcontent-stats-general');
+const subcontentStats2 = document.getElementById('subcontent-stats-2');
+
 // Duel Elements
 const duelCells = document.querySelectorAll('.duel-cell');
 const bakoSpeech = document.getElementById('bako-speech');
@@ -501,6 +507,7 @@ function selectTab(tabName) {
         tabStats.classList.add('active');
         contentStats.classList.add('active');
         updateStatsUI();
+        updateStats2UI();
     } else if (tabName === 'duel') {
         tabDuel.classList.add('active');
         contentDuel.classList.add('active');
@@ -512,6 +519,25 @@ function selectTab(tabName) {
 tabCounter.addEventListener('click', () => selectTab('counter'));
 tabStats.addEventListener('click', () => selectTab('stats'));
 tabDuel.addEventListener('click', () => selectTab('duel'));
+
+// Sub-Tab Navigation
+function selectSubTab(subTabName) {
+    [subtabStatsGeneral, subtabStats2].forEach(t => t.classList.remove('active'));
+    [subcontentStatsGeneral, subcontentStats2].forEach(c => c.classList.remove('active'));
+    
+    if (subTabName === 'general') {
+        subtabStatsGeneral.classList.add('active');
+        subcontentStatsGeneral.classList.add('active');
+    } else if (subTabName === 'stats2') {
+        subtabStats2.classList.add('active');
+        subcontentStats2.classList.add('active');
+        updateStats2UI();
+    }
+    playSound('click');
+}
+
+subtabStatsGeneral.addEventListener('click', () => selectSubTab('general'));
+subtabStats2.addEventListener('click', () => selectSubTab('stats2'));
 
 // Style Combo calculations
 function registerCombo() {
@@ -582,7 +608,7 @@ function triggerFloatingLie() {
     
     setTimeout(() => {
         el.remove();
-    }, 1400);
+    }, 4000);
 }
 
 // Format static numbers (used in stats panel)
@@ -788,6 +814,47 @@ function updateStatsUI() {
         document.getElementById('stat-last-time').textContent = 'Nenhuma ainda';
     }
     updateLPM();
+    updateStats2UI();
+}
+
+function formatStat2Value(val, suffix = '') {
+    if (val === 0) return '0' + suffix;
+    if (val >= 1000) {
+        return Math.floor(val).toLocaleString('pt-BR') + suffix;
+    }
+    if (val >= 1) {
+        return val.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + suffix;
+    }
+    // Very small numbers
+    if (val < 0.000001) {
+        return val.toExponential(2).replace('e', ' &times; 10<sup>') + '</sup>' + suffix;
+    }
+    return val.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 6 }) + suffix;
+}
+
+function updateStats2UI() {
+    const elLies = document.getElementById('stats-2-total-lies');
+    if (!elLies) return;
+    elLies.textContent = count.toLocaleString('pt-BR');
+    
+    const cristo = count / 38;
+    const everest = count / 8848;
+    const ponte = count / 13290;
+    const muralha = count / 21196000;
+    const terra = count / 40075000;
+    const lua = count / 384400000;
+    
+    document.getElementById('stat-2-cristo').innerHTML = formatStat2Value(cristo);
+    document.getElementById('stat-2-everest').innerHTML = formatStat2Value(everest);
+    document.getElementById('stat-2-ponte').innerHTML = formatStat2Value(ponte);
+    document.getElementById('stat-2-muralha').innerHTML = formatStat2Value(muralha);
+    document.getElementById('stat-2-terra').innerHTML = formatStat2Value(terra);
+    
+    if (lua < 0.01) {
+        document.getElementById('stat-2-lua').innerHTML = formatStat2Value(lua * 100, '%');
+    } else {
+        document.getElementById('stat-2-lua').innerHTML = (lua * 100).toLocaleString('pt-BR', { maximumFractionDigits: 2 }) + '%';
+    }
 }
 
 // Active timer update interval
