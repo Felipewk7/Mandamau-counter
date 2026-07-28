@@ -301,7 +301,70 @@
             </div>
         </div>
     </div>
+    <!-- Journey Map Overlay -->
+    <div id="journey-overlay" class="journey-overlay">
+        <div class="journey-box">
+            <button id="btn-close-journey-view" class="btn-close-journey-view" title="Fechar Jornada">&times;</button>
+            <h2 class="journey-title">A Jornada pelo Remédio Supremo</h2>
+            <p class="journey-subtitle">Desbrave o caminho até a sede do GGOPA para curar a maldição do Bako</p>
+            
+            <div id="journey-map-container" class="journey-map-container">
+                <!-- SVG connecting paths -->
+                <svg class="journey-map-svg">
+                    <line x1="15%" y1="75%" x2="45%" y2="55%" class="map-path-line line-fase1" />
+                    <line x1="45%" y1="55%" x2="70%" y2="40%" class="map-path-line line-fase2" />
+                    <line x1="70%" y1="40%" x2="90%" y2="20%" class="map-path-line line-ggopa" />
+                </svg>
+                
+                <!-- Map Nodes -->
+                <div id="node-start" class="map-node node-active" style="left: 15%; top: 75%;" title="Início">
+                    <span class="node-icon">🏁</span>
+                    <span class="node-label">Início</span>
+                </div>
+                
+                <div id="node-fase1" class="map-node" style="left: 45%; top: 55%;" title="Fase 1 - O Palhaço">
+                    <span class="node-icon">🤡</span>
+                    <span class="node-label">Fase 1</span>
+                </div>
+                
+                <div id="node-fase2" class="map-node node-locked" style="left: 70%; top: 40%;" title="Fase 2 - Bloqueado">
+                    <span class="node-icon">🔒</span>
+                    <span class="node-label">Fase 2</span>
+                </div>
+                
+                <div id="node-ggopa" class="map-node node-locked" style="left: 90%; top: 20%;" title="Sede do GGOPA">
+                    <span class="node-icon">🏛️</span>
+                    <span class="node-label">GGOPA</span>
+                </div>
+                
+                <!-- Player Token -->
+                <div id="journey-player-token" class="journey-player-token" style="left: 15%; top: 75%;">
+                    <span class="token-avatar">🏃</span>
+                    <span class="token-tag">Você</span>
+                </div>
+            </div>
+        </div>
 
+        <!-- Dialogue Encounter Overlay -->
+        <div id="journey-encounter-overlay" class="journey-encounter-overlay">
+            <div class="journey-encounter-card">
+                <div class="encounter-portrait-wrapper">
+                    <img src="kleber_clown.png" alt="Kleber O palhaço dos mil dentes" class="encounter-portrait">
+                </div>
+                <div class="encounter-info">
+                    <h3 class="encounter-name">Kleber</h3>
+                    <span class="encounter-title">O palhaço dos mil dentes</span>
+                </div>
+                <div class="encounter-dialog-bubble">
+                    <span class="dialog-author">Kleber</span>
+                    <p>pra passar de mim terá que me vencer numa queda de braço krl</p>
+                </div>
+                <div class="encounter-actions">
+                    <button id="btn-accept-challenge" class="btn btn-sum">Aceitar Desafio</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <script src="background.js"></script>
     <script src="index.js"></script>
 </body>

@@ -1571,10 +1571,56 @@ btnClosePhone.addEventListener('click', () => {
     playSound('click');
 });
 
+const journeyOverlay = document.getElementById('journey-overlay');
+const btnCloseJourneyView = document.getElementById('btn-close-journey-view');
+const journeyPlayerToken = document.getElementById('journey-player-token');
+const journeyEncounterOverlay = document.getElementById('journey-encounter-overlay');
+const btnAcceptChallenge = document.getElementById('btn-accept-challenge');
+const nodeFase1 = document.getElementById('node-fase1');
+const pathLineFase1 = document.querySelector('.line-fase1');
+
 btnJourneyTrigger.addEventListener('click', () => {
     playSound('click');
-    alert("Jornada: Em breve você poderá desbravar a sede da GGOPA e enfrentar os desafios pelo Remédio Supremo!");
+    openJourney();
 });
+
+btnCloseJourneyView.addEventListener('click', () => {
+    journeyOverlay.classList.remove('active');
+    playSound('click');
+});
+
+btnAcceptChallenge.addEventListener('click', () => {
+    journeyEncounterOverlay.classList.remove('active');
+    journeyOverlay.classList.remove('active');
+    playSound('click');
+    alert("Desafio Queda de Braço Aceito! Kleber está te encarando com seus mil dentes brilhantes...");
+});
+
+function openJourney() {
+    journeyOverlay.classList.add('active');
+    journeyEncounterOverlay.classList.remove('active');
+    pathLineFase1.classList.remove('line-active');
+    nodeFase1.classList.remove('node-active');
+    
+    // Reset player token position to Start Node
+    journeyPlayerToken.style.left = '15%';
+    journeyPlayerToken.style.top = '75%';
+    
+    // Trigger walking animation after a short delay
+    setTimeout(() => {
+        journeyPlayerToken.style.left = '45%';
+        journeyPlayerToken.style.top = '55%';
+        
+        // After 2.5s (walking duration), trigger the Kleber encounter
+        setTimeout(() => {
+            nodeFase1.classList.add('node-active');
+            pathLineFase1.classList.add('line-active');
+            playSound('rank_up_med');
+            journeyEncounterOverlay.classList.add('active');
+        }, 2500);
+        
+    }, 800);
+}
 
 const bakoChats = {
     patinhos: {

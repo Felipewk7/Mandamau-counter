@@ -1763,3 +1763,365 @@ body::before {
         opacity: 1;
     }
 }
+
+/* Journey Map Overlay Container */
+.journey-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(4, 6, 10, 0.95);
+    z-index: 1100;
+    display: none; /* Controlled by JS */
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(10px);
+}
+
+.journey-overlay.active {
+    display: flex;
+}
+
+/* Journey Box Frame */
+.journey-box {
+    width: 90%;
+    max-width: 800px;
+    height: 80%;
+    max-height: 600px;
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid var(--card-border);
+    border-radius: 28px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.7), 0 0 30px rgba(168, 85, 247, 0.15);
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    backdrop-filter: blur(20px);
+    animation: zoom-in-journey 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.15) forwards;
+}
+
+.btn-close-journey-view {
+    position: absolute;
+    top: 20px;
+    right: 25px;
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 2.2rem;
+    cursor: pointer;
+    line-height: 1;
+    transition: color 0.2s ease, transform 0.2s ease;
+}
+
+.btn-close-journey-view:hover {
+    color: var(--text-primary);
+    transform: rotate(90deg);
+}
+
+.journey-title {
+    font-size: 1.8rem;
+    font-weight: 800;
+    background: linear-gradient(135deg, #ffffff 40%, var(--text-primary) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 5px;
+    text-align: center;
+}
+
+.journey-subtitle {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+/* Journey Map Canvas/Container */
+.journey-map-container {
+    flex: 1;
+    width: 100%;
+    background: rgba(15, 23, 42, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 18px;
+    position: relative;
+    overflow: hidden;
+}
+
+/* SVG Line paths connecting nodes */
+.journey-map-svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.map-path-line {
+    stroke: rgba(255, 255, 255, 0.08);
+    stroke-width: 4;
+    stroke-dasharray: 8 8;
+    transition: all 0.5s ease;
+}
+
+.map-path-line.line-active {
+    stroke: var(--text-primary);
+    stroke-width: 4;
+    filter: drop-shadow(0 0 6px rgba(168, 85, 247, 0.5));
+}
+
+/* Map Nodes */
+.map-node {
+    position: absolute;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: rgba(15, 23, 42, 0.95);
+    border: 2px solid var(--card-border);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: translate(-50%, -50%);
+    z-index: 5;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.map-node.node-active {
+    border-color: rgba(168, 85, 247, 0.8);
+    box-shadow: 0 0 20px rgba(168, 85, 247, 0.6);
+}
+
+.map-node.node-active:hover {
+    transform: translate(-50%, -50%) scale(1.15);
+}
+
+.map-node.node-locked {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.node-icon {
+    font-size: 1.5rem;
+}
+
+.node-label {
+    position: absolute;
+    bottom: -22px;
+    white-space: nowrap;
+    font-size: 0.65rem;
+    font-weight: 800;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.node-active .node-label {
+    color: var(--text-primary);
+    text-shadow: 0 0 8px rgba(255,255,255,0.3);
+}
+
+/* Player Token on Map */
+.journey-player-token {
+    position: absolute;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgba(168, 85, 247, 1) 0%, rgba(236, 72, 153, 1) 100%);
+    border: 3px solid white;
+    box-shadow: 0 0 15px rgba(236, 72, 153, 0.8);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    transition: left 2.5s cubic-bezier(0.4, 0, 0.2, 1), top 2.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.token-avatar {
+    font-size: 1.3rem;
+}
+
+.token-tag {
+    position: absolute;
+    top: -20px;
+    background: rgba(236, 72, 153, 0.95);
+    color: white;
+    font-size: 0.55rem;
+    font-weight: 800;
+    padding: 2px 6px;
+    border-radius: 6px;
+    white-space: nowrap;
+    text-transform: uppercase;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+}
+
+/* Encounter Dialog Card Overlay */
+.journey-encounter-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    z-index: 100;
+    display: none; /* Controlled by JS */
+    align-items: center;
+    justify-content: center;
+    border-radius: 28px;
+    animation: fade-in-encounter 0.3s ease forwards;
+}
+
+.journey-encounter-overlay.active {
+    display: flex;
+}
+
+@keyframes fade-in-encounter {
+    0% { opacity: 0; }
+    100% { opacity: 1; }
+}
+
+.journey-encounter-card {
+    width: 80%;
+    max-width: 420px;
+    background: rgba(15, 23, 42, 0.95);
+    border: 1px solid var(--card-border);
+    border-radius: 24px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.8), 0 0 30px rgba(239, 68, 68, 0.15); /* Red gold accent for Kleber */
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    animation: zoom-in-journey 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.25) forwards;
+}
+
+.encounter-portrait-wrapper {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: 3px solid rgba(239, 68, 68, 0.6);
+    box-shadow: 0 0 20px rgba(239, 68, 68, 0.4);
+    overflow: hidden;
+    margin-bottom: 15px;
+    background: #0f172a;
+}
+
+.encounter-portrait {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.encounter-info {
+    margin-bottom: 20px;
+}
+
+.encounter-name {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin-bottom: 2px;
+}
+
+.encounter-title {
+    font-size: 0.7rem;
+    color: #ef4444;
+    text-transform: uppercase;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+}
+
+.encounter-dialog-bubble {
+    background: rgba(30, 41, 59, 0.9);
+    border: 1px solid var(--card-border);
+    border-radius: 16px;
+    border-top-left-radius: 2px;
+    padding: 15px;
+    margin-bottom: 20px;
+    position: relative;
+    max-width: 90%;
+    text-align: left;
+}
+
+.encounter-dialog-bubble::before {
+    content: '';
+    position: absolute;
+    top: -1px;
+    left: -8px;
+    border-width: 8px 8px 0 0;
+    border-style: solid;
+    border-color: var(--card-border) transparent transparent transparent;
+}
+
+.dialog-author {
+    font-size: 0.55rem;
+    font-weight: 800;
+    color: #ef4444;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+    display: block;
+}
+
+.encounter-dialog-bubble p {
+    font-size: 0.8rem;
+    line-height: 1.4;
+    color: var(--text-primary);
+}
+
+.encounter-actions {
+    width: 100%;
+}
+
+.encounter-actions button {
+    width: 100%;
+}
+
+@media (max-width: 480px) {
+    .journey-box {
+        width: 95%;
+        height: 90%;
+        padding: 20px 15px;
+        border-radius: 20px;
+    }
+    
+    .journey-title {
+        font-size: 1.3rem;
+    }
+    
+    .map-node {
+        width: 42px;
+        height: 42px;
+    }
+    
+    .node-icon {
+        font-size: 1.2rem;
+    }
+    
+    .node-label {
+        font-size: 0.55rem;
+        bottom: -18px;
+    }
+    
+    .journey-player-token {
+        width: 34px;
+        height: 34px;
+    }
+    
+    .token-avatar {
+        font-size: 1rem;
+    }
+    
+    .encounter-portrait-wrapper {
+        width: 110px;
+        height: 110px;
+    }
+    
+    .journey-encounter-card {
+        padding: 15px;
+        width: 90%;
+    }
+}
