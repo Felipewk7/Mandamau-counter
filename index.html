@@ -236,6 +236,69 @@
         </div>
     </div>
 
+    <!-- Floating Smartphone Trigger Button -->
+    <button id="btn-phone-trigger" class="btn-phone-trigger" title="Conversar com o Bako">
+        <span class="phone-icon">📱</span>
+        <span class="phone-badge">1</span>
+    </button>
+
+    <!-- Smartphone Chat Container -->
+    <div id="smartphone-container" class="smartphone-container">
+        <div class="smartphone-frame">
+            <!-- Notch/Speaker -->
+            <div class="smartphone-notch"></div>
+            
+            <!-- Smartphone Screen -->
+            <div class="smartphone-screen">
+                <!-- Status Bar -->
+                <div class="phone-status-bar">
+                    <span class="phone-time">04:20</span>
+                    <div class="phone-status-icons">
+                        <span>📶</span>
+                        <span>🔋</span>
+                    </div>
+                </div>
+                
+                <!-- Chat App Header -->
+                <div class="chat-header">
+                    <button id="btn-close-phone" class="btn-close-phone">&larr;</button>
+                    <div class="chat-avatar">🦆</div>
+                    <div class="chat-user-info">
+                        <span class="chat-username">Bako</span>
+                        <span class="chat-status">online</span>
+                    </div>
+                </div>
+                
+                <!-- Chat Message Area -->
+                <div id="chat-messages-container" class="chat-messages-container">
+                    <!-- Initial Welcome Message -->
+                    <div class="msg-bubble bako-msg">
+                        <span class="msg-author">Bako</span>
+                        <p>Diga lá, o que você quer me perguntar? Sem mentiras, hein! 😉</p>
+                    </div>
+                </div>
+                
+                <!-- Typing indicator (hidden by default) -->
+                <div id="chat-typing-indicator" class="chat-typing-indicator">
+                    <div class="typing-bubble">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                    <span class="typing-text">Bako está digitando...</span>
+                </div>
+                
+                <!-- Chat Bottom Options -->
+                <div id="chat-options-panel" class="chat-options-panel">
+                    <span class="options-title">Selecione uma pergunta para enviar:</span>
+                    <button class="chat-opt-btn" data-question="patinhos">🦆 Bako pq vc fez aquilo com os patinhos?</button>
+                    <button class="chat-opt-btn" data-question="terrorista">💣 bako vc é um terrorista?</button>
+                    <button class="chat-opt-btn" data-question="peixes">🐟 Bako pq vc gosta de mijar em peixes?</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="background.js"></script>
     <script src="index.js"></script>
 </body>

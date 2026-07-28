@@ -1544,3 +1544,116 @@ btnDuelReset.addEventListener('click', () => {
 
 // Initialize Duel at startup
 initDuel();
+
+// Smartphone Chat system
+const btnPhoneTrigger = document.getElementById('btn-phone-trigger');
+const smartphoneContainer = document.getElementById('smartphone-container');
+const btnClosePhone = document.getElementById('btn-close-phone');
+const chatMessagesContainer = document.getElementById('chat-messages-container');
+const chatTypingIndicator = document.getElementById('chat-typing-indicator');
+const chatOptionsPanel = document.getElementById('chat-options-panel');
+const chatOptBtns = document.querySelectorAll('.chat-opt-btn');
+
+btnPhoneTrigger.addEventListener('click', () => {
+    smartphoneContainer.classList.toggle('active');
+    // Hide notification badge when opened
+    const badge = btnPhoneTrigger.querySelector('.phone-badge');
+    if (badge) badge.style.display = 'none';
+    playSound('click');
+});
+
+btnClosePhone.addEventListener('click', () => {
+    smartphoneContainer.classList.remove('active');
+    playSound('click');
+});
+
+const bakoChats = {
+    patinhos: {
+        question: "Bako pq vc fez aquilo com os patinhos?",
+        bakoAnswer: "eu gosto de patinhos sabe, só de pensar nas penas deles eu tenho um orgasmo",
+        playerReply: "ok..."
+    },
+    terrorista: {
+        question: "bako vc é um terrorista?",
+        bakoAnswer: "eu gosto de explodir coisas,o osama era meu brother",
+        playerReply: "Misericórdia..."
+    },
+    peixes: {
+        question: "Bako pq vc gosta de mijar em peixes?",
+        bakoAnswer: "isso me acalma sabe , mijar neles enqunto se debatem no chão é prazeroso, e meter na boca deles depois  é melhor ainda",
+        playerReply: "..."
+    }
+};
+
+function appendChatMessage(text, isPlayer = false, author = '') {
+    const bubble = document.createElement('div');
+    bubble.className = `msg-bubble ${isPlayer ? 'player-msg' : 'bako-msg'}`;
+    
+    const authorSpan = document.createElement('span');
+    authorSpan.className = 'msg-author';
+    authorSpan.textContent = author;
+    
+    const p = document.createElement('p');
+    p.textContent = text;
+    
+    bubble.appendChild(authorSpan);
+    bubble.appendChild(p);
+    
+    chatMessagesContainer.appendChild(bubble);
+    chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
+}
+
+chatOptBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        const qKey = btn.getAttribute('data-question');
+        const chat = bakoChats[qKey];
+        if (!chat) return;
+        
+        playSound('click');
+        
+        // Disable options during conversation
+        chatOptionsPanel.style.pointerEvents = 'none';
+        chatOptionsPanel.style.opacity = '0.4';
+        
+        // 1. Send Player Question
+        appendChatMessage(chat.question, true, 'Você');
+        
+        // 2. Wait 800ms, then show typing indicator
+        setTimeout(() => {
+            chatTypingIndicator.style.display = 'flex';
+            chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
+            
+            // 3. Wait 1500ms of typing, then send Bako Answer
+            setTimeout(() => {
+                chatTypingIndicator.style.display = 'none';
+                appendChatMessage(chat.bakoAnswer, false, 'Bako');
+                playSound('rank_up_low'); // funny alert sound
+                
+                // 4. Wait 1200ms, then send Player Reply
+                setTimeout(() => {
+                    appendChatMessage(chat.playerReply, true, 'Você');
+                    
+                    // 5. Wait 3500ms, then reset chat to initial state
+                    setTimeout(() => {
+                        resetPhoneChat();
+                    }, 3500);
+                    
+                }, 1200);
+                
+            }, 1500);
+            
+        }, 800);
+    });
+});
+
+function resetPhoneChat() {
+    chatMessagesContainer.innerHTML = `
+        <div class="msg-bubble bako-msg">
+            <span class="msg-author">Bako</span>
+            <p>Diga lá, o que você quer me perguntar? Sem mentiras, hein! 😉</p>
+        </div>
+    `;
+    chatOptionsPanel.style.pointerEvents = 'all';
+    chatOptionsPanel.style.opacity = '1';
+    chatMessagesContainer.scrollTop = 0;
+}

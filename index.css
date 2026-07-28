@@ -1280,3 +1280,424 @@ body::before {
         max-height: 200px;
     }
 }
+
+/* Floating Smartphone Trigger Button */
+.btn-phone-trigger {
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background: rgba(15, 23, 42, 0.85);
+    border: 1px solid var(--card-border);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 15px rgba(168, 85, 247, 0.3);
+    cursor: pointer;
+    z-index: 999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    backdrop-filter: blur(8px);
+}
+
+.btn-phone-trigger:hover {
+    transform: scale(1.1) rotate(5deg);
+    border-color: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 20px rgba(168, 85, 247, 0.6);
+}
+
+.btn-phone-trigger:active {
+    transform: scale(0.95);
+}
+
+.phone-icon {
+    font-size: 1.8rem;
+    filter: drop-shadow(0 0 8px rgba(168, 85, 247, 0.5));
+}
+
+.phone-badge {
+    position: absolute;
+    top: -2px;
+    right: -2px;
+    background: linear-gradient(135deg, #ff007f, #ec4899);
+    color: white;
+    font-size: 0.7rem;
+    font-weight: 800;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid #0f172a;
+    animation: badge-pulse 2s infinite;
+}
+
+@keyframes badge-pulse {
+    0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(236, 72, 153, 0.7); }
+    70% { transform: scale(1.15); box-shadow: 0 0 0 8px rgba(236, 72, 153, 0); }
+    100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(236, 72, 153, 0); }
+}
+
+/* Smartphone Chat Container */
+.smartphone-container {
+    position: fixed;
+    bottom: -700px; /* Start hidden below screen */
+    right: 30px;
+    width: 340px;
+    height: 580px;
+    z-index: 1000;
+    transition: bottom 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.15);
+    pointer-events: none;
+}
+
+.smartphone-container.active {
+    bottom: 100px;
+    pointer-events: all;
+}
+
+.smartphone-frame {
+    width: 100%;
+    height: 100%;
+    background: #090d16;
+    border: 10px solid #1e293b;
+    border-radius: 36px;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 40px rgba(168, 85, 247, 0.2);
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.smartphone-frame::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, transparent 100%);
+    pointer-events: none;
+    z-index: 10;
+}
+
+/* Speaker Notch */
+.smartphone-notch {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 110px;
+    height: 20px;
+    background: #1e293b;
+    border-bottom-left-radius: 12px;
+    border-bottom-right-radius: 12px;
+    z-index: 20;
+}
+
+.smartphone-notch::after {
+    content: '';
+    position: absolute;
+    top: 4px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 40px;
+    height: 4px;
+    background: #0f172a;
+    border-radius: 2px;
+}
+
+/* Smartphone Screen */
+.smartphone-screen {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    padding-top: 15px; /* space for status bar */
+    background: radial-gradient(circle at top, #131a2b 0%, #060911 100%);
+    position: relative;
+}
+
+/* Phone Status Bar */
+.phone-status-bar {
+    height: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+    font-size: 0.65rem;
+    color: var(--text-secondary);
+    font-weight: 700;
+    z-index: 15;
+}
+
+.phone-status-icons {
+    display: flex;
+    gap: 5px;
+}
+
+/* Chat Header */
+.chat-header {
+    height: 50px;
+    background: rgba(15, 23, 42, 0.6);
+    border-bottom: 1px solid var(--card-border);
+    display: flex;
+    align-items: center;
+    padding: 0 12px;
+    backdrop-filter: blur(8px);
+    z-index: 15;
+}
+
+.btn-close-phone {
+    background: transparent;
+    border: none;
+    color: var(--text-primary);
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 4px 8px;
+    margin-right: 6px;
+    transition: transform 0.2s ease;
+}
+
+.btn-close-phone:hover {
+    transform: translateX(-3px);
+}
+
+.chat-avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--btn-sum-start), var(--btn-mul-start));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    margin-right: 10px;
+    box-shadow: 0 0 10px rgba(168, 85, 247, 0.4);
+}
+
+.chat-user-info {
+    display: flex;
+    flex-direction: column;
+}
+
+.chat-username {
+    font-size: 0.8rem;
+    font-weight: 800;
+    color: var(--text-primary);
+}
+
+.chat-status {
+    font-size: 0.6rem;
+    color: #10b981;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.chat-status::before {
+    content: '';
+    display: inline-block;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: #10b981;
+    animation: status-pulse 1.5s infinite;
+}
+
+@keyframes status-pulse {
+    0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
+    70% { box-shadow: 0 0 0 4px rgba(16, 185, 129, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
+}
+
+/* Chat Messages Container */
+.chat-messages-container {
+    flex: 1;
+    padding: 12px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* Custom Scrollbar for Chat Messages */
+.chat-messages-container::-webkit-scrollbar {
+    width: 3px;
+}
+.chat-messages-container::-webkit-scrollbar-track {
+    background: transparent;
+}
+.chat-messages-container::-webkit-scrollbar-thumb {
+    background: var(--card-border);
+    border-radius: 10px;
+}
+
+/* Message Bubbles */
+.msg-bubble {
+    max-width: 80%;
+    padding: 8px 12px;
+    border-radius: 14px;
+    font-size: 0.75rem;
+    line-height: 1.4;
+    animation: bubble-appear 0.25s cubic-bezier(0.18, 0.89, 0.32, 1.28) forwards;
+    position: relative;
+    word-wrap: break-word;
+}
+
+@keyframes bubble-appear {
+    0% { transform: scale(0.85); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.bako-msg {
+    align-self: flex-start;
+    background: rgba(30, 41, 59, 0.85);
+    border: 1px solid var(--card-border);
+    color: var(--text-primary);
+    border-top-left-radius: 2px;
+}
+
+.player-msg {
+    align-self: flex-end;
+    background: linear-gradient(135deg, rgba(168, 85, 247, 0.9) 0%, rgba(236, 72, 153, 0.9) 100%);
+    color: white;
+    border-top-right-radius: 2px;
+    box-shadow: 0 4px 12px rgba(168, 85, 247, 0.3);
+}
+
+.msg-author {
+    font-size: 0.55rem;
+    font-weight: 800;
+    color: var(--text-secondary);
+    display: block;
+    margin-bottom: 2px;
+    text-transform: uppercase;
+}
+
+.player-msg .msg-author {
+    color: rgba(255, 255, 255, 0.8);
+    text-align: right;
+}
+
+/* Typing Indicator */
+.chat-typing-indicator {
+    display: none;
+    align-self: flex-start;
+    margin: 0 12px 10px 12px;
+    align-items: center;
+    gap: 8px;
+}
+
+.typing-bubble {
+    background: rgba(30, 41, 59, 0.85);
+    border: 1px solid var(--card-border);
+    padding: 8px 12px;
+    border-radius: 14px;
+    border-top-left-radius: 2px;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.typing-bubble span {
+    width: 6px;
+    height: 6px;
+    background: var(--text-secondary);
+    border-radius: 50%;
+    animation: typing-dots 1.4s infinite alternate;
+}
+
+.typing-bubble span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.typing-bubble span:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes typing-dots {
+    0% { transform: translateY(0); opacity: 0.4; }
+    100% { transform: translateY(-4px); opacity: 1; }
+}
+
+.typing-text {
+    font-size: 0.6rem;
+    color: var(--text-secondary);
+    font-style: italic;
+}
+
+/* Chat Bottom Options Panel */
+.chat-options-panel {
+    background: rgba(15, 23, 42, 0.9);
+    border-top: 1px solid var(--card-border);
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    backdrop-filter: blur(8px);
+    z-index: 15;
+}
+
+.options-title {
+    font-size: 0.6rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 2px;
+    text-align: center;
+}
+
+.chat-opt-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--card-border);
+    color: var(--text-primary);
+    padding: 8px 10px;
+    border-radius: 10px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    text-align: left;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    width: 100%;
+}
+
+.chat-opt-btn:hover {
+    background: rgba(168, 85, 247, 0.15);
+    border-color: rgba(168, 85, 247, 0.4);
+    transform: translateY(-1px);
+}
+
+.chat-opt-btn:active {
+    transform: translateY(0);
+}
+
+/* Media query to make phone full height on small screens */
+@media (max-width: 480px) {
+    .smartphone-container {
+        right: 0;
+        bottom: -100%;
+        width: 100%;
+        height: 100%;
+    }
+    
+    .smartphone-container.active {
+        bottom: 0;
+    }
+    
+    .smartphone-frame {
+        border: none;
+        border-radius: 0;
+    }
+    
+    .smartphone-notch {
+        display: none;
+    }
+    
+    .smartphone-screen {
+        padding-top: 5px;
+    }
+}
