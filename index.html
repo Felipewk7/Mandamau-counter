@@ -311,34 +311,46 @@
             <div id="journey-map-container" class="journey-map-container">
                 <!-- SVG connecting paths -->
                 <svg class="journey-map-svg">
-                    <line x1="15%" y1="75%" x2="45%" y2="55%" class="map-path-line line-fase1" />
-                    <line x1="45%" y1="55%" x2="70%" y2="40%" class="map-path-line line-fase2" />
-                    <line x1="70%" y1="40%" x2="90%" y2="20%" class="map-path-line line-ggopa" />
+                    <line x1="10%" y1="75%" x2="25%" y2="62%" class="map-path-line line-fase1" />
+                    <line x1="25%" y1="62%" x2="40%" y2="50%" class="map-path-line line-fase2" />
+                    <line x1="40%" y1="50%" x2="55%" y2="40%" class="map-path-line line-fase3" />
+                    <line x1="55%" y1="40%" x2="72%" y2="30%" class="map-path-line line-fase4" />
+                    <line x1="72%" y1="30%" x2="90%" y2="20%" class="map-path-line line-fase5" />
                 </svg>
                 
                 <!-- Map Nodes -->
-                <div id="node-start" class="map-node node-active" style="left: 15%; top: 75%;" title="Início">
+                <div id="node-start" class="map-node node-active" style="left: 10%; top: 75%;" title="Início">
                     <span class="node-icon">🏁</span>
                     <span class="node-label">Início</span>
                 </div>
                 
-                <div id="node-fase1" class="map-node" style="left: 45%; top: 55%;" title="Fase 1 - O Palhaço">
+                <div id="node-fase1" class="map-node" style="left: 25%; top: 62%;" title="Fase 1 - O Palhaço Kleber">
                     <span class="node-icon">🤡</span>
                     <span class="node-label">Fase 1</span>
                 </div>
                 
-                <div id="node-fase2" class="map-node node-locked" style="left: 70%; top: 40%;" title="Fase 2 - Bloqueado">
+                <div id="node-fase2" class="map-node node-locked" style="left: 40%; top: 50%;" title="Fase 2 - Novidades em breve">
                     <span class="node-icon">🔒</span>
-                    <span class="node-label">Fase 2</span>
+                    <span class="node-label" style="line-height: 1.1; bottom: -30px;">Fase 2<br><small style="font-size:0.48rem;color:#eab308;display:block;margin-top:1px;text-transform:none;">Novidades em breve</small></span>
                 </div>
                 
-                <div id="node-ggopa" class="map-node node-locked" style="left: 90%; top: 20%;" title="Sede do GGOPA">
+                <div id="node-fase3" class="map-node node-locked" style="left: 55%; top: 40%;" title="Fase 3 - Bloqueada">
+                    <span class="node-icon">🔒</span>
+                    <span class="node-label">Fase 3</span>
+                </div>
+
+                <div id="node-fase4" class="map-node node-locked" style="left: 72%; top: 30%;" title="Fase 4 - Bloqueada">
+                    <span class="node-icon">🔒</span>
+                    <span class="node-label">Fase 4</span>
+                </div>
+
+                <div id="node-ggopa" class="map-node node-locked" style="left: 90%; top: 20%;" title="Fase 5 - Fim (Sede do GGOPA)">
                     <span class="node-icon">🏛️</span>
-                    <span class="node-label">GGOPA</span>
+                    <span class="node-label">Fase 5 (Fim)</span>
                 </div>
                 
                 <!-- Player Token -->
-                <div id="journey-player-token" class="journey-player-token" style="left: 15%; top: 75%;">
+                <div id="journey-player-token" class="journey-player-token" style="left: 10%; top: 75%;">
                     <span class="token-avatar">🏃</span>
                     <span class="token-tag">Você</span>
                 </div>

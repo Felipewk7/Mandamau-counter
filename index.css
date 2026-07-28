@@ -2262,7 +2262,7 @@ body::before {
 .arm-pointer {
     position: absolute;
     top: 0;
-    left: 0;
+    left: 2%;
     width: 6px;
     height: 100%;
     background: #ef4444; /* Red pointer */
@@ -2270,17 +2270,7 @@ body::before {
     border-radius: 3px;
     pointer-events: none;
     transform: translateX(-50%);
-    animation: pointer-slide 0.7s linear infinite alternate; /* Accelerated to 0.7s! */
-}
-
-/* Pointer speed configurations */
-@keyframes pointer-slide {
-    0% {
-        left: 2%;
-    }
-    100% {
-        left: 98%;
-    }
+    /* Animation removed - controlled via JS requestAnimationFrame for zero-lag precision! */
 }
 
 .arm-actions {

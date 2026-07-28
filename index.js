@@ -1609,13 +1609,13 @@ function openJourney() {
     nodeFase1.classList.remove('node-active');
     
     // Reset player token position to Start Node
-    journeyPlayerToken.style.left = '15%';
+    journeyPlayerToken.style.left = '10%';
     journeyPlayerToken.style.top = '75%';
     
     // Trigger walking animation after a short delay
     setTimeout(() => {
-        journeyPlayerToken.style.left = '45%';
-        journeyPlayerToken.style.top = '55%';
+        journeyPlayerToken.style.left = '25%';
+        journeyPlayerToken.style.top = '62%';
         
         // After 2.5s (walking duration), trigger the Kleber encounter
         setTimeout(() => {
@@ -1868,6 +1868,10 @@ let isArmGameActive = false;
 let isTutorialOpen = false;
 let isUpsideDown = false;
 let hasJumpscareTriggered = false;
+let pointerPercent = 2;
+let pointerDirection = 1;
+let armAnimationId = null;
+let lastTime = 0;
 
 // Dynamic SVG Arms Generator
 function getArmSVG(state) {
@@ -2023,7 +2027,7 @@ function playJumpscareSound() {
 
 function triggerJumpscare() {
     hasJumpscareTriggered = true;
-    isArmGameActive = false; // Pause game during susto
+    isArmGameActive = false; // Pause game during jumpscare
     
     playJumpscareSound();
     armJumpscareOverlay.classList.add('active');
@@ -2042,20 +2046,44 @@ function triggerJumpscare() {
     }, 1500);
 }
 
-function updatePointerSpeed() {
-    let duration = 1.4;
-    if (armWrestlingState <= 0) {
-        duration = 1.4;
-    } else if (armWrestlingState >= 1 && armWrestlingState <= 3) {
-        duration = 1.1;
-    } else if (armWrestlingState >= 4 && armWrestlingState <= 6) {
-        duration = 0.8;
-    } else if (armWrestlingState >= 7 && armWrestlingState <= 8) {
-        duration = 0.6;
-    } else if (armWrestlingState === 9) {
-        duration = 0.45;
+function getPointerDuration() {
+    if (armWrestlingState <= 0) return 1.4;
+    if (armWrestlingState >= 1 && armWrestlingState <= 3) return 1.1;
+    if (armWrestlingState >= 4 && armWrestlingState <= 6) return 0.8;
+    if (armWrestlingState >= 7 && armWrestlingState <= 8) return 0.6;
+    if (armWrestlingState === 9) return 0.45;
+    return 1.4;
+}
+
+function animatePointer(time) {
+    if (!isArmGameActive || isTutorialOpen) {
+        lastTime = 0;
+        armAnimationId = requestAnimationFrame(animatePointer);
+        return;
     }
-    armPointer.style.animationDuration = `${duration}s`;
+    
+    if (!lastTime) lastTime = time;
+    let delta = (time - lastTime) / 1000;
+    lastTime = time;
+    
+    if (delta > 0.1) delta = 0.1;
+    
+    const duration = getPointerDuration();
+    const totalDistance = 96; // 2% to 98%
+    const speed = totalDistance / duration; // % per second
+    
+    pointerPercent += pointerDirection * speed * delta;
+    
+    if (pointerPercent >= 98) {
+        pointerPercent = 98;
+        pointerDirection = -1;
+    } else if (pointerPercent <= 2) {
+        pointerPercent = 2;
+        pointerDirection = 1;
+    }
+    
+    armPointer.style.left = `${pointerPercent}%`;
+    armAnimationId = requestAnimationFrame(animatePointer);
 }
 
 function updateArmWrestlingUI() {
@@ -2080,9 +2108,6 @@ function updateArmWrestlingUI() {
         btnArmAction.style.top = '';
         btnArmAction.style.width = '';
     }
-    
-    // Update pointer speed scale
-    updatePointerSpeed();
     
     // Curse Effects mapping
     if (armWrestlingState > 2) {
@@ -2112,6 +2137,9 @@ function startArmWrestlingGame() {
     isTutorialOpen = false;
     isUpsideDown = false;
     hasJumpscareTriggered = false;
+    pointerPercent = 2;
+    pointerDirection = 1;
+    lastTime = 0;
     
     randomizeTargetZone();
     updateArmWrestlingUI();
@@ -2128,11 +2156,18 @@ function startArmWrestlingGame() {
             }
         }
     }, 1000);
+    
+    if (armAnimationId) cancelAnimationFrame(armAnimationId);
+    armAnimationId = requestAnimationFrame(animatePointer);
 }
 
 function cleanupArmWrestlingEffects() {
     isArmGameActive = false;
     clearInterval(armWrestlingInterval);
+    if (armAnimationId) {
+        cancelAnimationFrame(armAnimationId);
+        armAnimationId = null;
+    }
     
     armWrestlingCard.classList.remove('arm-shake');
     armWrestlingCard.classList.remove('arm-upside-down');
@@ -2181,10 +2216,12 @@ function endArmWrestlingGame(isVictory) {
 btnArmAction.addEventListener('click', () => {
     if (!isArmGameActive || isTutorialOpen) return;
     
-    const pointerRect = armPointer.getBoundingClientRect();
-    const targetRect = document.querySelector('.arm-target-zone').getBoundingClientRect();
+    const targetLeft = parseFloat(armTargetZone.style.left) || 40;
+    const targetWidth = parseFloat(armTargetZone.style.width) || 20;
+    const targetRight = targetLeft + targetWidth;
     
-    const isHit = (pointerRect.right >= targetRect.left && pointerRect.left <= targetRect.right);
+    // Exact mathematical collision detection (no rendering lag!)
+    const isHit = (pointerPercent >= targetLeft && pointerPercent <= targetRight);
     
     if (isHit) {
         armWrestlingState += 2;
@@ -2246,3 +2283,12 @@ function initJourneyMapState() {
         }
     }
 }
+
+// Add the click listener for Fase 2 Node
+document.getElementById('node-fase2').addEventListener('click', () => {
+    const journeyFase1Completed = localStorage.getItem('mandamau_journey_fase1_completed') === 'true';
+    if (journeyFase1Completed) {
+        playSound('click');
+        alert("Fase 2: Novidades em breve!");
+    }
+});
