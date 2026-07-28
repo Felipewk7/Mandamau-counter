@@ -1589,17 +1589,54 @@ btnCloseJourneyView.addEventListener('click', () => {
     playSound('click');
 });
 
+let currentBossEncounter = 'kleber';
+let isGwenTutorialOpen = false;
+
+function setupBossEncounterUI() {
+    const portrait = document.querySelector('.encounter-portrait');
+    const nameText = document.querySelector('.encounter-name');
+    const titleText = document.querySelector('.encounter-title');
+    const authorText = document.querySelector('.dialog-author');
+    const bubblePara = document.querySelector('.encounter-dialog-bubble p');
+    
+    if (currentBossEncounter === 'kleber') {
+        portrait.src = "kleber_clown.png";
+        portrait.alt = "Kleber O palhaço dos mil dentes";
+        nameText.textContent = "Kleber";
+        titleText.textContent = "O palhaço dos mil dentes";
+        authorText.textContent = "Kleber";
+        bubblePara.textContent = "pra passar de mim terá que me vencer numa queda de braço krl";
+    } else if (currentBossEncounter === 'gwen') {
+        portrait.src = "img/gwen.png";
+        portrait.alt = "Gwen";
+        nameText.textContent = "Gwen";
+        titleText.textContent = "A mestre do quiz";
+        authorText.textContent = "Gwen";
+        bubblePara.textContent = "Eai porra, vc é bom em matematica ? Não ? que pena vai ter que ser pra passar Hahahaha!!!";
+    }
+}
+
 btnAcceptChallenge.addEventListener('click', () => {
     journeyEncounterOverlay.classList.remove('active');
     playSound('click');
     
-    // Open Arm Wrestling view but force tutorial first
-    armWrestlingOverlay.classList.add('active');
-    armTutorialModal.classList.add('active');
-    isTutorialOpen = true;
-    isArmGameActive = false;
-    armWrestlingState = 0;
-    updateArmWrestlingUI();
+    if (currentBossEncounter === 'kleber') {
+        armWrestlingOverlay.classList.add('active');
+        armTutorialModal.classList.add('active');
+        isTutorialOpen = true;
+        isArmGameActive = false;
+        armWrestlingState = 0;
+        updateArmWrestlingUI();
+    } else if (currentBossEncounter === 'gwen') {
+        gwenQuizOverlay.classList.add('active');
+        gwenTutorialModal.classList.add('active');
+        isGwenTutorialOpen = true;
+        gwenActive = false;
+        gwenScore = 0;
+        gwenLives = 3;
+        isPrankQuestion = false;
+        updateGwenUI();
+    }
 });
 
 function openJourney() {
@@ -1608,24 +1645,37 @@ function openJourney() {
     pathLineFase1.classList.remove('line-active');
     nodeFase1.classList.remove('node-active');
     
-    // Reset player token position to Start Node
-    journeyPlayerToken.style.left = '10%';
-    journeyPlayerToken.style.top = '75%';
+    const journeyFase1Completed = localStorage.getItem('mandamau_journey_fase1_completed') === 'true';
     
-    // Trigger walking animation after a short delay
-    setTimeout(() => {
+    if (journeyFase1Completed) {
+        // Start directly at Fase 1 node (already completed)
         journeyPlayerToken.style.left = '25%';
         journeyPlayerToken.style.top = '62%';
+        nodeFase1.classList.add('node-active');
+        pathLineFase1.classList.add('line-active');
+    } else {
+        // Reset player token position to Start Node
+        journeyPlayerToken.style.left = '10%';
+        journeyPlayerToken.style.top = '75%';
         
-        // After 2.5s (walking duration), trigger the Kleber encounter
+        // Trigger walking animation to Fase 1 after a short delay
         setTimeout(() => {
-            nodeFase1.classList.add('node-active');
-            pathLineFase1.classList.add('line-active');
-            playSound('rank_up_med');
-            journeyEncounterOverlay.classList.add('active');
-        }, 2500);
-        
-    }, 800);
+            journeyPlayerToken.style.left = '25%';
+            journeyPlayerToken.style.top = '62%';
+            
+            // After 2.5s (walking duration), trigger the Kleber encounter
+            setTimeout(() => {
+                nodeFase1.classList.add('node-active');
+                pathLineFase1.classList.add('line-active');
+                playSound('rank_up_med');
+                
+                currentBossEncounter = 'kleber';
+                setupBossEncounterUI();
+                journeyEncounterOverlay.classList.add('active');
+            }, 2500);
+            
+        }, 800);
+    }
 }
 
 const bakoChats = {
@@ -2312,7 +2362,22 @@ document.getElementById('node-fase2').addEventListener('click', () => {
     const journeyFase1Completed = localStorage.getItem('mandamau_journey_fase1_completed') === 'true';
     if (journeyFase1Completed) {
         playSound('click');
-        openGwenQuiz();
+        
+        // Walk from Fase 1 node (25%, 62%) to Fase 2 node (40%, 50%)
+        journeyPlayerToken.style.left = '40%';
+        journeyPlayerToken.style.top = '50%';
+        
+        setTimeout(() => {
+            const nodeFase2Element = document.getElementById('node-fase2');
+            const pathLineFase2Element = document.querySelector('.line-fase2');
+            if (nodeFase2Element) nodeFase2Element.classList.add('node-active');
+            if (pathLineFase2Element) pathLineFase2Element.classList.add('line-active');
+            
+            playSound('rank_up_med');
+            currentBossEncounter = 'gwen';
+            setupBossEncounterUI();
+            journeyEncounterOverlay.classList.add('active');
+        }, 1500);
     }
 });
 
@@ -2334,6 +2399,9 @@ const gwenLoseOverlay = document.getElementById('gwen-lose-overlay');
 const btnGwenWinOk = document.getElementById('btn-gwen-win-ok');
 const btnGwenRestart = document.getElementById('btn-gwen-restart');
 const gwenWinSpeech = document.getElementById('gwen-win-speech');
+
+const gwenTutorialModal = document.getElementById('gwen-tutorial-modal');
+const btnCloseGwenTutorial = document.getElementById('btn-close-gwen-tutorial');
 
 let gwenScore = 0;
 let gwenLives = 3;
@@ -2371,12 +2439,13 @@ function openGwenQuiz() {
     gwenQuizOverlay.classList.add('active');
     gwenWinOverlay.style.display = 'none';
     gwenLoseOverlay.style.display = 'none';
+    gwenTutorialModal.classList.add('active'); // force tutorial modal first!
+    isGwenTutorialOpen = true;
     gwenScore = 0;
     gwenLives = 3;
     isPrankQuestion = false;
-    gwenActive = true;
+    gwenActive = false; // paused
     updateGwenUI();
-    generateGwenQuestion();
 }
 
 function updateGwenUI() {
@@ -2478,7 +2547,7 @@ function startGwenTimer() {
     gwenTimerBar.style.width = "100%";
     
     gwenTimer = setInterval(() => {
-        if (!gwenActive || isTutorialOpen) return;
+        if (!gwenActive || isTutorialOpen || isGwenTutorialOpen) return;
         
         timeElapsed += 0.1;
         gwenTimeLeft = totalDuration - timeElapsed;
@@ -2623,5 +2692,24 @@ btnGwenWinOk.addEventListener('click', () => {
 
 btnGwenRestart.addEventListener('click', () => {
     playSound('click');
-    openGwenQuiz();
+    gwenQuizOverlay.classList.add('active');
+    gwenWinOverlay.style.display = 'none';
+    gwenLoseOverlay.style.display = 'none';
+    isGwenTutorialOpen = false;
+    gwenScore = 0;
+    gwenLives = 3;
+    isPrankQuestion = false;
+    gwenActive = true;
+    updateGwenUI();
+    generateGwenQuestion();
+});
+
+btnCloseGwenTutorial.addEventListener('click', () => {
+    isGwenTutorialOpen = false;
+    gwenTutorialModal.classList.remove('active');
+    playSound('click');
+    
+    gwenActive = true;
+    startGwenTimer();
+    generateGwenQuestion();
 });
