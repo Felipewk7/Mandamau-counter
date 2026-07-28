@@ -364,6 +364,50 @@
                 </div>
             </div>
         </div>
+
+        <!-- Arm Wrestling Minigame Overlay -->
+        <div id="arm-wrestling-overlay" class="arm-wrestling-overlay">
+            <div class="arm-wrestling-card">
+                <div class="arm-game-header">
+                    <button id="btn-arm-tutorial" class="btn-arm-tutorial">Como Jogar ?</button>
+                    <h3 class="arm-game-title">Queda de Braço contra Kleber</h3>
+                    <span id="arm-score-text" class="arm-score-text">Força: 0</span>
+                </div>
+                
+                <div class="arm-image-container">
+                    <img id="arm-wrestling-img" src="img/neutro.png" alt="Queda de Braço" class="arm-wrestling-img">
+                </div>
+                
+                <!-- Timing Bar -->
+                <div class="arm-timing-container">
+                    <div class="arm-timing-bar">
+                        <div class="arm-target-zone"></div>
+                        <div id="arm-pointer" class="arm-pointer"></div>
+                    </div>
+                </div>
+                
+                <div class="arm-actions">
+                    <button id="btn-arm-action" class="btn btn-sum arm-btn-action">AÇÃO</button>
+                    <button id="btn-arm-quit" class="btn-arm-quit">Desistir</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- How to Play Modal (Tutorial Overlay) -->
+        <div id="arm-tutorial-modal" class="arm-tutorial-modal">
+            <div class="tutorial-card">
+                <h2>Como Jogar Queda de Braço</h2>
+                <div class="tutorial-body">
+                    <p>1. O ponteiro vermelho se move rapidamente pela barra.</p>
+                    <p>2. Clique no botão <strong>AÇÃO</strong> exatamente quando o ponteiro estiver na <strong>área verde neon</strong> no centro.</p>
+                    <p>3. Se você acertar o alvo, empurra o palhaço Kleber com força (<strong>+2</strong>).</p>
+                    <p>4. Se você errar ou clicar fora da área, perde o equilíbrio (<strong>-1</strong>).</p>
+                    <p>5. Cuidado! O palhaço Kleber é forte e empurra você de volta (<strong>-1 a cada segundo</strong>).</p>
+                    <p>6. Alcance <strong>+10</strong> de força para vencer. Se chegar a <strong>-10</strong>, você perde!</p>
+                </div>
+                <button id="btn-close-tutorial" class="btn btn-sum">Entendido!</button>
+            </div>
+        </div>
     </div>
     <script src="background.js"></script>
     <script src="index.js"></script>

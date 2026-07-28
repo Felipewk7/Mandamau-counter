@@ -2125,3 +2125,273 @@ body::before {
         width: 90%;
     }
 }
+
+/* Arm Wrestling Minigame Overlay */
+.arm-wrestling-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(4, 6, 10, 0.98);
+    z-index: 150;
+    display: none; /* Controlled by JS */
+    align-items: center;
+    justify-content: center;
+    border-radius: 28px;
+    animation: fade-in-encounter 0.3s ease forwards;
+}
+
+.arm-wrestling-overlay.active {
+    display: flex;
+}
+
+.arm-wrestling-card {
+    width: 90%;
+    max-width: 500px;
+    background: rgba(15, 23, 42, 0.95);
+    border: 2px solid rgba(168, 85, 247, 0.3); /* Purple neon border */
+    border-radius: 24px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.8), 0 0 30px rgba(168, 85, 247, 0.2);
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+
+.arm-game-header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding-bottom: 12px;
+}
+
+.btn-arm-tutorial {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--text-secondary);
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 6px 12px;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-arm-tutorial:hover {
+    background: rgba(168, 85, 247, 0.1);
+    border-color: rgba(168, 85, 247, 0.4);
+    color: var(--text-primary);
+}
+
+.arm-game-title {
+    font-size: 1rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.arm-score-text {
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: #a855f7;
+    background: rgba(168, 85, 247, 0.1);
+    padding: 4px 10px;
+    border-radius: 8px;
+    border: 1px solid rgba(168, 85, 247, 0.2);
+    min-width: 80px;
+    text-align: center;
+}
+
+.arm-image-container {
+    width: 240px;
+    height: 180px;
+    background: rgba(10, 15, 30, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.03);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 25px;
+    overflow: hidden;
+    position: relative;
+}
+
+.arm-wrestling-img {
+    width: 90%;
+    height: 90%;
+    object-fit: contain;
+    filter: drop-shadow(0 0 10px rgba(168, 85, 247, 0.3));
+    transition: filter 0.3s ease;
+}
+
+/* Timing Bar styling */
+.arm-timing-container {
+    width: 100%;
+    margin-bottom: 25px;
+}
+
+.arm-timing-bar {
+    width: 100%;
+    height: 24px;
+    background: rgba(15, 23, 42, 0.8);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+.arm-target-zone {
+    position: absolute;
+    top: 0;
+    left: 40%;
+    width: 20%; /* 20% target width in the center */
+    height: 100%;
+    background: rgba(34, 197, 94, 0.25); /* Green target neon */
+    border-left: 2px dashed rgba(34, 197, 94, 0.6);
+    border-right: 2px dashed rgba(34, 197, 94, 0.6);
+    box-shadow: 0 0 10px rgba(34, 197, 94, 0.3);
+}
+
+.arm-pointer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 6px;
+    height: 100%;
+    background: #ef4444; /* Red pointer */
+    box-shadow: 0 0 10px #ef4444, 0 0 20px #ef4444;
+    border-radius: 3px;
+    pointer-events: none;
+    transform: translateX(-50%);
+    animation: pointer-slide 1.4s linear infinite alternate; /* Ping-pong animation */
+}
+
+/* Pointer speed configurations */
+@keyframes pointer-slide {
+    0% {
+        left: 2%;
+    }
+    100% {
+        left: 98%;
+    }
+}
+
+.arm-actions {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    align-items: center;
+}
+
+.arm-btn-action {
+    width: 100% !important;
+    padding: 14px !important;
+    font-size: 1.2rem !important;
+    font-weight: 900 !important;
+    letter-spacing: 1px;
+    border-radius: 14px !important;
+    background: linear-gradient(135deg, #a855f7 0%, #ec4899 100%) !important;
+    box-shadow: 0 4px 15px rgba(168, 85, 247, 0.4) !important;
+    transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.1) !important;
+}
+
+.arm-btn-action:hover {
+    transform: scale(1.02);
+    box-shadow: 0 6px 20px rgba(168, 85, 247, 0.6) !important;
+}
+
+.arm-btn-action:active {
+    transform: scale(0.97);
+}
+
+.btn-arm-quit {
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.btn-arm-quit:hover {
+    color: #ef4444;
+}
+
+/* How to Play Modal (Tutorial Overlay) */
+.arm-tutorial-modal {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    z-index: 200;
+    display: none; /* Controlled by JS */
+    align-items: center;
+    justify-content: center;
+    border-radius: 28px;
+    animation: fade-in-encounter 0.2s ease forwards;
+}
+
+.arm-tutorial-modal.active {
+    display: flex;
+}
+
+.tutorial-card {
+    width: 85%;
+    max-width: 400px;
+    background: rgba(15, 23, 42, 0.98);
+    border: 1px solid var(--card-border);
+    border-radius: 20px;
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+}
+
+.tutorial-card h2 {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin-bottom: 15px;
+}
+
+.tutorial-body {
+    text-align: left;
+    margin-bottom: 20px;
+    width: 100%;
+}
+
+.tutorial-body p {
+    font-size: 0.8rem;
+    line-height: 1.5;
+    color: var(--text-secondary);
+    margin-bottom: 8px;
+}
+
+.tutorial-body strong {
+    color: var(--text-primary);
+}
+
+@media (max-width: 480px) {
+    .arm-wrestling-card {
+        padding: 15px;
+    }
+    .arm-image-container {
+        width: 100%;
+        height: 140px;
+    }
+    .arm-game-title {
+        font-size: 0.85rem;
+    }
+}

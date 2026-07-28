@@ -1591,9 +1591,9 @@ btnCloseJourneyView.addEventListener('click', () => {
 
 btnAcceptChallenge.addEventListener('click', () => {
     journeyEncounterOverlay.classList.remove('active');
-    journeyOverlay.classList.remove('active');
     playSound('click');
-    alert("Desafio Queda de Braço Aceito! Kleber está te encarando com seus mil dentes brilhantes...");
+    armWrestlingOverlay.classList.add('active');
+    startArmWrestlingGame();
 });
 
 function openJourney() {
@@ -1835,7 +1835,223 @@ function initPhoneChat() {
         `;
     }
     renderChatOptions();
+    initJourneyMapState();
 }
 
 // Start Phone system
 initPhoneChat();
+
+// Queda de Braço Minigame System
+const armWrestlingOverlay = document.getElementById('arm-wrestling-overlay');
+const armScoreText = document.getElementById('arm-score-text');
+const armWrestlingImg = document.getElementById('arm-wrestling-img');
+const armPointer = document.getElementById('arm-pointer');
+const btnArmAction = document.getElementById('btn-arm-action');
+const btnArmQuit = document.getElementById('btn-arm-quit');
+const btnArmTutorial = document.getElementById('btn-arm-tutorial');
+const armTutorialModal = document.getElementById('arm-tutorial-modal');
+const btnCloseTutorial = document.getElementById('btn-close-tutorial');
+
+let armWrestlingState = 0;
+let armWrestlingInterval = null;
+let isArmGameActive = false;
+let isTutorialOpen = false;
+
+// Dynamic SVG Arms Generator
+function getArmSVG(state) {
+    const angle = state * 7.5; // range: -75deg (Kleber victory) to +75deg (Player victory)
+    
+    // Select color based on status
+    let playerColor = "#ec4899"; // pink
+    let opponentColor = "#ef4444"; // red
+    if (state > 5) playerColor = "#10b981"; // green if winning big
+    if (state < -5) opponentColor = "#f59e0b"; // orange if opponent winning big
+    
+    const svg = `
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200" width="100%" height="100%">
+        <defs>
+            <linearGradient id="neonGlow" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="${playerColor}" />
+                <stop offset="100%" stop-color="${opponentColor}" />
+            </linearGradient>
+            <filter id="glow">
+                <feGaussianBlur stdDeviation="4" result="coloredBlur"/>
+                <feMerge>
+                    <feMergeNode in="coloredBlur"/>
+                    <feMergeNode in="SourceGraphic"/>
+                </feMerge>
+            </filter>
+        </defs>
+        
+        <!-- Grid/Arcade background elements -->
+        <rect width="300" height="200" fill="#0f172a" />
+        <path d="M 0,20 L 300,20 M 0,60 L 300,60 M 0,100 L 300,100 M 0,140 L 300,140" stroke="#1e293b" stroke-width="1" />
+        <path d="M 50,0 L 50,200 M 100,0 L 100,200 M 150,0 L 150,200 M 200,0 L 200,200 M 250,0 L 250,200" stroke="#1e293b" stroke-width="1" />
+        
+        <!-- Table Surface -->
+        <line x1="10" y1="170" x2="290" y2="170" stroke="#334155" stroke-width="6" stroke-linecap="round" />
+        <line x1="10" y1="170" x2="290" y2="170" stroke="#a855f7" stroke-width="2" opacity="0.6" filter="url(#glow)" />
+        
+        <!-- Pivot base -->
+        <circle cx="150" cy="170" r="10" fill="#1e293b" stroke="#64748b" stroke-width="2" />
+        
+        <!-- Arms Group (centered at 150, 170 for rotation) -->
+        <g transform="rotate(${angle}, 150, 170)">
+            <!-- Player Arm (pink neon) -->
+            <path d="M 150,170 L 175,80" stroke="${playerColor}" stroke-width="14" stroke-linecap="round" filter="url(#glow)" />
+            <path d="M 150,170 L 175,80" stroke="#ffffff" stroke-width="6" stroke-linecap="round" />
+            
+            <!-- Kleber Arm (red neon) -->
+            <path d="M 150,170 L 125,80" stroke="${opponentColor}" stroke-width="14" stroke-linecap="round" filter="url(#glow)" />
+            <path d="M 150,170 L 125,80" stroke="#ffffff" stroke-width="6" stroke-linecap="round" />
+            
+            <!-- Locked Hands Center -->
+            <circle cx="150" cy="80" r="18" fill="#1e293b" stroke="url(#neonGlow)" stroke-width="3" filter="url(#glow)" />
+            <text x="150" y="86" font-size="16" text-anchor="middle" dominant-baseline="middle">🤝</text>
+        </g>
+        
+        <!-- Side HUD labels -->
+        <text x="250" y="40" fill="#ec4899" font-size="11" font-weight="900" text-anchor="middle" font-family="'Courier New', monospace" filter="url(#glow)">VOCÊ</text>
+        <text x="250" y="55" fill="#a855f7" font-size="9" text-anchor="middle" font-family="'Courier New', monospace">PLAYER</text>
+        
+        <text x="50" y="40" fill="#ef4444" font-size="11" font-weight="900" text-anchor="middle" font-family="'Courier New', monospace" filter="url(#glow)">KLEBER</text>
+        <text x="50" y="55" fill="#94a3b8" font-size="9" text-anchor="middle" font-family="'Courier New', monospace">CHEFE</text>
+    </svg>
+    `;
+    return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
+}
+
+function updateArmWrestlingUI() {
+    armScoreText.textContent = `Força: ${armWrestlingState > 0 ? '+' : ''}${armWrestlingState}`;
+    
+    // Scale text color depending on state
+    if (armWrestlingState > 5) {
+        armScoreText.style.color = '#10b981'; // green
+    } else if (armWrestlingState < -5) {
+        armScoreText.style.color = '#ef4444'; // red
+    } else {
+        armScoreText.style.color = '#a855f7'; // default purple
+    }
+    
+    // Update vector arms graphic
+    armWrestlingImg.src = getArmSVG(armWrestlingState);
+}
+
+function startArmWrestlingGame() {
+    armWrestlingState = 0;
+    isArmGameActive = true;
+    isTutorialOpen = false;
+    updateArmWrestlingUI();
+    
+    if (armWrestlingInterval) clearInterval(armWrestlingInterval);
+    
+    armWrestlingInterval = setInterval(() => {
+        if (isArmGameActive && !isTutorialOpen) {
+            armWrestlingState -= 1; // Kleber pushes back
+            updateArmWrestlingUI();
+            
+            if (armWrestlingState <= -10) {
+                endArmWrestlingGame(false);
+            }
+        }
+    }, 1000);
+}
+
+function endArmWrestlingGame(isVictory) {
+    isArmGameActive = false;
+    clearInterval(armWrestlingInterval);
+    
+    if (isVictory) {
+        playSound('rank_up');
+        alert("VITÓRIA! Você derrotou Kleber em uma intensa queda de braço! Seu caminho para a Fase 2 está livre.");
+        
+        // Save and unlock Fase 2 in localStorage
+        localStorage.setItem('mandamau_journey_fase1_completed', 'true');
+        
+        // Update Map Elements
+        const nodeFase2 = document.getElementById('node-fase2');
+        const pathLineFase2 = document.querySelector('.line-fase2');
+        if (nodeFase2) {
+            nodeFase2.className = 'map-node node-active';
+            nodeFase2.title = 'Fase 2 - Disponível';
+            const iconSpan = nodeFase2.querySelector('.node-icon');
+            if (iconSpan) iconSpan.textContent = '⚔️';
+        }
+        if (pathLineFase2) {
+            pathLineFase2.classList.add('line-active');
+        }
+        
+        armWrestlingOverlay.classList.remove('active');
+    } else {
+        playSound('reset');
+        alert("DERROTA! Kleber usou a força dos seus mil dentes e te derrotou. O jogo reiniciou, continue tentando!");
+        startArmWrestlingGame();
+    }
+}
+
+// Event Listeners for Arm Wrestling minigame
+btnArmAction.addEventListener('click', () => {
+    if (!isArmGameActive || isTutorialOpen) return;
+    
+    // Detect collision
+    const pointerRect = armPointer.getBoundingClientRect();
+    const targetRect = document.querySelector('.arm-target-zone').getBoundingClientRect();
+    
+    const isHit = (pointerRect.right >= targetRect.left && pointerRect.left <= targetRect.right);
+    
+    if (isHit) {
+        armWrestlingState += 2;
+        playSound('click');
+        
+        // Visual hit flash
+        btnArmAction.style.transform = 'scale(0.95)';
+        setTimeout(() => btnArmAction.style.transform = '', 100);
+    } else {
+        armWrestlingState -= 1;
+        playSound('bako_cheat');
+    }
+    
+    updateArmWrestlingUI();
+    
+    if (armWrestlingState >= 10) {
+        endArmWrestlingGame(true);
+    } else if (armWrestlingState <= -10) {
+        endArmWrestlingGame(false);
+    }
+});
+
+btnArmQuit.addEventListener('click', () => {
+    isArmGameActive = false;
+    clearInterval(armWrestlingInterval);
+    armWrestlingOverlay.classList.remove('active');
+    playSound('click');
+});
+
+btnArmTutorial.addEventListener('click', () => {
+    isTutorialOpen = true;
+    armTutorialModal.classList.add('active');
+    playSound('click');
+});
+
+btnCloseTutorial.addEventListener('click', () => {
+    isTutorialOpen = false;
+    armTutorialModal.classList.remove('active');
+    playSound('click');
+});
+
+function initJourneyMapState() {
+    const journeyFase1Completed = localStorage.getItem('mandamau_journey_fase1_completed') === 'true';
+    if (journeyFase1Completed) {
+        const nodeFase2 = document.getElementById('node-fase2');
+        const pathLineFase2 = document.querySelector('.line-fase2');
+        if (nodeFase2) {
+            nodeFase2.className = 'map-node node-active';
+            nodeFase2.title = 'Fase 2 - Disponível';
+            const iconSpan = nodeFase2.querySelector('.node-icon');
+            if (iconSpan) iconSpan.textContent = '⚔️';
+        }
+        if (pathLineFase2) {
+            pathLineFase2.classList.add('line-active');
+        }
+    }
+}
