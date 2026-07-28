@@ -1938,8 +1938,8 @@ function getArmSVG(state) {
 }
 
 function randomizeTargetZone() {
-    // Randomize width between 8% and 14%
-    const targetWidth = Math.floor(Math.random() * 7) + 8;
+    // Randomize width between 12% and 18% (slightly more generous)
+    const targetWidth = Math.floor(Math.random() * 7) + 12;
     // Randomize left keeping it within bounds
     const maxLeft = 98 - targetWidth;
     const targetLeft = Math.floor(Math.random() * (maxLeft - 5)) + 5;
@@ -2039,8 +2039,8 @@ function triggerJumpscare() {
         
         if (armWrestlingOverlay.classList.contains('active')) {
             isArmGameActive = true;
-            // Extremely small target for final blow
-            armTargetZone.style.width = '6%';
+            // Extremely small target for final blow (calibrated)
+            armTargetZone.style.width = '8%';
             armCurseWarning.textContent = "💀 SÓ MAIS UM GOLPE!";
         }
     }, 1500);
@@ -2220,8 +2220,16 @@ btnArmAction.addEventListener('click', () => {
     const targetWidth = parseFloat(armTargetZone.style.width) || 20;
     const targetRight = targetLeft + targetWidth;
     
-    // Exact mathematical collision detection (no rendering lag!)
-    const isHit = (pointerPercent >= targetLeft && pointerPercent <= targetRight);
+    // Calculate the speed and the path range covered during typical mouse click latency (75ms)
+    const duration = getPointerDuration();
+    const speed = 96 / duration; // % per second
+    const lagSeconds = 0.075; // 75ms input lag compensation
+    
+    const minPath = Math.min(pointerPercent, pointerPercent - pointerDirection * speed * lagSeconds);
+    const maxPath = Math.max(pointerPercent, pointerPercent - pointerDirection * speed * lagSeconds);
+    
+    // Check if the green zone overlaps with the pointer's lag window path
+    const isHit = (minPath <= targetRight && maxPath >= targetLeft);
     
     if (isHit) {
         armWrestlingState += 2;
