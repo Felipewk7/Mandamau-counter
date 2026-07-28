@@ -2042,6 +2042,22 @@ function triggerJumpscare() {
     }, 1500);
 }
 
+function updatePointerSpeed() {
+    let duration = 1.4;
+    if (armWrestlingState <= 0) {
+        duration = 1.4;
+    } else if (armWrestlingState >= 1 && armWrestlingState <= 3) {
+        duration = 1.1;
+    } else if (armWrestlingState >= 4 && armWrestlingState <= 6) {
+        duration = 0.8;
+    } else if (armWrestlingState >= 7 && armWrestlingState <= 8) {
+        duration = 0.6;
+    } else if (armWrestlingState === 9) {
+        duration = 0.45;
+    }
+    armPointer.style.animationDuration = `${duration}s`;
+}
+
 function updateArmWrestlingUI() {
     armScoreText.textContent = `Força: ${armWrestlingState > 0 ? '+' : ''}${armWrestlingState}`;
     
@@ -2064,6 +2080,9 @@ function updateArmWrestlingUI() {
         btnArmAction.style.top = '';
         btnArmAction.style.width = '';
     }
+    
+    // Update pointer speed scale
+    updatePointerSpeed();
     
     // Curse Effects mapping
     if (armWrestlingState > 2) {
@@ -2102,10 +2121,6 @@ function startArmWrestlingGame() {
     armWrestlingInterval = setInterval(() => {
         if (isArmGameActive && !isTutorialOpen) {
             armWrestlingState -= 1; // Kleber pulls back
-            
-            // 50% chance to randomize target zone every second as well
-            if (Math.random() > 0.5) randomizeTargetZone();
-            
             updateArmWrestlingUI();
             
             if (armWrestlingState <= -10) {
@@ -2175,7 +2190,7 @@ btnArmAction.addEventListener('click', () => {
         armWrestlingState += 2;
         playSound('click');
         
-        // Randomize target zone on hits
+        // Randomize target zone ONLY on hits!
         randomizeTargetZone();
         
         btnArmAction.style.transform = 'scale(0.95)';
@@ -2183,9 +2198,6 @@ btnArmAction.addEventListener('click', () => {
     } else {
         armWrestlingState -= 1;
         playSound('bako_cheat');
-        
-        // Randomize target zone on misses too
-        randomizeTargetZone();
     }
     
     updateArmWrestlingUI();
