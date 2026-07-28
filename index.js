@@ -1592,8 +1592,14 @@ btnCloseJourneyView.addEventListener('click', () => {
 btnAcceptChallenge.addEventListener('click', () => {
     journeyEncounterOverlay.classList.remove('active');
     playSound('click');
+    
+    // Open Arm Wrestling view but force tutorial first
     armWrestlingOverlay.classList.add('active');
-    startArmWrestlingGame();
+    armTutorialModal.classList.add('active');
+    isTutorialOpen = true;
+    isArmGameActive = false;
+    armWrestlingState = 0;
+    updateArmWrestlingUI();
 });
 
 function openJourney() {
@@ -1851,11 +1857,17 @@ const btnArmQuit = document.getElementById('btn-arm-quit');
 const btnArmTutorial = document.getElementById('btn-arm-tutorial');
 const armTutorialModal = document.getElementById('arm-tutorial-modal');
 const btnCloseTutorial = document.getElementById('btn-close-tutorial');
+const armCurseWarning = document.getElementById('arm-curse-warning');
+const armJumpscareOverlay = document.getElementById('arm-jumpscare-overlay');
+const armWrestlingCard = document.querySelector('.arm-wrestling-card');
+const armTargetZone = document.querySelector('.arm-target-zone');
 
 let armWrestlingState = 0;
 let armWrestlingInterval = null;
 let isArmGameActive = false;
 let isTutorialOpen = false;
+let isUpsideDown = false;
+let hasJumpscareTriggered = false;
 
 // Dynamic SVG Arms Generator
 function getArmSVG(state) {
@@ -1895,7 +1907,7 @@ function getArmSVG(state) {
         <!-- Pivot base -->
         <circle cx="150" cy="170" r="10" fill="#1e293b" stroke="#64748b" stroke-width="2" />
         
-        <!-- Arms Group (centered at 150, 170 for rotation) -->
+        <!-- Arms Group -->
         <g transform="rotate(${angle}, 150, 170)">
             <!-- Player Arm (pink neon) -->
             <path d="M 150,170 L 175,80" stroke="${playerColor}" stroke-width="14" stroke-linecap="round" filter="url(#glow)" />
@@ -1921,33 +1933,179 @@ function getArmSVG(state) {
     return 'data:image/svg+xml;utf8,' + encodeURIComponent(svg);
 }
 
+function randomizeTargetZone() {
+    // Randomize width between 8% and 14%
+    const targetWidth = Math.floor(Math.random() * 7) + 8;
+    // Randomize left keeping it within bounds
+    const maxLeft = 98 - targetWidth;
+    const targetLeft = Math.floor(Math.random() * (maxLeft - 5)) + 5;
+    
+    armTargetZone.style.width = `${targetWidth}%`;
+    armTargetZone.style.left = `${targetLeft}%`;
+}
+
+function randomizeButtonPosition() {
+    if (armWrestlingState <= 0) {
+        btnArmAction.style.position = '';
+        btnArmAction.style.left = '';
+        btnArmAction.style.top = '';
+        btnArmAction.style.width = '';
+        return;
+    }
+    
+    btnArmAction.style.position = 'absolute';
+    btnArmAction.style.width = '65%';
+    
+    const randomLeft = Math.floor(Math.random() * 35);
+    const randomTop = Math.floor(Math.random() * 30) - 15;
+    
+    btnArmAction.style.left = `${randomLeft}%`;
+    btnArmAction.style.top = `${randomTop}px`;
+}
+
+function triggerUpsideDown() {
+    isUpsideDown = true;
+    armWrestlingCard.classList.add('arm-upside-down');
+    armCurseWarning.textContent = "🌀 BAKO CURSE: GRAVIDADE INVERTIDA!";
+    playSound('bako_cheat');
+    
+    setTimeout(() => {
+        armWrestlingCard.classList.remove('arm-upside-down');
+        isUpsideDown = false;
+        if (isArmGameActive) {
+            armCurseWarning.textContent = armWrestlingState > 2 ? "⚠️ MALDIÇÃO: TREMOR DETECTADO!" : "";
+        }
+    }, 3000);
+}
+
+function playJumpscareSound() {
+    try {
+        const ctx = audioCtx || new (window.AudioContext || window.webkitAudioContext)();
+        
+        const osc1 = ctx.createOscillator();
+        const osc2 = ctx.createOscillator();
+        const mainGain = ctx.createGain();
+        const filter = ctx.createBiquadFilter();
+        
+        osc1.type = 'sawtooth';
+        osc2.type = 'square';
+        
+        osc1.frequency.setValueAtTime(90, ctx.currentTime);
+        osc1.frequency.exponentialRampToValueAtTime(3200, ctx.currentTime + 0.12);
+        osc1.frequency.linearRampToValueAtTime(80, ctx.currentTime + 1.2);
+        
+        osc2.frequency.setValueAtTime(110, ctx.currentTime);
+        osc2.frequency.exponentialRampToValueAtTime(4200, ctx.currentTime + 0.18);
+        osc2.frequency.linearRampToValueAtTime(40, ctx.currentTime + 1.4);
+        
+        filter.type = 'peaking';
+        filter.Q.value = 20;
+        filter.frequency.setValueAtTime(1200, ctx.currentTime);
+        filter.frequency.exponentialRampToValueAtTime(5500, ctx.currentTime + 0.25);
+        
+        mainGain.gain.setValueAtTime(0.9, ctx.currentTime);
+        mainGain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 1.4);
+        
+        osc1.connect(filter);
+        osc2.connect(filter);
+        filter.connect(mainGain);
+        mainGain.connect(ctx.destination);
+        
+        osc1.start();
+        osc2.start();
+        
+        osc1.stop(ctx.currentTime + 1.4);
+        osc2.stop(ctx.currentTime + 1.4);
+    } catch (e) {
+        console.error("Audio Context jumpscare failed", e);
+    }
+}
+
+function triggerJumpscare() {
+    hasJumpscareTriggered = true;
+    isArmGameActive = false; // Pause game during susto
+    
+    playJumpscareSound();
+    armJumpscareOverlay.classList.add('active');
+    document.body.classList.add('arm-shake');
+    
+    setTimeout(() => {
+        armJumpscareOverlay.classList.remove('active');
+        document.body.classList.remove('arm-shake');
+        
+        if (armWrestlingOverlay.classList.contains('active')) {
+            isArmGameActive = true;
+            // Extremely small target for final blow
+            armTargetZone.style.width = '6%';
+            armCurseWarning.textContent = "💀 SÓ MAIS UM GOLPE!";
+        }
+    }, 1500);
+}
+
 function updateArmWrestlingUI() {
     armScoreText.textContent = `Força: ${armWrestlingState > 0 ? '+' : ''}${armWrestlingState}`;
     
-    // Scale text color depending on state
     if (armWrestlingState > 5) {
-        armScoreText.style.color = '#10b981'; // green
+        armScoreText.style.color = '#10b981';
     } else if (armWrestlingState < -5) {
-        armScoreText.style.color = '#ef4444'; // red
+        armScoreText.style.color = '#ef4444';
     } else {
-        armScoreText.style.color = '#a855f7'; // default purple
+        armScoreText.style.color = '#a855f7';
     }
     
-    // Update vector arms graphic
     armWrestlingImg.src = getArmSVG(armWrestlingState);
+    
+    // Manage dynamic action button position
+    if (armWrestlingState > 0) {
+        randomizeButtonPosition();
+    } else {
+        btnArmAction.style.position = '';
+        btnArmAction.style.left = '';
+        btnArmAction.style.top = '';
+        btnArmAction.style.width = '';
+    }
+    
+    // Curse Effects mapping
+    if (armWrestlingState > 2) {
+        armWrestlingCard.classList.add('arm-shake');
+        armCurseWarning.textContent = "⚠️ MALDIÇÃO: TREMOR DETECTADO!";
+    } else {
+        armWrestlingCard.classList.remove('arm-shake');
+        if (armWrestlingState <= 0) {
+            armCurseWarning.textContent = "";
+        } else {
+            armCurseWarning.textContent = "⚠️ MALDIÇÃO EM ESTADO PASSIVO";
+        }
+    }
+    
+    if (armWrestlingState >= 5 && !isUpsideDown) {
+        triggerUpsideDown();
+    }
+    
+    if (armWrestlingState === 9 && !hasJumpscareTriggered) {
+        triggerJumpscare();
+    }
 }
 
 function startArmWrestlingGame() {
     armWrestlingState = 0;
     isArmGameActive = true;
     isTutorialOpen = false;
+    isUpsideDown = false;
+    hasJumpscareTriggered = false;
+    
+    randomizeTargetZone();
     updateArmWrestlingUI();
     
     if (armWrestlingInterval) clearInterval(armWrestlingInterval);
     
     armWrestlingInterval = setInterval(() => {
         if (isArmGameActive && !isTutorialOpen) {
-            armWrestlingState -= 1; // Kleber pushes back
+            armWrestlingState -= 1; // Kleber pulls back
+            
+            // 50% chance to randomize target zone every second as well
+            if (Math.random() > 0.5) randomizeTargetZone();
+            
             updateArmWrestlingUI();
             
             if (armWrestlingState <= -10) {
@@ -1957,18 +2115,33 @@ function startArmWrestlingGame() {
     }, 1000);
 }
 
-function endArmWrestlingGame(isVictory) {
+function cleanupArmWrestlingEffects() {
     isArmGameActive = false;
     clearInterval(armWrestlingInterval);
+    
+    armWrestlingCard.classList.remove('arm-shake');
+    armWrestlingCard.classList.remove('arm-upside-down');
+    document.body.classList.remove('arm-shake');
+    armJumpscareOverlay.classList.remove('active');
+    
+    btnArmAction.style.position = '';
+    btnArmAction.style.left = '';
+    btnArmAction.style.top = '';
+    btnArmAction.style.width = '';
+    
+    armCurseWarning.textContent = '';
+    isUpsideDown = false;
+}
+
+function endArmWrestlingGame(isVictory) {
+    cleanupArmWrestlingEffects();
     
     if (isVictory) {
         playSound('rank_up');
         alert("VITÓRIA! Você derrotou Kleber em uma intensa queda de braço! Seu caminho para a Fase 2 está livre.");
         
-        // Save and unlock Fase 2 in localStorage
         localStorage.setItem('mandamau_journey_fase1_completed', 'true');
         
-        // Update Map Elements
         const nodeFase2 = document.getElementById('node-fase2');
         const pathLineFase2 = document.querySelector('.line-fase2');
         if (nodeFase2) {
@@ -1993,7 +2166,6 @@ function endArmWrestlingGame(isVictory) {
 btnArmAction.addEventListener('click', () => {
     if (!isArmGameActive || isTutorialOpen) return;
     
-    // Detect collision
     const pointerRect = armPointer.getBoundingClientRect();
     const targetRect = document.querySelector('.arm-target-zone').getBoundingClientRect();
     
@@ -2003,12 +2175,17 @@ btnArmAction.addEventListener('click', () => {
         armWrestlingState += 2;
         playSound('click');
         
-        // Visual hit flash
+        // Randomize target zone on hits
+        randomizeTargetZone();
+        
         btnArmAction.style.transform = 'scale(0.95)';
         setTimeout(() => btnArmAction.style.transform = '', 100);
     } else {
         armWrestlingState -= 1;
         playSound('bako_cheat');
+        
+        // Randomize target zone on misses too
+        randomizeTargetZone();
     }
     
     updateArmWrestlingUI();
@@ -2021,8 +2198,7 @@ btnArmAction.addEventListener('click', () => {
 });
 
 btnArmQuit.addEventListener('click', () => {
-    isArmGameActive = false;
-    clearInterval(armWrestlingInterval);
+    cleanupArmWrestlingEffects();
     armWrestlingOverlay.classList.remove('active');
     playSound('click');
 });
@@ -2037,6 +2213,9 @@ btnCloseTutorial.addEventListener('click', () => {
     isTutorialOpen = false;
     armTutorialModal.classList.remove('active');
     playSound('click');
+    if (!isArmGameActive) {
+        startArmWrestlingGame();
+    }
 });
 
 function initJourneyMapState() {

@@ -373,6 +373,9 @@
                     <h3 class="arm-game-title">Queda de Braço contra Kleber</h3>
                     <span id="arm-score-text" class="arm-score-text">Força: 0</span>
                 </div>
+
+                <!-- Curse Warning text (e.g. Gravity Inverted) -->
+                <div id="arm-curse-warning" class="arm-curse-warning"></div>
                 
                 <div class="arm-image-container">
                     <img id="arm-wrestling-img" src="img/neutro.png" alt="Queda de Braço" class="arm-wrestling-img">
@@ -387,7 +390,9 @@
                 </div>
                 
                 <div class="arm-actions">
-                    <button id="btn-arm-action" class="btn btn-sum arm-btn-action">AÇÃO</button>
+                    <div class="arm-action-btn-wrapper">
+                        <button id="btn-arm-action" class="btn btn-sum arm-btn-action">AÇÃO</button>
+                    </div>
                     <button id="btn-arm-quit" class="btn-arm-quit">Desistir</button>
                 </div>
             </div>
@@ -407,6 +412,12 @@
                 </div>
                 <button id="btn-close-tutorial" class="btn btn-sum">Entendido!</button>
             </div>
+        </div>
+
+        <!-- Jumpscare Overlay -->
+        <div id="arm-jumpscare-overlay" class="arm-jumpscare-overlay">
+            <img src="kleber_clown.png" alt="Kleber Jumpscare" class="jumpscare-portrait">
+            <div class="jumpscare-glitch-text">M̶O̶R̶R̶A̶!̶!̶!̶</div>
         </div>
     </div>
     <script src="background.js"></script>
