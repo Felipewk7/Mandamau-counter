@@ -2501,3 +2501,322 @@ body::before {
     0% { transform: translate(2px, 1px) skew(-15deg); }
     100% { transform: translate(-2px, -1px) skew(-12deg); }
 }
+
+/* Gwen Quiz Overlay (Fase 2) */
+.gwen-quiz-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(4, 6, 10, 0.98);
+    z-index: 150;
+    display: none; /* Controlled by JS */
+    align-items: center;
+    justify-content: center;
+    border-radius: 28px;
+    animation: fade-in-encounter 0.3s ease forwards;
+}
+
+.gwen-quiz-overlay.active {
+    display: flex;
+}
+
+.gwen-quiz-card {
+    width: 90%;
+    max-width: 480px;
+    background: rgba(15, 23, 42, 0.96);
+    border: 2px solid rgba(236, 72, 153, 0.4); /* Pink neon border */
+    border-radius: 24px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.8), 0 0 30px rgba(236, 72, 153, 0.2);
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+}
+
+.btn-gwen-quit {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    font-size: 1.4rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: color 0.2s ease, transform 0.2s ease;
+    line-height: 1;
+    z-index: 10;
+}
+
+.btn-gwen-quit:hover {
+    color: #ef4444;
+    transform: scale(1.1);
+}
+
+/* Gwen Header with Avatar & Speech Bubble */
+.gwen-quiz-header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.gwen-avatar-wrapper {
+    width: 75px;
+    height: 75px;
+    border-radius: 50%;
+    border: 2px solid #ec4899;
+    box-shadow: 0 0 10px rgba(236, 72, 153, 0.4);
+    overflow: hidden;
+    flex-shrink: 0;
+    background: #0f172a;
+}
+
+.gwen-avatar {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.gwen-dialog-bubble {
+    background: rgba(30, 41, 59, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    border-top-left-radius: 2px;
+    padding: 12px 16px;
+    flex-grow: 1;
+    position: relative;
+    min-height: 65px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.gwen-dialog-author {
+    font-size: 0.7rem;
+    font-weight: 900;
+    color: #ec4899;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+}
+
+#gwen-speech {
+    font-size: 0.82rem;
+    line-height: 1.4;
+    color: var(--text-primary);
+    margin: 0;
+}
+
+/* Gwen Quiz Body (Timer, Equation, Grid) */
+.gwen-quiz-body {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.gwen-timer-container {
+    width: 100%;
+    height: 18px;
+    background: rgba(15, 23, 42, 0.8);
+    border: 1.5px solid rgba(255, 255, 255, 0.08);
+    border-radius: 9px;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 18px;
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+}
+
+.gwen-timer-bar {
+    height: 100%;
+    width: 100%;
+    background: linear-gradient(90deg, #ec4899 0%, #a855f7 100%);
+    box-shadow: 0 0 8px rgba(236, 72, 153, 0.6);
+    border-radius: 9px;
+    transition: width 0.1s linear;
+}
+
+.gwen-timer-text {
+    position: absolute;
+    width: 100%;
+    text-align: center;
+    font-size: 0.65rem;
+    font-weight: 900;
+    color: var(--text-primary);
+    text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+    pointer-events: none;
+}
+
+.gwen-equation-display {
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    margin: 15px 0 22px 0;
+    text-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+    font-family: 'Outfit', sans-serif;
+    letter-spacing: 1px;
+}
+
+.gwen-answers-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    width: 100%;
+    margin-bottom: 22px;
+}
+
+.gwen-answer-btn {
+    background: rgba(30, 41, 59, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 14px;
+    padding: 16px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    outline: none;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.15);
+}
+
+.gwen-answer-btn:hover {
+    background: rgba(236, 72, 153, 0.1);
+    border-color: rgba(236, 72, 153, 0.4);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 12px rgba(236, 72, 153, 0.15);
+}
+
+.gwen-answer-btn:active {
+    transform: translateY(0);
+}
+
+/* Feedback states */
+.gwen-answer-btn.correct {
+    background: rgba(16, 185, 129, 0.2) !important;
+    border-color: #10b981 !important;
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.4) !important;
+    color: #10b981 !important;
+}
+
+.gwen-answer-btn.incorrect {
+    background: rgba(239, 68, 68, 0.2) !important;
+    border-color: #ef4444 !important;
+    box-shadow: 0 0 15px rgba(239, 68, 68, 0.4) !important;
+    color: #ef4444 !important;
+}
+
+/* Gwen Quiz Footer (Progress & Lives) */
+.gwen-quiz-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    padding-top: 16px;
+    margin-top: 5px;
+}
+
+.gwen-progress-container {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    width: 60%;
+}
+
+#gwen-progress-text {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+}
+
+.gwen-progress-bar-bg {
+    width: 100%;
+    height: 8px;
+    background: rgba(30, 41, 59, 0.8);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.gwen-progress-bar {
+    height: 100%;
+    width: 0%;
+    background: #ec4899;
+    border-radius: 4px;
+    box-shadow: 0 0 6px rgba(236, 72, 153, 0.5);
+    transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.gwen-lives-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 4px;
+}
+
+.gwen-lives-label {
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+}
+
+.gwen-lives-hearts {
+    font-size: 1.1rem;
+    letter-spacing: 2px;
+    filter: drop-shadow(0 0 2px rgba(239, 68, 68, 0.5));
+}
+
+/* Internal Overlay states (Victory / Game Over / Regressao Linear) */
+.gwen-quiz-state-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(15, 23, 42, 0.98);
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
+    text-align: center;
+    animation: fade-in-encounter 0.2s ease forwards;
+}
+
+.gwen-state-title {
+    font-size: 1.6rem;
+    font-weight: 800;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.gwen-state-title.win {
+    color: #10b981;
+    text-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
+}
+
+.gwen-state-title.lose {
+    color: #ef4444;
+    text-shadow: 0 0 15px rgba(239, 68, 68, 0.3);
+}
+
+.gwen-state-desc {
+    font-size: 0.88rem;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    margin-bottom: 25px;
+    max-width: 320px;
+}
+
+.gwen-shake {
+    animation: arm-tremor 0.15s linear infinite !important;
+}

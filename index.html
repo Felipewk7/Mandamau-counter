@@ -426,6 +426,76 @@
             </div>
         </div>
 
+        <!-- Gwen Math Quiz Overlay (Fase 2) -->
+        <div id="gwen-quiz-overlay" class="gwen-quiz-overlay">
+            <div id="gwen-quiz-card" class="gwen-quiz-card">
+                <button id="btn-gwen-quit" class="btn-gwen-quit" title="Desistir">&times;</button>
+                
+                <!-- Win State Overlay -->
+                <div id="gwen-win-overlay" class="gwen-quiz-state-overlay" style="display: none;">
+                    <h3 class="gwen-state-title win">🏆 Vitória! 🏆</h3>
+                    <p id="gwen-win-speech" class="gwen-state-desc">Você passou pela Gwen!</p>
+                    <button id="btn-gwen-win-ok" class="btn btn-sum" style="width: 100%;">Finalizar Nível 2</button>
+                </div>
+                
+                <!-- Lose State Overlay -->
+                <div id="gwen-lose-overlay" class="gwen-quiz-state-overlay" style="display: none;">
+                    <h3 class="gwen-state-title lose">💀 Game Over 💀</h3>
+                    <p class="gwen-state-desc">A Gwen acabou com você! Estude um pouco mais de matemática e tente novamente.</p>
+                    <button id="btn-gwen-restart" class="btn btn-sum" style="width: 100%;">Tentar Novamente</button>
+                </div>
+                
+                <div class="gwen-quiz-header">
+                    <div class="gwen-avatar-wrapper">
+                        <img id="gwen-avatar" src="img/gwen.png" alt="Gwen" class="gwen-avatar">
+                    </div>
+                    <div class="gwen-dialog-bubble">
+                        <span class="gwen-dialog-author">Gwen</span>
+                        <p id="gwen-speech">Tenta resolver essa se for capaz! 🧠</p>
+                    </div>
+                </div>
+                
+                <div class="gwen-quiz-body">
+                    <!-- Timer Bar -->
+                    <div class="gwen-timer-container">
+                        <div id="gwen-timer-bar" class="gwen-timer-bar"></div>
+                        <span id="gwen-timer-text" class="gwen-timer-text">15s</span>
+                    </div>
+                    
+                    <!-- Equation Display -->
+                    <div id="gwen-equation-display" class="gwen-equation-display">
+                        12 + 15 = ?
+                    </div>
+                    
+                    <!-- Answer Choices -->
+                    <div class="gwen-answers-grid">
+                        <button class="gwen-answer-btn" data-index="0">A</button>
+                        <button class="gwen-answer-btn" data-index="1">B</button>
+                        <button class="gwen-answer-btn" data-index="2">C</button>
+                        <button class="gwen-answer-btn" data-index="3">D</button>
+                    </div>
+                </div>
+                
+                <div class="gwen-quiz-footer">
+                    <!-- Progress display -->
+                    <div class="gwen-progress-container">
+                        <span id="gwen-progress-text">Perguntas respondidas: 0/5</span>
+                        <div class="gwen-progress-bar-bg">
+                            <div id="gwen-progress-bar" class="gwen-progress-bar" style="width: 0%;"></div>
+                        </div>
+                    </div>
+                    
+                    <!-- Lives indicator -->
+                    <div class="gwen-lives-container">
+                        <span class="gwen-lives-label">Tentativas</span>
+                        <div id="gwen-lives-hearts" class="gwen-lives-hearts">
+                            ❤️❤️❤️
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Jumpscare Overlay -->
         <div id="arm-jumpscare-overlay" class="arm-jumpscare-overlay">
             <img src="kleber_clown.png" alt="Kleber Jumpscare" class="jumpscare-portrait">
