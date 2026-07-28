@@ -819,23 +819,42 @@ function updateStatsUI() {
 
 function formatStat2Value(val, suffix = '') {
     if (val === 0) return '0' + suffix;
-    if (val >= 1000) {
+    
+    // Very small numbers
+    if (val < 0.01) {
+        if (val < 0.000001) {
+            return val.toExponential(2).replace('e', ' &times; 10<sup>') + '</sup>' + suffix;
+        }
+        return val.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 6 }) + suffix;
+    }
+    
+    // Large numbers compact formatting (K, mi, bi, tri)
+    if (val >= 1e12) { // Trillion
+        return (val / 1e12).toLocaleString('pt-BR', { maximumFractionDigits: 2 }) + ' tri' + suffix;
+    }
+    if (val >= 1e9) { // Billion
+        return (val / 1e9).toLocaleString('pt-BR', { maximumFractionDigits: 2 }) + ' bi' + suffix;
+    }
+    if (val >= 1e6) { // Million
+        return (val / 1e6).toLocaleString('pt-BR', { maximumFractionDigits: 2 }) + ' mi' + suffix;
+    }
+    if (val >= 1e4) { // 10 thousand or above
+        return (val / 1e3).toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + ' mil' + suffix;
+    }
+    if (val >= 1000) { // between 1000 and 10000
         return Math.floor(val).toLocaleString('pt-BR') + suffix;
     }
-    if (val >= 1) {
-        return val.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + suffix;
-    }
-    // Very small numbers
-    if (val < 0.000001) {
-        return val.toExponential(2).replace('e', ' &times; 10<sup>') + '</sup>' + suffix;
-    }
-    return val.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 6 }) + suffix;
+    
+    // Medium/Normal numbers
+    return val.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + suffix;
 }
 
 function updateStats2UI() {
     const elLies = document.getElementById('stats-2-total-lies');
     if (!elLies) return;
-    elLies.textContent = count.toLocaleString('pt-BR');
+    
+    // Also compact the count in the intro if it gets very large
+    elLies.innerHTML = formatStat2Value(count);
     
     const cristo = count / 38;
     const everest = count / 8848;
