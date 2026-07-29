@@ -1646,24 +1646,59 @@ function openJourney() {
     nodeFase1.classList.remove('node-active');
     
     const journeyFase1Completed = localStorage.getItem('mandamau_journey_fase1_completed') === 'true';
+    const journeyFase2Completed = localStorage.getItem('mandamau_journey_fase2_completed') === 'true';
     
-    if (journeyFase1Completed) {
-        // Start directly at Fase 1 node (already completed)
+    if (journeyFase2Completed) {
+        // Start directly at Fase 3 node (since Fase 2 is completed)
+        journeyPlayerToken.style.left = '55%';
+        journeyPlayerToken.style.top = '40%';
+        
+        // Make sure previous nodes/paths are visually active
+        nodeFase1.classList.add('node-active');
+        pathLineFase1.classList.add('line-active');
+        
+        const nodeFase2 = document.getElementById('node-fase2');
+        const pathLineFase2 = document.querySelector('.line-fase2');
+        if (nodeFase2) {
+            nodeFase2.className = 'map-node node-active';
+            const iconSpan = nodeFase2.querySelector('.node-icon');
+            if (iconSpan) iconSpan.textContent = '⚔️';
+        }
+        if (pathLineFase2) pathLineFase2.classList.add('line-active');
+        
+        const nodeFase3 = document.getElementById('node-fase3');
+        const pathLineFase3 = document.querySelector('.line-fase3');
+        if (nodeFase3) {
+            nodeFase3.className = 'map-node node-active';
+            const iconSpan = nodeFase3.querySelector('.node-icon');
+            if (iconSpan) iconSpan.textContent = '⚔️';
+        }
+        if (pathLineFase3) pathLineFase3.classList.add('line-active');
+        
+    } else if (journeyFase1Completed) {
+        // Start directly at Fase 1 node (already completed Kleber)
         journeyPlayerToken.style.left = '25%';
         journeyPlayerToken.style.top = '62%';
         nodeFase1.classList.add('node-active');
         pathLineFase1.classList.add('line-active');
+        
+        const nodeFase2 = document.getElementById('node-fase2');
+        const pathLineFase2 = document.querySelector('.line-fase2');
+        if (nodeFase2) {
+            nodeFase2.className = 'map-node node-active';
+            const iconSpan = nodeFase2.querySelector('.node-icon');
+            if (iconSpan) iconSpan.textContent = '⚔️';
+        }
+        if (pathLineFase2) pathLineFase2.classList.add('line-active');
     } else {
-        // Reset player token position to Start Node
+        // Start at Início and walk to Fase 1
         journeyPlayerToken.style.left = '10%';
         journeyPlayerToken.style.top = '75%';
         
-        // Trigger walking animation to Fase 1 after a short delay
         setTimeout(() => {
             journeyPlayerToken.style.left = '25%';
             journeyPlayerToken.style.top = '62%';
             
-            // After 2.5s (walking duration), trigger the Kleber encounter
             setTimeout(() => {
                 nodeFase1.classList.add('node-active');
                 pathLineFase1.classList.add('line-active');
@@ -1673,7 +1708,6 @@ function openJourney() {
                 setupBossEncounterUI();
                 journeyEncounterOverlay.classList.add('active');
             }, 2500);
-            
         }, 800);
     }
 }
@@ -2238,7 +2272,7 @@ function endArmWrestlingGame(isVictory) {
     
     if (isVictory) {
         playSound('rank_up');
-        alert("VITÓRIA! Você derrotou Kleber em uma intensa queda de braço! Seu caminho para a Fase 2 está livre.");
+        alert("VITÓRIA! Você derrotou Kleber em uma intensa queda de braço! O caminho da sua jornada avança!");
         
         localStorage.setItem('mandamau_journey_fase1_completed', 'true');
         
@@ -2255,6 +2289,20 @@ function endArmWrestlingGame(isVictory) {
         }
         
         armWrestlingOverlay.classList.remove('active');
+        
+        // AUTO-WALK from Fase 1 node (25%, 62%) to Fase 2 node (40%, 50%)
+        setTimeout(() => {
+            journeyPlayerToken.style.left = '40%';
+            journeyPlayerToken.style.top = '50%';
+            
+            setTimeout(() => {
+                playSound('rank_up_med');
+                currentBossEncounter = 'gwen';
+                setupBossEncounterUI();
+                journeyEncounterOverlay.classList.add('active');
+            }, 1500); // 1.5s walking animation
+        }, 800);
+        
     } else {
         playSound('reset');
         alert("DERROTA! Kleber usou a força dos seus mil dentes e te derrotou. O jogo reiniciou, continue tentando!");
@@ -2687,6 +2735,26 @@ btnGwenWinOk.addEventListener('click', () => {
     }
     if (pathLineFase3) {
         pathLineFase3.classList.add('line-active');
+    }
+    
+    // AUTO-WALK from Fase 2 node (40%, 50%) to Fase 3 node (55%, 40%)
+    setTimeout(() => {
+        journeyPlayerToken.style.left = '55%';
+        journeyPlayerToken.style.top = '40%';
+        
+        setTimeout(() => {
+            playSound('rank_up_med');
+            alert("Fase 3: Novidades em breve!");
+        }, 1500); // 1.5s walking animation
+    }, 800);
+});
+
+// Add the click listener for Fase 3 Node
+document.getElementById('node-fase3').addEventListener('click', () => {
+    const journeyFase2Completed = localStorage.getItem('mandamau_journey_fase2_completed') === 'true';
+    if (journeyFase2Completed) {
+        playSound('click');
+        alert("Fase 3: Novidades em breve!");
     }
 });
 
