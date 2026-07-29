@@ -1600,14 +1600,14 @@ function setupBossEncounterUI() {
     const bubblePara = document.querySelector('.encounter-dialog-bubble p');
     
     if (currentBossEncounter === 'kleber') {
-        portrait.src = "kleber_clown.png";
+        portrait.src = "kleber_clown.jpg";
         portrait.alt = "Kleber O palhaço dos mil dentes";
         nameText.textContent = "Kleber";
         titleText.textContent = "O palhaço dos mil dentes";
         authorText.textContent = "Kleber";
         bubblePara.textContent = "pra passar de mim terá que me vencer numa queda de braço krl";
     } else if (currentBossEncounter === 'gwen') {
-        portrait.src = "img/gwen.png";
+        portrait.src = "img/gwen.jpg";
         portrait.alt = "Gwen";
         nameText.textContent = "Gwen";
         titleText.textContent = "A mestre do quiz";
