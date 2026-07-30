@@ -632,6 +632,81 @@
             </div>
         </div>
 
+        <!-- Cláudio Genius Minigame Overlay (Fase 4) -->
+        <div id="claudio-genius-overlay" class="claudio-genius-overlay">
+            <div id="claudio-genius-card" class="claudio-genius-card">
+                <button id="btn-claudio-quit" class="btn-claudio-quit" title="Desistir">&times;</button>
+
+                <!-- Win State -->
+                <div id="claudio-win-overlay" class="claudio-state-overlay" style="display:none;">
+                    <div class="claudio-state-icon">🏆</div>
+                    <h3 class="claudio-state-title win">Vitória!</h3>
+                    <p class="claudio-state-desc">Você venceu o Cláudio no Genius! O cubo gay foi derrotado!</p>
+                    <button id="btn-claudio-win-ok" class="btn btn-sum" style="width:100%;">Ir para Próxima Fase</button>
+                </div>
+
+                <!-- Lose State -->
+                <div id="claudio-lose-overlay" class="claudio-state-overlay" style="display:none;">
+                    <div class="claudio-state-icon">💀</div>
+                    <h3 class="claudio-state-title lose">Game Over</h3>
+                    <p class="claudio-state-desc">O Cláudio te destruiu na memória! Tente novamente!</p>
+                    <button id="btn-claudio-restart" class="btn btn-sum" style="width:100%;">Tentar Novamente</button>
+                </div>
+
+                <!-- Header: Portrait + Speech -->
+                <div class="claudio-game-header">
+                    <div class="claudio-portrait-wrapper">
+                        <img id="claudio-avatar" src="img/claudio.png" alt="Cláudio O Cubo Gey" class="claudio-avatar"
+                            onerror="this.src='kleber_clown.jpg'">
+                    </div>
+                    <div class="claudio-speech-bubble">
+                        <span class="claudio-speech-author">Cláudio</span>
+                        <p id="claudio-speech">Eu sou um cubo gey, me vença se for capaz!</p>
+                    </div>
+                </div>
+
+                <!-- Status bar -->
+                <div class="claudio-status-bar">
+                    <span id="claudio-round-text" class="claudio-status-tag">Rodada: 1/5</span>
+                    <span id="claudio-turn-text" class="claudio-turn-tag">Preste atenção!</span>
+                    <div id="claudio-lives-display" class="claudio-lives">❤️❤️❤️</div>
+                </div>
+
+                <!-- Genius 2×2 Grid -->
+                <div class="genius-grid">
+                    <button id="genius-btn-0" class="genius-btn genius-red"   data-color="0"></button>
+                    <button id="genius-btn-1" class="genius-btn genius-blue"  data-color="1"></button>
+                    <button id="genius-btn-2" class="genius-btn genius-green" data-color="2"></button>
+                    <button id="genius-btn-3" class="genius-btn genius-yellow"data-color="3"></button>
+                </div>
+
+                <!-- Round progress dots -->
+                <div class="claudio-round-dots">
+                    <div id="claudio-dot-1" class="claudio-dot"></div>
+                    <div id="claudio-dot-2" class="claudio-dot"></div>
+                    <div id="claudio-dot-3" class="claudio-dot"></div>
+                    <div id="claudio-dot-4" class="claudio-dot"></div>
+                    <div id="claudio-dot-5" class="claudio-dot"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Cláudio Tutorial Modal (Fase 4) -->
+        <div id="claudio-tutorial-modal" class="arm-tutorial-modal">
+            <div class="tutorial-card">
+                <h2>Como Jogar Genius do Cláudio</h2>
+                <div class="tutorial-body">
+                    <p>1. O Cláudio irá piscar uma sequência de cores nos 4 botões coloridos.</p>
+                    <p>2. Após ele terminar, <strong>repita a sequência exata</strong> clicando nos botões na mesma ordem.</p>
+                    <p>3. A cada rodada, <strong>uma nova cor</strong> é adicionada ao final da sequência.</p>
+                    <p>4. Se errar, perde <strong>1 vida</strong> e a rodada volta ao início.</p>
+                    <p>5. Você tem <strong>3 vidas</strong>. Se zerar, é Game Over!</p>
+                    <p>6. Complete <strong>5 rodadas</strong> seguidas para vencer o Cláudio!</p>
+                </div>
+                <button id="btn-close-claudio-tutorial" class="btn btn-sum">Entendido!</button>
+            </div>
+        </div>
+
         <!-- Jumpscare Overlay -->
         <div id="arm-jumpscare-overlay" class="arm-jumpscare-overlay">
             <img src="kleber_clown.jpg" alt="Kleber Jumpscare" class="jumpscare-portrait">

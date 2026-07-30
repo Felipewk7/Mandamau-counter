@@ -1622,6 +1622,14 @@ function setupBossEncounterUI() {
         titleText.textContent = "O Gordão do Esmaga";
         authorText.textContent = "Sam";
         bubblePara.textContent = "Eai porra, vc é bom em esmagar comida? Não? que pena vai ter que ser pra passar Hahahaha!!!";
+    } else if (currentBossEncounter === 'claudio') {
+        portrait.src = "img/claudio.png";
+        portrait.alt = "Cláudio O Cubo Gey";
+        portrait.onerror = function() { this.src = 'kleber_clown.jpg'; };
+        nameText.textContent = "Cláudio";
+        titleText.textContent = "O Cubo Gey";
+        authorText.textContent = "Cláudio";
+        bubblePara.textContent = "Eu sou um cubo gey, me vença se for capaz!";
     }
 }
 
@@ -1663,6 +1671,16 @@ btnAcceptChallenge.addEventListener('click', () => {
         samTimeLeft = 15;
         lastPressedKey = '';
         updateSamTugUI();
+    } else if (currentBossEncounter === 'claudio') {
+        cleanupArmWrestlingEffects();
+        closeGwenQuiz();
+        closeSamGame();
+        
+        claudioGeniusOverlay.classList.add('active');
+        claudioTutorialModal.classList.add('active');
+        isClaudioTutorialOpen = true;
+        claudioGameActive = false;
+        resetClaudioGame();
     }
 });
 
@@ -1675,10 +1693,12 @@ function openJourney() {
     isTutorialOpen = false;
     isGwenTutorialOpen = false;
     isSamTutorialOpen = false;
+    isClaudioTutorialOpen = false;
     
     const journeyFase1Completed = localStorage.getItem('mandamau_journey_fase1_completed') === 'true';
     const journeyFase2Completed = localStorage.getItem('mandamau_journey_fase2_completed') === 'true';
     const journeyFase3Completed = localStorage.getItem('mandamau_journey_fase3_completed') === 'true';
+    const journeyFase4Completed = localStorage.getItem('mandamau_journey_fase4_completed') === 'true';
     
     // Reset all nodes/paths classes first to ensure clean state load
     nodeFase1.classList.remove('node-active');
@@ -1711,11 +1731,22 @@ function openJourney() {
     }
     if (pathLineFase4) pathLineFase4.classList.remove('line-active');
 
+    const nodeGgopa = document.getElementById('node-ggopa');
+    const pathLineFase5 = document.querySelector('.line-fase5');
+    if (nodeGgopa) {
+        nodeGgopa.className = 'map-node node-locked';
+        const iconSpan = nodeGgopa.querySelector('.node-icon');
+        if (iconSpan) iconSpan.textContent = '🏗️';
+    }
+    if (pathLineFase5) pathLineFase5.classList.remove('line-active');
+
     // Run map initialization to unlock correct nodes/paths
     initJourneyMapState();
     
-    if (journeyFase3Completed) {
-        // Starts at Fase 3 node (since Fase 3 is completed, standing there)
+    if (journeyFase4Completed) {
+        journeyPlayerToken.style.left = '90%';
+        journeyPlayerToken.style.top = '20%';
+    } else if (journeyFase3Completed) {
         journeyPlayerToken.style.left = '55%';
         journeyPlayerToken.style.top = '40%';
     } else if (journeyFase2Completed) {
@@ -2456,6 +2487,21 @@ function initJourneyMapState() {
             pathLineFase4.classList.add('line-active');
         }
     }
+
+    const journeyFase4Completed = localStorage.getItem('mandamau_journey_fase4_completed') === 'true';
+    if (journeyFase4Completed) {
+        const nodeGgopa = document.getElementById('node-ggopa');
+        const pathLineFase5 = document.querySelector('.line-fase5');
+        if (nodeGgopa) {
+            nodeGgopa.className = 'map-node node-active';
+            nodeGgopa.title = 'Fase 5 - Sede do GGOPA';
+            const iconSpan = nodeGgopa.querySelector('.node-icon');
+            if (iconSpan) iconSpan.textContent = '🏗️';
+        }
+        if (pathLineFase5) {
+            pathLineFase5.classList.add('line-active');
+        }
+    }
 }
 
 // Add the click listener for Fase 1 Node
@@ -3192,7 +3238,9 @@ btnSamWinOk.addEventListener('click', () => {
         
         setTimeout(() => {
             playSound('rank_up_med');
-            alert("Fase 4: Novidades em breve!");
+            currentBossEncounter = 'claudio';
+            setupBossEncounterUI();
+            journeyEncounterOverlay.classList.add('active');
         }, 1500);
     }, 800);
 });
@@ -3210,12 +3258,18 @@ btnCloseSamTutorial.addEventListener('click', () => {
     startSamRound(1);
 });
 
-// Click listener for Fase 4 Node (Novidades em breve)
+// Click listener for Fase 4 Node — Cláudio Genius
 document.getElementById('node-fase4').addEventListener('click', () => {
     const journeyFase3Completed = localStorage.getItem('mandamau_journey_fase3_completed') === 'true';
     if (journeyFase3Completed) {
         playSound('click');
-        alert("Fase 4: Novidades em breve!");
+        journeyPlayerToken.style.left = '72%';
+        journeyPlayerToken.style.top = '30%';
+        setTimeout(() => {
+            currentBossEncounter = 'claudio';
+            setupBossEncounterUI();
+            journeyEncounterOverlay.classList.add('active');
+        }, 1000);
     }
 });
 
@@ -3278,7 +3332,7 @@ window.addEventListener('keydown', (e) => {
         debugKeyBuffer = '';
         return;
     }
-    if (samGameActive || gwenActive || isArmGameActive) return;
+    if (samGameActive || gwenActive || isArmGameActive || claudioGameActive) return;
 
     debugKeyBuffer += e.key.toUpperCase();
 
@@ -3304,6 +3358,7 @@ function debugCompletePhase(phase) {
     if (phase >= 1) localStorage.setItem('mandamau_journey_fase1_completed', 'true');
     if (phase >= 2) localStorage.setItem('mandamau_journey_fase2_completed', 'true');
     if (phase >= 3) localStorage.setItem('mandamau_journey_fase3_completed', 'true');
+    if (phase >= 4) localStorage.setItem('mandamau_journey_fase4_completed', 'true');
     playSound('rank_up_high');
     // Refresh map state visually
     openJourney();
@@ -3316,6 +3371,7 @@ function debugResetPhase(fromPhase) {
     if (fromPhase <= 1) localStorage.removeItem('mandamau_journey_fase1_completed');
     if (fromPhase <= 2) localStorage.removeItem('mandamau_journey_fase2_completed');
     if (fromPhase <= 3) localStorage.removeItem('mandamau_journey_fase3_completed');
+    if (fromPhase <= 4) localStorage.removeItem('mandamau_journey_fase4_completed');
     playSound('reset');
     openJourney();
     setTimeout(() => { debugPanel.style.display = 'block'; }, 50);
@@ -3333,7 +3389,282 @@ document.getElementById('dbg-reset-all').addEventListener('click', () => {
     localStorage.removeItem('mandamau_journey_fase1_completed');
     localStorage.removeItem('mandamau_journey_fase2_completed');
     localStorage.removeItem('mandamau_journey_fase3_completed');
+    localStorage.removeItem('mandamau_journey_fase4_completed');
     playSound('reset');
     openJourney();
     setTimeout(() => { debugPanel.style.display = 'block'; }, 50);
+});
+
+// ================================================================
+// FASE 4 — CLÁUDIO GENIUS MINIGAME
+// ================================================================
+
+const claudioGeniusOverlay   = document.getElementById('claudio-genius-overlay');
+const claudioGeniusCard      = document.getElementById('claudio-genius-card');
+const btnClaudioQuit         = document.getElementById('btn-claudio-quit');
+const claudioSpeech          = document.getElementById('claudio-speech');
+const claudioRoundText       = document.getElementById('claudio-round-text');
+const claudioTurnText        = document.getElementById('claudio-turn-text');
+const claudioLivesDisplay    = document.getElementById('claudio-lives-display');
+const claudioWinOverlay      = document.getElementById('claudio-win-overlay');
+const claudioLoseOverlay     = document.getElementById('claudio-lose-overlay');
+const btnClaudioWinOk        = document.getElementById('btn-claudio-win-ok');
+const btnClaudioRestart      = document.getElementById('btn-claudio-restart');
+const claudioTutorialModal   = document.getElementById('claudio-tutorial-modal');
+const btnCloseClaudioTutorial= document.getElementById('btn-close-claudio-tutorial');
+const geniusBtns             = document.querySelectorAll('.genius-btn');
+const geniusGrid             = document.querySelector('.genius-grid');
+
+// Game state
+let claudioSequence      = [];
+let claudioPlayerIndex   = 0;
+let claudioCurrentRound  = 0;
+const CLAUDIO_MAX_ROUNDS = 5;
+let claudioLives         = 3;
+let claudioGameActive    = false;
+let isClaudioTutorialOpen= false;
+let claudioIsPlaying     = false; // true while sequence is being shown
+
+// Phrases
+const claudioPhrasesNormal = [
+    "Eu sou um cubo gey, me vença se for capaz!",
+    "Você vai errar, tenho certeza! 🟥🟦🟩🟨",
+    "Minha memória é perfeita. A sua? Hehe.",
+    "Continue tentando, mortal.",
+    "Cada cor que você erra, eu rio! 😈"
+];
+const claudioPhrasesCorrect = [
+    "Hmph... você teve sorte!",
+    "Ok, talvez você não seja tão idiota.",
+    "Continue... mas a próxima vai te quebrar.",
+    "Acertou? Impossível...",
+    "Bem jogado. Mas não vai durar."
+];
+const claudioPhrasesWrong = [
+    "HAHAHAHA! ERROU! Que vergonha! 😂",
+    "Sabia que você ia errar! Cubo gey 1 x 0 você!",
+    "Que memória fraca! Vai estudar mais!",
+    "Errou feio! Tenta de novo, panaca!",
+    "KKKKKK que fail! A cor era óbvia!"
+];
+const claudioPhrasesWin = [
+    "Impossível! Você me venceu?! Não acredito!",
+    "Ok ok... você é melhor que eu esperava. Por hoje.",
+    "Você é bom nisso... cubo gey derrotado! 😤"
+];
+
+function setClaudioSpeech(text) {
+    claudioSpeech.style.opacity = '0';
+    setTimeout(() => {
+        claudioSpeech.textContent = text;
+        claudioSpeech.style.opacity = '1';
+    }, 200);
+}
+
+function updateClaudioLives() {
+    let h = '';
+    for (let i = 0; i < 3; i++) h += i < claudioLives ? '❤️' : '🖤';
+    claudioLivesDisplay.textContent = h;
+}
+
+function updateClaudioRoundDots() {
+    for (let i = 1; i <= CLAUDIO_MAX_ROUNDS; i++) {
+        const dot = document.getElementById(`claudio-dot-${i}`);
+        if (dot) dot.className = i <= claudioCurrentRound ? 'claudio-dot done' : 'claudio-dot';
+    }
+}
+
+function litButton(colorIndex, duration = 400) {
+    return new Promise(resolve => {
+        const btn = document.getElementById(`genius-btn-${colorIndex}`);
+        btn.classList.add('lit');
+        playSound('click');
+        setTimeout(() => {
+            btn.classList.remove('lit');
+            setTimeout(resolve, 100);
+        }, duration);
+    });
+}
+
+async function playSequence() {
+    claudioIsPlaying = true;
+    geniusGrid.classList.remove('player-active');
+    claudioTurnText.textContent = 'Preste atenção!';
+    claudioTurnText.classList.remove('player-turn');
+
+    // Small pause before showing sequence
+    await new Promise(r => setTimeout(r, 600));
+
+    for (const color of claudioSequence) {
+        await litButton(color, 450);
+    }
+
+    // Now it's the player's turn
+    claudioIsPlaying = false;
+    claudioPlayerIndex = 0;
+    geniusGrid.classList.add('player-active');
+    claudioTurnText.textContent = 'Sua vez!';
+    claudioTurnText.classList.add('player-turn');
+    setClaudioSpeech(claudioPhrasesNormal[Math.floor(Math.random() * claudioPhrasesNormal.length)]);
+}
+
+function resetClaudioGame() {
+    claudioSequence = [];
+    claudioPlayerIndex = 0;
+    claudioCurrentRound = 0;
+    claudioLives = 3;
+    claudioGameActive = false;
+    claudioIsPlaying = false;
+
+    claudioWinOverlay.style.display = 'none';
+    claudioLoseOverlay.style.display = 'none';
+    geniusGrid.classList.remove('player-active');
+
+    updateClaudioLives();
+    updateClaudioRoundDots();
+    claudioRoundText.textContent = `Rodada: 1/${CLAUDIO_MAX_ROUNDS}`;
+    claudioTurnText.textContent = 'Preste atenção!';
+    claudioTurnText.classList.remove('player-turn');
+    setClaudioSpeech("Eu sou um cubo gey, me vença se for capaz!");
+}
+
+function startClaudioGame() {
+    resetClaudioGame();
+    claudioGameActive = true;
+    nextClaudioRound();
+}
+
+function nextClaudioRound() {
+    claudioCurrentRound++;
+    claudioPlayerIndex = 0;
+
+    // Add one random color to sequence
+    claudioSequence.push(Math.floor(Math.random() * 4));
+
+    claudioRoundText.textContent = `Rodada: ${claudioCurrentRound}/${CLAUDIO_MAX_ROUNDS}`;
+    updateClaudioRoundDots();
+
+    playSequence();
+}
+
+function handleClaudioPlayerInput(colorIndex) {
+    if (!claudioGameActive || claudioIsPlaying || isClaudioTutorialOpen) return;
+    if (!geniusGrid.classList.contains('player-active')) return;
+
+    // Flash the button
+    litButton(colorIndex, 200);
+
+    if (colorIndex !== claudioSequence[claudioPlayerIndex]) {
+        // WRONG!
+        claudioLives--;
+        updateClaudioLives();
+        playSound('bako_cheat');
+        setClaudioSpeech(claudioPhrasesWrong[Math.floor(Math.random() * claudioPhrasesWrong.length)]);
+
+        // Error shake
+        claudioGeniusCard.classList.add('claudio-error');
+        setTimeout(() => claudioGeniusCard.classList.remove('claudio-error'), 500);
+
+        geniusGrid.classList.remove('player-active');
+        claudioTurnText.textContent = 'Preste atenção!';
+        claudioTurnText.classList.remove('player-turn');
+
+        if (claudioLives <= 0) {
+            setTimeout(() => {
+                claudioLoseOverlay.style.display = 'flex';
+                claudioGameActive = false;
+            }, 1000);
+        } else {
+            // Replay the sequence for this round
+            setTimeout(() => playSequence(), 1500);
+        }
+        return;
+    }
+
+    claudioPlayerIndex++;
+
+    if (claudioPlayerIndex >= claudioSequence.length) {
+        // Completed this round!
+        playSound('rank_up_med');
+        geniusGrid.classList.remove('player-active');
+        claudioTurnText.textContent = 'Preste atenção!';
+        claudioTurnText.classList.remove('player-turn');
+        setClaudioSpeech(claudioPhrasesCorrect[Math.floor(Math.random() * claudioPhrasesCorrect.length)]);
+
+        if (claudioCurrentRound >= CLAUDIO_MAX_ROUNDS) {
+            // WON!
+            setTimeout(() => {
+                playSound('rank_up');
+                setClaudioSpeech(claudioPhrasesWin[Math.floor(Math.random() * claudioPhrasesWin.length)]);
+                claudioWinOverlay.style.display = 'flex';
+                claudioGameActive = false;
+            }, 1000);
+        } else {
+            setTimeout(() => nextClaudioRound(), 1500);
+        }
+    }
+}
+
+// Wire genius buttons
+geniusBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+        handleClaudioPlayerInput(parseInt(btn.dataset.color));
+    });
+});
+
+function closeClaudioGame() {
+    claudioGameActive = false;
+    claudioIsPlaying = false;
+    claudioGeniusOverlay.classList.remove('active');
+    claudioTutorialModal.classList.remove('active');
+    isClaudioTutorialOpen = false;
+    claudioGeniusCard.classList.remove('claudio-error');
+    geniusGrid.classList.remove('player-active');
+}
+
+btnClaudioQuit.addEventListener('click', () => {
+    closeClaudioGame();
+    playSound('click');
+});
+
+btnClaudioRestart.addEventListener('click', () => {
+    playSound('click');
+    claudioWinOverlay.style.display = 'none';
+    claudioLoseOverlay.style.display = 'none';
+    startClaudioGame();
+});
+
+btnCloseClaudioTutorial.addEventListener('click', () => {
+    isClaudioTutorialOpen = false;
+    claudioTutorialModal.classList.remove('active');
+    playSound('click');
+    startClaudioGame();
+});
+
+btnClaudioWinOk.addEventListener('click', () => {
+    closeClaudioGame();
+    playSound('rank_up');
+
+    localStorage.setItem('mandamau_journey_fase4_completed', 'true');
+
+    const nodeGgopa = document.getElementById('node-ggopa');
+    const pathLineFase5 = document.querySelector('.line-fase5');
+    if (nodeGgopa) {
+        nodeGgopa.className = 'map-node node-active';
+        nodeGgopa.title = 'Fase 5 - Sede do GGOPA';
+        const iconSpan = nodeGgopa.querySelector('.node-icon');
+        if (iconSpan) iconSpan.textContent = '🏛️';
+    }
+    if (pathLineFase5) pathLineFase5.classList.add('line-active');
+
+    // AUTO-WALK from Fase 4 (72%, 30%) to GGOPA (90%, 20%)
+    setTimeout(() => {
+        journeyPlayerToken.style.left = '90%';
+        journeyPlayerToken.style.top = '20%';
+
+        setTimeout(() => {
+            playSound('rank_up_high');
+            alert("🏛️ Fase 5 — Sede do GGOPA: Novidades em breve!");
+        }, 1500);
+    }, 800);
 });
