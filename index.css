@@ -3502,6 +3502,12 @@ body::before {
     transition: opacity 0.15s, box-shadow 0.15s, transform 0.1s;
     position: relative;
     overflow: hidden;
+    font-size: 1.6rem;
+    font-weight: 900;
+    color: rgba(255,255,255,0.85);
+    text-shadow: 0 0 8px rgba(0,0,0,0.5);
+    letter-spacing: 0.02em;
+    aspect-ratio: 1;
 }
 
 .genius-btn::after {
@@ -3522,24 +3528,72 @@ body::before {
 .genius-blue   { background: #3b82f6; }
 .genius-green  { background: #22c55e; }
 .genius-yellow { background: #eab308; }
+/* Round 4+ new colors */
+.genius-purple  { background: #a855f7; }
+.genius-pink    { background: #ec4899; }
+/* Round 5+ Greek colors */
+.genius-orange  { background: linear-gradient(135deg, #f97316, #ea580c); }
+.genius-cyan    { background: linear-gradient(135deg, #06b6d4, #0891b2); }
+.genius-magenta { background: linear-gradient(135deg, #d946ef, #a21caf); }
 
 /* Lit state (added by JS) */
 .genius-btn.lit {
     opacity: 1;
-    transform: scale(1.04);
+    transform: scale(1.06);
 }
-.genius-red.lit    { box-shadow: 0 0 30px 8px rgba(239, 68, 68, 0.75); }
-.genius-blue.lit   { box-shadow: 0 0 30px 8px rgba(59, 130, 246, 0.75); }
-.genius-green.lit  { box-shadow: 0 0 30px 8px rgba(34, 197, 94, 0.75); }
-.genius-yellow.lit { box-shadow: 0 0 30px 8px rgba(234, 179, 8, 0.75); }
+.genius-red.lit     { box-shadow: 0 0 40px 12px rgba(239, 68, 68, 0.85); }
+.genius-blue.lit    { box-shadow: 0 0 40px 12px rgba(59, 130, 246, 0.85); }
+.genius-green.lit   { box-shadow: 0 0 40px 12px rgba(34, 197, 94, 0.85); }
+.genius-yellow.lit  { box-shadow: 0 0 40px 12px rgba(234, 179, 8, 0.85); }
+.genius-purple.lit  { box-shadow: 0 0 40px 12px rgba(168, 85, 247, 0.85); }
+.genius-pink.lit    { box-shadow: 0 0 40px 12px rgba(236, 72, 153, 0.85); }
+.genius-orange.lit  { box-shadow: 0 0 40px 12px rgba(249, 115, 22, 0.85); }
+.genius-cyan.lit    { box-shadow: 0 0 40px 12px rgba(6, 182, 212, 0.85); }
+.genius-magenta.lit { box-shadow: 0 0 40px 12px rgba(217, 70, 239, 0.85); }
 
 /* Player-enabled state */
 .genius-grid.player-active .genius-btn {
     opacity: 0.6;
+    cursor: pointer;
 }
 .genius-grid.player-active .genius-btn:hover {
     opacity: 1;
-    transform: scale(1.03);
+    transform: scale(1.05);
+}
+
+/* New button entrance pop animation */
+@keyframes geniusBtnPop {
+    0%   { transform: scale(0) rotate(-20deg); opacity: 0; }
+    60%  { transform: scale(1.15) rotate(5deg); opacity: 1; }
+    100% { transform: scale(1) rotate(0deg); opacity: 0.35; }
+}
+.genius-btn.genius-new {
+    animation: geniusBtnPop 0.55s cubic-bezier(.36,1.5,.6,1) both;
+}
+
+/* Announcement banner */
+.genius-announcement {
+    width: 100%;
+    text-align: center;
+    font-size: 1rem;
+    font-weight: 900;
+    letter-spacing: 0.08em;
+    color: #fff;
+    background: linear-gradient(90deg, #f97316, #ec4899, #a855f7);
+    border-radius: 10px;
+    padding: 0;
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: max-height 0.4s ease, opacity 0.4s ease, padding 0.4s ease;
+    text-transform: uppercase;
+    text-shadow: 0 0 10px rgba(0,0,0,0.5);
+    margin-bottom: 4px;
+}
+.genius-announcement.visible {
+    max-height: 60px;
+    opacity: 1;
+    padding: 10px 16px;
 }
 
 /* ---- Round dots ---- */

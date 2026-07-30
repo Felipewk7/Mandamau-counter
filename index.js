@@ -1615,13 +1615,19 @@ function setupBossEncounterUI() {
         authorText.textContent = "Gwen";
         bubblePara.textContent = "Eai porra, vc é bom em matematica ? Não ? que pena vai ter que ser pra passar Hahahaha!!!";
     } else if (currentBossEncounter === 'sam') {
-        portrait.src = "img/sam.png";
-        portrait.alt = "Sam";
-        portrait.onerror = function() { this.src = 'kleber_clown.jpg'; };
-        nameText.textContent = "Sam";
-        titleText.textContent = "O Gordão do Esmaga";
-        authorText.textContent = "Sam";
-        bubblePara.textContent = "Eai porra, vc é bom em esmagar comida? Não? que pena vai ter que ser pra passar Hahahaha!!!";
+        portrait.onerror = function() {
+            if (!this.src.endsWith('kleber_clown.jpg')) {
+                this.onerror = function() { this.src = 'kleber_clown.jpg'; this.onerror = null; };
+                this.src = 'img/sam.jpg';
+            }
+        };
+        portrait.src = '';
+        portrait.src = 'img/sam.png';
+        portrait.alt = 'Sam';
+        nameText.textContent = 'Sam';
+        titleText.textContent = 'O Gordão do Esmaga';
+        authorText.textContent = 'Sam';
+        bubblePara.textContent = 'Eai porra, vc é bom em esmagar comida? Não? que pena vai ter que ser pra passar Hahahaha!!!';
     } else if (currentBossEncounter === 'claudio') {
         portrait.src = "img/claudio.png";
         portrait.alt = "Cláudio O Cubo Gey";
@@ -3396,7 +3402,7 @@ document.getElementById('dbg-reset-all').addEventListener('click', () => {
 });
 
 // ================================================================
-// FASE 4 — CLÁUDIO GENIUS MINIGAME
+// FASE 4 — CLÁUDIO GENIUS MINIGAME (ESCALATING DIFFICULTY)
 // ================================================================
 
 const claudioGeniusOverlay   = document.getElementById('claudio-genius-overlay');
@@ -3412,10 +3418,35 @@ const btnClaudioWinOk        = document.getElementById('btn-claudio-win-ok');
 const btnClaudioRestart      = document.getElementById('btn-claudio-restart');
 const claudioTutorialModal   = document.getElementById('claudio-tutorial-modal');
 const btnCloseClaudioTutorial= document.getElementById('btn-close-claudio-tutorial');
-const geniusBtns             = document.querySelectorAll('.genius-btn');
-const geniusGrid             = document.querySelector('.genius-grid');
+const geniusGrid             = document.getElementById('genius-grid');
+const geniusAnnouncement     = document.getElementById('genius-announcement');
 
-// Game state
+// ---- Button Definitions (index = data-color) ----
+const GENIUS_BTN_DEFS = [
+    // Rounds 1–3
+    { css: 'genius-red',     label: '' },
+    { css: 'genius-blue',    label: '' },
+    { css: 'genius-green',   label: '' },
+    { css: 'genius-yellow',  label: '' },
+    // Round 4+
+    { css: 'genius-purple',  label: '' },
+    { css: 'genius-pink',    label: '' },
+    // Round 5+ (Greek letters)
+    { css: 'genius-orange',  label: 'Α' },
+    { css: 'genius-cyan',    label: 'Β' },
+    { css: 'genius-magenta', label: 'Γ' },
+];
+
+// ---- Per-round config: seqLen = how many to memorize, activeBtns = how many buttons ----
+const GENIUS_ROUND_CONFIG = [
+    { seqLen:  5, activeBtns: 4, msg: null },
+    { seqLen:  8, activeBtns: 4, msg: null },
+    { seqLen: 12, activeBtns: 4, msg: null },
+    { seqLen: 16, activeBtns: 6, msg: '⚠️ NOVOS BOTÕES APARECEM!' },
+    { seqLen: 22, activeBtns: 9, msg: '🔮 LETRAS GREGAS INVADEM O JOGO!' },
+];
+
+// ---- Game state ----
 let claudioSequence      = [];
 let claudioPlayerIndex   = 0;
 let claudioCurrentRound  = 0;
@@ -3423,9 +3454,10 @@ const CLAUDIO_MAX_ROUNDS = 5;
 let claudioLives         = 3;
 let claudioGameActive    = false;
 let isClaudioTutorialOpen= false;
-let claudioIsPlaying     = false; // true while sequence is being shown
+let claudioIsPlaying     = false;
+let claudioActiveBtns    = 4; // how many buttons are currently in the grid
 
-// Phrases
+// ---- Phrases ----
 const claudioPhrasesNormal = [
     "Eu sou um cubo gey, me vença se for capaz!",
     "Você vai errar, tenho certeza! 🟥🟦🟩🟨",
@@ -3453,6 +3485,7 @@ const claudioPhrasesWin = [
     "Você é bom nisso... cubo gey derrotado! 😤"
 ];
 
+// ---- Helpers ----
 function setClaudioSpeech(text) {
     claudioSpeech.style.opacity = '0';
     setTimeout(() => {
@@ -3474,14 +3507,48 @@ function updateClaudioRoundDots() {
     }
 }
 
-function litButton(colorIndex, duration = 400) {
+function showGeniusAnnouncement(msg, durationMs = 3000) {
+    if (!geniusAnnouncement) return;
+    geniusAnnouncement.textContent = msg;
+    geniusAnnouncement.classList.add('visible');
+    setTimeout(() => geniusAnnouncement.classList.remove('visible'), durationMs);
+}
+
+// ---- Build grid dynamically ----
+function buildGeniusGrid(numBtns, isNewRound = false) {
+    const prevCount = geniusGrid.children.length;
+    const cols = numBtns <= 4 ? 2 : 3;
+    geniusGrid.style.gridTemplateColumns = `repeat(${cols}, 1fr)`;
+    geniusGrid.innerHTML = '';
+
+    for (let i = 0; i < numBtns; i++) {
+        const def = GENIUS_BTN_DEFS[i];
+        const btn = document.createElement('button');
+        btn.id = `genius-btn-${i}`;
+        btn.className = `genius-btn ${def.css}`;
+        btn.dataset.color = i;
+        if (def.label) btn.textContent = def.label;
+        // Pop-in animation only for truly new buttons
+        if (isNewRound && i >= prevCount) {
+            btn.classList.add('genius-new');
+            // Remove animation class after it completes to allow re-triggering
+            setTimeout(() => btn.classList.remove('genius-new'), 600);
+        }
+        geniusGrid.appendChild(btn);
+    }
+    claudioActiveBtns = numBtns;
+}
+
+// ---- Sequence playback ----
+function litButton(colorIndex, duration = 450) {
     return new Promise(resolve => {
         const btn = document.getElementById(`genius-btn-${colorIndex}`);
+        if (!btn) { setTimeout(resolve, duration + 80); return; }
         btn.classList.add('lit');
         playSound('click');
         setTimeout(() => {
             btn.classList.remove('lit');
-            setTimeout(resolve, 100);
+            setTimeout(resolve, 80);
         }, duration);
     });
 }
@@ -3492,14 +3559,12 @@ async function playSequence() {
     claudioTurnText.textContent = 'Preste atenção!';
     claudioTurnText.classList.remove('player-turn');
 
-    // Small pause before showing sequence
-    await new Promise(r => setTimeout(r, 600));
+    await new Promise(r => setTimeout(r, 700));
 
     for (const color of claudioSequence) {
-        await litButton(color, 450);
+        await litButton(color, 420);
     }
 
-    // Now it's the player's turn
     claudioIsPlaying = false;
     claudioPlayerIndex = 0;
     geniusGrid.classList.add('player-active');
@@ -3508,6 +3573,7 @@ async function playSequence() {
     setClaudioSpeech(claudioPhrasesNormal[Math.floor(Math.random() * claudioPhrasesNormal.length)]);
 }
 
+// ---- Reset / Start ----
 function resetClaudioGame() {
     claudioSequence = [];
     claudioPlayerIndex = 0;
@@ -3519,13 +3585,15 @@ function resetClaudioGame() {
     claudioWinOverlay.style.display = 'none';
     claudioLoseOverlay.style.display = 'none';
     geniusGrid.classList.remove('player-active');
+    if (geniusAnnouncement) geniusAnnouncement.classList.remove('visible');
 
+    buildGeniusGrid(4);
     updateClaudioLives();
     updateClaudioRoundDots();
     claudioRoundText.textContent = `Rodada: 1/${CLAUDIO_MAX_ROUNDS}`;
     claudioTurnText.textContent = 'Preste atenção!';
     claudioTurnText.classList.remove('player-turn');
-    setClaudioSpeech("Eu sou um cubo gey, me vença se for capaz!");
+    setClaudioSpeech('Eu sou um cubo gey, me vença se for capaz!');
 }
 
 function startClaudioGame() {
@@ -3534,34 +3602,58 @@ function startClaudioGame() {
     nextClaudioRound();
 }
 
+// ---- Round logic ----
 function nextClaudioRound() {
     claudioCurrentRound++;
     claudioPlayerIndex = 0;
 
-    // Add one random color to sequence
-    claudioSequence.push(Math.floor(Math.random() * 4));
+    const config = GENIUS_ROUND_CONFIG[claudioCurrentRound - 1];
+    const { seqLen, activeBtns, msg } = config;
 
-    claudioRoundText.textContent = `Rodada: ${claudioCurrentRound}/${CLAUDIO_MAX_ROUNDS}`;
-    updateClaudioRoundDots();
+    // Announce and rebuild grid if button count grew
+    const needsMoreBtns = activeBtns > claudioActiveBtns;
+    if (needsMoreBtns && msg) {
+        showGeniusAnnouncement(msg, 3200);
+    }
 
-    playSequence();
+    const rebuildDelay = needsMoreBtns ? 800 : 0;
+    setTimeout(() => {
+        if (needsMoreBtns) buildGeniusGrid(activeBtns, true);
+
+        // Build fresh sequence from active button pool
+        claudioSequence = [];
+        for (let i = 0; i < seqLen; i++) {
+            claudioSequence.push(Math.floor(Math.random() * activeBtns));
+        }
+
+        claudioRoundText.textContent = `Rodada: ${claudioCurrentRound}/${CLAUDIO_MAX_ROUNDS}`;
+        updateClaudioRoundDots();
+        setClaudioSpeech(`Rodada ${claudioCurrentRound}: memorize ${seqLen} cores!`);
+
+        setTimeout(() => playSequence(), 1200);
+    }, rebuildDelay);
 }
+
+// ---- Player input (event delegation on grid) ----
+geniusGrid.addEventListener('click', (e) => {
+    const btn = e.target.closest('.genius-btn');
+    if (!btn) return;
+    handleClaudioPlayerInput(parseInt(btn.dataset.color));
+});
 
 function handleClaudioPlayerInput(colorIndex) {
     if (!claudioGameActive || claudioIsPlaying || isClaudioTutorialOpen) return;
     if (!geniusGrid.classList.contains('player-active')) return;
 
-    // Flash the button
-    litButton(colorIndex, 200);
+    litButton(colorIndex, 180);
 
     if (colorIndex !== claudioSequence[claudioPlayerIndex]) {
-        // WRONG!
+        // WRONG
         claudioLives--;
         updateClaudioLives();
         playSound('bako_cheat');
         setClaudioSpeech(claudioPhrasesWrong[Math.floor(Math.random() * claudioPhrasesWrong.length)]);
 
-        // Error shake
         claudioGeniusCard.classList.add('claudio-error');
         setTimeout(() => claudioGeniusCard.classList.remove('claudio-error'), 500);
 
@@ -3575,8 +3667,8 @@ function handleClaudioPlayerInput(colorIndex) {
                 claudioGameActive = false;
             }, 1000);
         } else {
-            // Replay the sequence for this round
-            setTimeout(() => playSequence(), 1500);
+            // Replay same round sequence
+            setTimeout(() => playSequence(), 1600);
         }
         return;
     }
@@ -3584,7 +3676,7 @@ function handleClaudioPlayerInput(colorIndex) {
     claudioPlayerIndex++;
 
     if (claudioPlayerIndex >= claudioSequence.length) {
-        // Completed this round!
+        // Round complete!
         playSound('rank_up_med');
         geniusGrid.classList.remove('player-active');
         claudioTurnText.textContent = 'Preste atenção!';
@@ -3592,7 +3684,6 @@ function handleClaudioPlayerInput(colorIndex) {
         setClaudioSpeech(claudioPhrasesCorrect[Math.floor(Math.random() * claudioPhrasesCorrect.length)]);
 
         if (claudioCurrentRound >= CLAUDIO_MAX_ROUNDS) {
-            // WON!
             setTimeout(() => {
                 playSound('rank_up');
                 setClaudioSpeech(claudioPhrasesWin[Math.floor(Math.random() * claudioPhrasesWin.length)]);
@@ -3600,18 +3691,12 @@ function handleClaudioPlayerInput(colorIndex) {
                 claudioGameActive = false;
             }, 1000);
         } else {
-            setTimeout(() => nextClaudioRound(), 1500);
+            setTimeout(() => nextClaudioRound(), 2000);
         }
     }
 }
 
-// Wire genius buttons
-geniusBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-        handleClaudioPlayerInput(parseInt(btn.dataset.color));
-    });
-});
-
+// ---- Close / Quit / Restart ----
 function closeClaudioGame() {
     claudioGameActive = false;
     claudioIsPlaying = false;
@@ -3620,6 +3705,7 @@ function closeClaudioGame() {
     isClaudioTutorialOpen = false;
     claudioGeniusCard.classList.remove('claudio-error');
     geniusGrid.classList.remove('player-active');
+    if (geniusAnnouncement) geniusAnnouncement.classList.remove('visible');
 }
 
 btnClaudioQuit.addEventListener('click', () => {
@@ -3653,18 +3739,18 @@ btnClaudioWinOk.addEventListener('click', () => {
         nodeGgopa.className = 'map-node node-active';
         nodeGgopa.title = 'Fase 5 - Sede do GGOPA';
         const iconSpan = nodeGgopa.querySelector('.node-icon');
-        if (iconSpan) iconSpan.textContent = '🏛️';
+        if (iconSpan) iconSpan.textContent = '🏗️';
     }
     if (pathLineFase5) pathLineFase5.classList.add('line-active');
 
-    // AUTO-WALK from Fase 4 (72%, 30%) to GGOPA (90%, 20%)
     setTimeout(() => {
         journeyPlayerToken.style.left = '90%';
         journeyPlayerToken.style.top = '20%';
-
         setTimeout(() => {
             playSound('rank_up_high');
-            alert("🏛️ Fase 5 — Sede do GGOPA: Novidades em breve!");
+            alert('🏗️ Fase 5 — Sede do GGOPA: Novidades em breve!');
         }, 1500);
     }, 800);
 });
+
+
