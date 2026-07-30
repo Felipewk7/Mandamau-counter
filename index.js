@@ -1591,6 +1591,7 @@ btnCloseJourneyView.addEventListener('click', () => {
 
 let currentBossEncounter = 'kleber';
 let isGwenTutorialOpen = false;
+let isSamTutorialOpen = false;
 
 function setupBossEncounterUI() {
     const portrait = document.querySelector('.encounter-portrait');
@@ -1613,6 +1614,14 @@ function setupBossEncounterUI() {
         titleText.textContent = "A mestre do quiz";
         authorText.textContent = "Gwen";
         bubblePara.textContent = "Eai porra, vc é bom em matematica ? Não ? que pena vai ter que ser pra passar Hahahaha!!!";
+    } else if (currentBossEncounter === 'sam') {
+        portrait.src = "img/sam.png";
+        portrait.alt = "Sam";
+        portrait.onerror = function() { this.src = 'kleber_clown.jpg'; };
+        nameText.textContent = "Sam";
+        titleText.textContent = "O Gordão do Esmaga";
+        authorText.textContent = "Sam";
+        bubblePara.textContent = "Eai porra, vc é bom em esmagar comida? Não? que pena vai ter que ser pra passar Hahahaha!!!";
     }
 }
 
@@ -1636,6 +1645,15 @@ btnAcceptChallenge.addEventListener('click', () => {
         gwenLives = 3;
         isPrankQuestion = false;
         updateGwenUI();
+    } else if (currentBossEncounter === 'sam') {
+        samSmashOverlay.classList.add('active');
+        samTutorialModal.classList.add('active');
+        isSamTutorialOpen = true;
+        samGameActive = false;
+        samTugProgress = 50;
+        samTimeLeft = 15;
+        lastPressedKey = '';
+        updateSamTugUI();
     }
 });
 
@@ -2403,6 +2421,21 @@ function initJourneyMapState() {
             pathLineFase3.classList.add('line-active');
         }
     }
+    
+    const journeyFase3Completed = localStorage.getItem('mandamau_journey_fase3_completed') === 'true';
+    if (journeyFase3Completed) {
+        const nodeFase4 = document.getElementById('node-fase4');
+        const pathLineFase4 = document.querySelector('.line-fase4');
+        if (nodeFase4) {
+            nodeFase4.className = 'map-node node-active';
+            nodeFase4.title = 'Fase 4 - Disponível';
+            const iconSpan = nodeFase4.querySelector('.node-icon');
+            if (iconSpan) iconSpan.textContent = '⚔️';
+        }
+        if (pathLineFase4) {
+            pathLineFase4.classList.add('line-active');
+        }
+    }
 }
 
 // Add the click listener for Fase 2 Node
@@ -2744,7 +2777,9 @@ btnGwenWinOk.addEventListener('click', () => {
         
         setTimeout(() => {
             playSound('rank_up_med');
-            alert("Fase 3: Novidades em breve!");
+            currentBossEncounter = 'sam';
+            setupBossEncounterUI();
+            journeyEncounterOverlay.classList.add('active');
         }, 1500); // 1.5s walking animation
     }, 800);
 });
@@ -2754,7 +2789,22 @@ document.getElementById('node-fase3').addEventListener('click', () => {
     const journeyFase2Completed = localStorage.getItem('mandamau_journey_fase2_completed') === 'true';
     if (journeyFase2Completed) {
         playSound('click');
-        alert("Fase 3: Novidades em breve!");
+        
+        // Walk from Fase 2 node (40%, 50%) to Fase 3 node (55%, 40%)
+        journeyPlayerToken.style.left = '55%';
+        journeyPlayerToken.style.top = '40%';
+        
+        setTimeout(() => {
+            const nodeFase3Element = document.getElementById('node-fase3');
+            const pathLineFase3Element = document.querySelector('.line-fase3');
+            if (nodeFase3Element) nodeFase3Element.classList.add('node-active');
+            if (pathLineFase3Element) pathLineFase3Element.classList.add('line-active');
+            
+            playSound('rank_up_med');
+            currentBossEncounter = 'sam';
+            setupBossEncounterUI();
+            journeyEncounterOverlay.classList.add('active');
+        }, 1500);
     }
 });
 
@@ -2780,4 +2830,235 @@ btnCloseGwenTutorial.addEventListener('click', () => {
     gwenActive = true;
     startGwenTimer();
     generateGwenQuestion();
+});
+
+// Sam Food Smash System (Fase 3)
+const samSmashOverlay = document.getElementById('sam-smash-overlay');
+const samSmashCard = document.getElementById('sam-smash-card');
+const btnSamQuit = document.getElementById('btn-sam-quit');
+const samSpeech = document.getElementById('sam-speech');
+const samTugBar = document.getElementById('sam-tug-bar');
+const samFoodDivider = document.getElementById('sam-food-divider');
+const samKeyA = document.getElementById('sam-key-a');
+const samKeyD = document.getElementById('sam-key-d');
+const samTimerText = document.getElementById('sam-timer-text');
+const samWinOverlay = document.getElementById('sam-win-overlay');
+const samLoseOverlay = document.getElementById('sam-lose-overlay');
+const btnSamWinOk = document.getElementById('btn-sam-win-ok');
+const btnSamRestart = document.getElementById('btn-sam-restart');
+const samTutorialModal = document.getElementById('sam-tutorial-modal');
+const btnCloseSamTutorial = document.getElementById('btn-close-sam-tutorial');
+
+let samTugProgress = 50;
+let samTimeLeft = 15;
+let samGameActive = false;
+let samTimerInterval = null;
+let samAiInterval = null;
+let lastPressedKey = '';
+
+const samPhrases = [
+    "Eu esmago mais rápido que você! 🍔",
+    "Nhac nhac nhac! Mais comida! 🍕",
+    "Você já era, magrelo! 🌭",
+    "Vou te esmagar! 🍰",
+    "Sinta o poder do Gordão do Esmaga! 🍟",
+    "Está comendo poeira! 🍩"
+];
+
+function updateSamTugUI() {
+    samTugBar.style.width = `${samTugProgress}%`;
+    samFoodDivider.style.left = `${samTugProgress}%`;
+}
+
+function updateSamSpeech() {
+    if (samTugProgress < 30) {
+        samSpeech.textContent = "Hahaha! Você não aguenta o tranco! 😈";
+    } else if (samTugProgress > 70) {
+        samSpeech.textContent = "Ei! Deixe um pouco pra mim! 😢";
+    } else {
+        samSpeech.textContent = samPhrases[Math.floor(Math.random() * samPhrases.length)];
+    }
+}
+
+function startSamGame() {
+    samTugProgress = 50;
+    samTimeLeft = 15;
+    samGameActive = true;
+    isSamTutorialOpen = false;
+    lastPressedKey = '';
+    
+    samKeyA.className = 'sam-key-box active';
+    samKeyD.className = 'sam-key-box';
+    samTimerText.textContent = '15s';
+    samWinOverlay.style.display = 'none';
+    samLoseOverlay.style.display = 'none';
+    updateSamTugUI();
+    
+    updateSamSpeech();
+    
+    if (samTimerInterval) clearInterval(samTimerInterval);
+    if (samAiInterval) clearInterval(samAiInterval);
+    
+    // AI loop (-1.5% every 100ms)
+    samAiInterval = setInterval(() => {
+        if (!samGameActive || isSamTutorialOpen) return;
+        
+        samTugProgress = Math.max(0, samTugProgress - 1.5);
+        updateSamTugUI();
+        
+        if (samTugProgress <= 0) {
+            endSamGame(false);
+        }
+    }, 100);
+    
+    // Timer loop (every 1s)
+    samTimerInterval = setInterval(() => {
+        if (!samGameActive || isSamTutorialOpen) return;
+        
+        samTimeLeft--;
+        samTimerText.textContent = `${samTimeLeft}s`;
+        
+        if (samTimeLeft % 3 === 0) {
+            updateSamSpeech();
+        }
+        
+        if (samTimeLeft <= 0) {
+            if (samTugProgress > 50) {
+                endSamGame(true);
+            } else {
+                endSamGame(false);
+            }
+        }
+    }, 1000);
+}
+
+function endSamGame(isVictory) {
+    samGameActive = false;
+    clearInterval(samTimerInterval);
+    clearInterval(samAiInterval);
+    
+    if (isVictory) {
+        playSound('rank_up');
+        samWinOverlay.style.display = 'flex';
+    } else {
+        playSound('reset');
+        samLoseOverlay.style.display = 'flex';
+    }
+}
+
+function triggerSamScreenShake() {
+    samSmashCard.classList.add('sam-card-shake');
+    setTimeout(() => {
+        samSmashCard.classList.remove('sam-card-shake');
+    }, 150);
+}
+
+function closeSamGame() {
+    samGameActive = false;
+    clearInterval(samTimerInterval);
+    clearInterval(samAiInterval);
+    samSmashOverlay.classList.remove('active');
+    samSmashCard.classList.remove('sam-card-shake');
+}
+
+btnSamQuit.addEventListener('click', () => {
+    closeSamGame();
+    playSound('click');
+});
+
+btnSamRestart.addEventListener('click', () => {
+    playSound('click');
+    samWinOverlay.style.display = 'none';
+    samLoseOverlay.style.display = 'none';
+    startSamGame();
+});
+
+btnSamWinOk.addEventListener('click', () => {
+    closeSamGame();
+    playSound('rank_up');
+    
+    localStorage.setItem('mandamau_journey_fase3_completed', 'true');
+    
+    const nodeFase4 = document.getElementById('node-fase4');
+    const pathLineFase4 = document.querySelector('.line-fase4');
+    if (nodeFase4) {
+        nodeFase4.className = 'map-node node-active';
+        nodeFase4.title = 'Fase 4 - Disponível';
+        const iconSpan = nodeFase4.querySelector('.node-icon');
+        if (iconSpan) iconSpan.textContent = '⚔️';
+    }
+    if (pathLineFase4) {
+        pathLineFase4.classList.add('line-active');
+    }
+    
+    // AUTO-WALK from Fase 3 node (55%, 40%) to Fase 4 node (72%, 30%)
+    setTimeout(() => {
+        journeyPlayerToken.style.left = '72%';
+        journeyPlayerToken.style.top = '30%';
+        
+        setTimeout(() => {
+            playSound('rank_up_med');
+            alert("Fase 4: Novidades em breve!");
+        }, 1500);
+    }, 800);
+});
+
+btnCloseSamTutorial.addEventListener('click', () => {
+    isSamTutorialOpen = false;
+    samTutorialModal.classList.remove('active');
+    playSound('click');
+    
+    startSamGame();
+});
+
+// Click listener for Fase 4 Node (Novidades em breve)
+document.getElementById('node-fase4').addEventListener('click', () => {
+    const journeyFase3Completed = localStorage.getItem('mandamau_journey_fase3_completed') === 'true';
+    if (journeyFase3Completed) {
+        playSound('click');
+        alert("Fase 4: Novidades em breve!");
+    }
+});
+
+// Keydown listener for alternate key smashing (A and D or Left and Right arrows)
+window.addEventListener('keydown', (e) => {
+    if (!samGameActive || isSamTutorialOpen || isTutorialOpen || isGwenTutorialOpen) return;
+    
+    const key = e.key.toUpperCase();
+    
+    if (key === 'A' || e.key === 'ArrowLeft') {
+        if (lastPressedKey !== 'A') {
+            lastPressedKey = 'A';
+            samKeyA.classList.remove('active');
+            samKeyD.classList.add('active');
+            
+            samKeyA.classList.add('success');
+            setTimeout(() => samKeyA.classList.remove('success'), 100);
+            
+            samTugProgress = Math.min(100, samTugProgress + 2);
+            updateSamTugUI();
+            triggerSamScreenShake();
+            
+            if (samTugProgress >= 100) {
+                endSamGame(true);
+            }
+        }
+    } else if (key === 'D' || e.key === 'ArrowRight') {
+        if (lastPressedKey !== 'D') {
+            lastPressedKey = 'D';
+            samKeyD.classList.remove('active');
+            samKeyA.classList.add('active');
+            
+            samKeyD.classList.add('success');
+            setTimeout(() => samKeyD.classList.remove('success'), 100);
+            
+            samTugProgress = Math.min(100, samTugProgress + 2);
+            updateSamTugUI();
+            triggerSamScreenShake();
+            
+            if (samTugProgress >= 100) {
+                endSamGame(true);
+            }
+        }
+    }
 });

@@ -510,6 +510,88 @@
             </div>
         </div>
 
+        <!-- Sam Food Smash Overlay (Fase 3) -->
+        <div id="sam-smash-overlay" class="sam-smash-overlay">
+            <div id="sam-smash-card" class="sam-smash-card">
+                <button id="btn-sam-quit" class="btn-sam-quit" title="Desistir">&times;</button>
+                
+                <!-- Win State Overlay -->
+                <div id="sam-win-overlay" class="sam-state-overlay" style="display: none;">
+                    <h3 class="sam-state-title win">🏆 Vitória! 🏆</h3>
+                    <p class="sam-state-desc">Você esmagou mais comida que o Sam! Ele está empanturrado e não aguenta mais!</p>
+                    <button id="btn-sam-win-ok" class="btn btn-sum" style="width: 100%;">Finalizar Nível 3</button>
+                </div>
+                
+                <!-- Lose State Overlay -->
+                <div id="sam-lose-overlay" class="sam-state-overlay" style="display: none;">
+                    <h3 class="sam-state-title lose">💀 Derrota! 💀</h3>
+                    <p class="sam-state-desc">O Sam esmagou você! Ele limpou o prato e você comeu poeira.</p>
+                    <button id="btn-sam-restart" class="btn btn-sum" style="width: 100%;">Tentar Novamente</button>
+                </div>
+                
+                <div class="sam-smash-header">
+                    <h2 class="sam-smash-title">Disputa de Esmaga Comida</h2>
+                </div>
+                
+                <div class="sam-combat-grid">
+                    <!-- Player Side -->
+                    <div class="sam-player-side">
+                        <h3 style="color: #a855f7; margin-bottom: 10px; font-weight: 800; font-size: 1.1rem; text-transform: uppercase;">Você</h3>
+                        <p style="font-size: 0.8rem; color: #cbd5e1; margin-bottom: 10px;">Aperte alternadamente:</p>
+                        <div class="sam-key-indicators-container">
+                            <div id="sam-key-a" class="sam-key-box active">A</div>
+                            <div id="sam-key-d" class="sam-key-box">D</div>
+                        </div>
+                        <span style="font-size: 0.75rem; color: #94a3b8;">(ou Setas Esquerda/Direita)</span>
+                    </div>
+                    
+                    <!-- Sam Side -->
+                    <div class="sam-boss-side">
+                        <div class="sam-boss-portrait-wrapper">
+                            <img id="sam-avatar" src="img/sam.png" alt="Sam O Gordão do Esmaga" class="sam-avatar sam-pulse" onerror="this.onerror=null; this.src='kleber_clown.jpg';">
+                        </div>
+                        <h3 style="color: #ef4444; font-weight: 800; font-size: 1rem; text-transform: uppercase; margin: 2px 0;">Sam</h3>
+                        <div class="sam-dialog-bubble">
+                            <p id="sam-speech">Eu esmago mais rápido que você! 🍔</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Tug of War Progress Bar -->
+                <div class="sam-tug-wrapper">
+                    <div class="sam-tug-labels">
+                        <span class="sam-tug-player-label">Seu Lado</span>
+                        <span class="sam-tug-boss-label">Lado do Sam</span>
+                    </div>
+                    <div class="sam-tug-track">
+                        <div id="sam-tug-bar" class="sam-tug-bar" style="width: 50%;"></div>
+                        <div id="sam-food-divider" class="sam-food-divider">🍔</div>
+                    </div>
+                </div>
+                
+                <!-- Timer Container -->
+                <div class="sam-timer-container">
+                    <span>Tempo Restante:</span>
+                    <span id="sam-timer-text" class="sam-timer-text">15s</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sam Tutorial Modal (Fase 3 Tutorial) -->
+        <div id="sam-tutorial-modal" class="arm-tutorial-modal">
+            <div class="tutorial-card">
+                <h2>Como Jogar Esmaga Comida do Sam</h2>
+                <div class="tutorial-body">
+                    <p>1. Esmague a comida alternando as teclas <strong>A</strong> e <strong>D</strong> (ou as <strong>Setas Esquerda e Direita</strong>) o mais rápido que puder!</p>
+                    <p>2. Pressionar a mesma tecla duas vezes seguidas <strong>não</strong> conta pontos. Mantenha o ritmo alternado!</p>
+                    <p>3. Cada alternância bem-sucedida puxa o progresso <strong>+2%</strong> para o seu lado.</p>
+                    <p>4. O Sam come constantemente, puxando a barra <strong>-1.5%</strong> a cada 100ms.</p>
+                    <p>5. Mantenha a comida do seu lado (<strong>acima de 50%</strong>) até o tempo acabar, ou puxe <strong>até 100%</strong> para vencer de imediato!</p>
+                </div>
+                <button id="btn-close-sam-tutorial" class="btn btn-sum">Entendido!</button>
+            </div>
+        </div>
+
         <!-- Jumpscare Overlay -->
         <div id="arm-jumpscare-overlay" class="arm-jumpscare-overlay">
             <img src="kleber_clown.jpg" alt="Kleber Jumpscare" class="jumpscare-portrait">

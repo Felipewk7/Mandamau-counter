@@ -2820,3 +2820,314 @@ body::before {
 .gwen-shake {
     animation: arm-tremor 0.15s linear infinite !important;
 }
+
+/* Sam Food Smash overlay (Fase 3) */
+.sam-smash-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(10, 10, 18, 0.96);
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(10px);
+}
+
+.sam-smash-overlay.active {
+    display: flex;
+}
+
+.sam-smash-card {
+    background: linear-gradient(135deg, #13112c, #070515);
+    border: 3px solid #ff7e00;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 650px;
+    padding: 25px;
+    box-shadow: 0 0 30px rgba(255, 126, 0, 0.25), inset 0 0 15px rgba(255, 126, 0, 0.1);
+    position: relative;
+    color: #fff;
+    font-family: 'Inter', sans-serif;
+    overflow: hidden;
+}
+
+.btn-sam-quit {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    color: #94a3b8;
+    font-size: 1.8rem;
+    cursor: pointer;
+    line-height: 1;
+    transition: color 0.2s;
+    z-index: 10;
+}
+
+.btn-sam-quit:hover {
+    color: #ff7e00;
+}
+
+.sam-smash-header {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.sam-smash-title {
+    font-size: 1.8rem;
+    font-weight: 800;
+    background: linear-gradient(90deg, #ff7e00, #ff0055);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 10px rgba(255, 126, 0, 0.2);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.sam-combat-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.sam-player-side {
+    background: rgba(30, 27, 75, 0.4);
+    border: 2px solid rgba(168, 85, 247, 0.3);
+    border-radius: 15px;
+    padding: 15px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.sam-boss-side {
+    background: rgba(120, 20, 20, 0.15);
+    border: 2px solid rgba(239, 68, 68, 0.3);
+    border-radius: 15px;
+    padding: 15px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.sam-boss-portrait-wrapper {
+    position: relative;
+    margin-bottom: 10px;
+}
+
+.sam-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 3px solid #ef4444;
+    background-color: #1e1b4b;
+    box-shadow: 0 0 15px rgba(239, 68, 68, 0.2);
+}
+
+.sam-avatar.sam-pulse {
+    animation: sam-avatar-pulse 0.8s infinite alternate ease-in-out;
+}
+
+@keyframes sam-avatar-pulse {
+    0% { transform: scale(1); box-shadow: 0 0 15px rgba(239, 68, 68, 0.2); }
+    100% { transform: scale(1.08); box-shadow: 0 0 25px rgba(239, 68, 68, 0.5); }
+}
+
+.sam-dialog-bubble {
+    background: #2e0505;
+    border: 2px solid #ef4444;
+    border-radius: 12px;
+    padding: 10px;
+    color: #fca5a5;
+    font-size: 0.82rem;
+    line-height: 1.3;
+    max-width: 180px;
+    position: relative;
+    margin-top: 8px;
+    word-wrap: break-word;
+}
+
+.sam-dialog-bubble::before {
+    content: '';
+    position: absolute;
+    top: -10px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-width: 0 10px 10px 10px;
+    border-style: solid;
+    border-color: transparent transparent #ef4444 transparent;
+}
+
+.sam-tug-wrapper {
+    margin: 25px 0;
+    text-align: center;
+    position: relative;
+}
+
+.sam-tug-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    font-weight: 700;
+    margin-bottom: 5px;
+    text-transform: uppercase;
+}
+
+.sam-tug-player-label { color: #a855f7; }
+.sam-tug-boss-label { color: #ef4444; }
+
+.sam-tug-track {
+    height: 24px;
+    background: #1e293b;
+    border-radius: 12px;
+    border: 2px solid #334155;
+    position: relative;
+    overflow: visible;
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);
+}
+
+.sam-tug-bar {
+    height: 100%;
+    width: 50%;
+    background: linear-gradient(90deg, #a855f7, #6366f1);
+    border-radius: 10px 0 0 10px;
+    transition: width 0.1s ease;
+}
+
+.sam-food-divider {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1.8rem;
+    z-index: 5;
+    transition: left 0.1s ease;
+    filter: drop-shadow(0 0 5px rgba(255,255,255,0.8));
+    user-select: none;
+}
+
+.sam-key-indicators-container {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin: 15px 0;
+}
+
+.sam-key-box {
+    width: 60px;
+    height: 60px;
+    background: #1e1b4b;
+    border: 3px solid #475569;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.6rem;
+    font-weight: 900;
+    color: #64748b;
+    transition: all 0.1s ease;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+}
+
+.sam-key-box.active {
+    border-color: #a855f7;
+    color: #fff;
+    background: #4c1d95;
+    box-shadow: 0 0 15px rgba(168, 85, 247, 0.6);
+    transform: scale(1.05);
+}
+
+.sam-key-box.success {
+    background: #064e3b;
+    border-color: #10b981;
+    color: #fff;
+    box-shadow: 0 0 15px rgba(16, 185, 129, 0.8);
+    transform: scale(1.1);
+}
+
+.sam-timer-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 15px;
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: #ffbd00;
+}
+
+.sam-timer-text {
+    font-family: monospace;
+    font-size: 1.4rem;
+}
+
+.sam-state-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(15, 23, 42, 0.98);
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
+    text-align: center;
+}
+
+.sam-state-title {
+    font-size: 1.8rem;
+    font-weight: 800;
+    margin-bottom: 12px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.sam-state-title.win {
+    color: #10b981;
+    text-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
+}
+
+.sam-state-title.lose {
+    color: #ef4444;
+    text-shadow: 0 0 15px rgba(239, 68, 68, 0.3);
+}
+
+.sam-state-desc {
+    font-size: 0.9rem;
+    color: #cbd5e1;
+    line-height: 1.5;
+    margin-bottom: 25px;
+    max-width: 350px;
+}
+
+.sam-card-shake {
+    animation: sam-screen-shake 0.15s ease-in-out infinite;
+}
+
+@keyframes sam-screen-shake {
+    0% { transform: translate(1px, 1px) rotate(0deg); }
+    10% { transform: translate(-1px, -2px) rotate(-1deg); }
+    20% { transform: translate(-3px, 0px) rotate(1deg); }
+    30% { transform: translate(0px, 2px) rotate(0deg); }
+    40% { transform: translate(1px, -1px) rotate(1deg); }
+    50% { transform: translate(-1px, 2px) rotate(-1deg); }
+    60% { transform: translate(-3px, 1px) rotate(0deg); }
+    70% { transform: translate(2px, 1px) rotate(-1deg); }
+    80% { transform: translate(-1px, -1px) rotate(1deg); }
+    90% { transform: translate(2px, 2px) rotate(0deg); }
+    100% { transform: translate(1px, -2px) rotate(-1deg); }
+}
+
