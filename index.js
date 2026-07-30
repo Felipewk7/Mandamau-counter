@@ -3386,10 +3386,12 @@ function debugResetPhase(fromPhase) {
 document.getElementById('dbg-complete-1').addEventListener('click', () => debugCompletePhase(1));
 document.getElementById('dbg-complete-2').addEventListener('click', () => debugCompletePhase(2));
 document.getElementById('dbg-complete-3').addEventListener('click', () => debugCompletePhase(3));
+document.getElementById('dbg-complete-4').addEventListener('click', () => debugCompletePhase(4));
 
 document.getElementById('dbg-reset-1').addEventListener('click', () => debugResetPhase(1));
 document.getElementById('dbg-reset-2').addEventListener('click', () => debugResetPhase(2));
 document.getElementById('dbg-reset-3').addEventListener('click', () => debugResetPhase(3));
+document.getElementById('dbg-reset-4').addEventListener('click', () => debugResetPhase(4));
 
 document.getElementById('dbg-reset-all').addEventListener('click', () => {
     localStorage.removeItem('mandamau_journey_fase1_completed');
@@ -3439,11 +3441,11 @@ const GENIUS_BTN_DEFS = [
 
 // ---- Per-round config: seqLen = how many to memorize, activeBtns = how many buttons ----
 const GENIUS_ROUND_CONFIG = [
-    { seqLen:  5, activeBtns: 4, msg: null },
-    { seqLen:  8, activeBtns: 4, msg: null },
-    { seqLen: 12, activeBtns: 4, msg: null },
-    { seqLen: 16, activeBtns: 6, msg: '⚠️ NOVOS BOTÕES APARECEM!' },
-    { seqLen: 22, activeBtns: 9, msg: '🔮 LETRAS GREGAS INVADEM O JOGO!' },
+    { seqLen: 5, activeBtns: 4, msg: null },
+    { seqLen: 6, activeBtns: 4, msg: null },
+    { seqLen: 6, activeBtns: 4, msg: null },
+    { seqLen: 6, activeBtns: 6, msg: '⚠️ NOVOS BOTÕES APARECEM!' },
+    { seqLen: 7, activeBtns: 9, msg: '🔮 LETRAS GREGAS INVADEM O JOGO!' },
 ];
 
 // ---- Game state ----
