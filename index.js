@@ -3016,8 +3016,8 @@ function startSamRound(round) {
     if (samAiInterval) clearInterval(samAiInterval);
     if (samKeySwapInterval) clearInterval(samKeySwapInterval);
     
-    // Difficulty scales per round: round 1 = 1.5%, round 2 = 1.7%, round 3 = 1.9%
-    const drainRates = [1.5, 1.7, 1.9];
+    // Difficulty stays at 1.5% drain for all rounds (key swaps add the challenge)
+    const drainRates = [1.5, 1.5, 1.5];
     const drain = drainRates[Math.min(round - 1, 2)];
     
     // Key-swap randomisation: round 2+ gets key swaps every 4-7s
