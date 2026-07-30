@@ -2458,6 +2458,22 @@ function initJourneyMapState() {
     }
 }
 
+// Add the click listener for Fase 1 Node
+document.getElementById('node-fase1').addEventListener('click', () => {
+    playSound('click');
+    
+    // Walk to Fase 1 node (25%, 62%)
+    journeyPlayerToken.style.left = '25%';
+    journeyPlayerToken.style.top = '62%';
+    
+    setTimeout(() => {
+        playSound('rank_up_med');
+        currentBossEncounter = 'kleber';
+        setupBossEncounterUI();
+        journeyEncounterOverlay.classList.add('active');
+    }, 1500);
+});
+
 // Add the click listener for Fase 2 Node
 document.getElementById('node-fase2').addEventListener('click', () => {
     const journeyFase1Completed = localStorage.getItem('mandamau_journey_fase1_completed') === 'true';
