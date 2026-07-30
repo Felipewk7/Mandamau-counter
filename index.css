@@ -2823,13 +2823,12 @@ body::before {
 
 /* Sam Food Smash overlay (Fase 3) */
 .sam-smash-overlay {
-    position: fixed;
+    position: absolute;
     top: 0;
     left: 0;
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    height: 100%;
     background: rgba(10, 10, 18, 0.96);
-    z-index: 1000;
     display: none;
     align-items: center;
     justify-content: center;

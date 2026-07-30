@@ -1630,6 +1630,9 @@ btnAcceptChallenge.addEventListener('click', () => {
     playSound('click');
     
     if (currentBossEncounter === 'kleber') {
+        closeGwenQuiz();
+        closeSamGame();
+        
         armWrestlingOverlay.classList.add('active');
         armTutorialModal.classList.add('active');
         isTutorialOpen = true;
@@ -1637,6 +1640,9 @@ btnAcceptChallenge.addEventListener('click', () => {
         armWrestlingState = 0;
         updateArmWrestlingUI();
     } else if (currentBossEncounter === 'gwen') {
+        cleanupArmWrestlingEffects();
+        closeSamGame();
+        
         gwenQuizOverlay.classList.add('active');
         gwenTutorialModal.classList.add('active');
         isGwenTutorialOpen = true;
@@ -1646,6 +1652,9 @@ btnAcceptChallenge.addEventListener('click', () => {
         isPrankQuestion = false;
         updateGwenUI();
     } else if (currentBossEncounter === 'sam') {
+        cleanupArmWrestlingEffects();
+        closeGwenQuiz();
+        
         samSmashOverlay.classList.add('active');
         samTutorialModal.classList.add('active');
         isSamTutorialOpen = true;
@@ -2284,6 +2293,8 @@ function cleanupArmWrestlingEffects() {
     armWrestlingCard.classList.remove('arm-upside-down');
     document.body.classList.remove('arm-shake');
     armJumpscareOverlay.classList.remove('active');
+    armTutorialModal.classList.remove('active');
+    isTutorialOpen = false;
     
     btnArmAction.style.position = '';
     btnArmAction.style.left = '';
@@ -2753,6 +2764,8 @@ function closeGwenQuiz() {
     gwenActive = false;
     clearInterval(gwenTimer);
     gwenQuizOverlay.classList.remove('active');
+    gwenTutorialModal.classList.remove('active');
+    isGwenTutorialOpen = false;
     gwenQuizCard.classList.remove('gwen-shake');
 }
 
@@ -2967,6 +2980,8 @@ function closeSamGame() {
     clearInterval(samTimerInterval);
     clearInterval(samAiInterval);
     samSmashOverlay.classList.remove('active');
+    samTutorialModal.classList.remove('active');
+    isSamTutorialOpen = false;
     samSmashCard.classList.remove('sam-card-shake');
 }
 
