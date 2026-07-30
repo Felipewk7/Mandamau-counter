@@ -1663,53 +1663,62 @@ function openJourney() {
     pathLineFase1.classList.remove('line-active');
     nodeFase1.classList.remove('node-active');
     
+    isTutorialOpen = false;
+    isGwenTutorialOpen = false;
+    isSamTutorialOpen = false;
+    
     const journeyFase1Completed = localStorage.getItem('mandamau_journey_fase1_completed') === 'true';
     const journeyFase2Completed = localStorage.getItem('mandamau_journey_fase2_completed') === 'true';
+    const journeyFase3Completed = localStorage.getItem('mandamau_journey_fase3_completed') === 'true';
     
-    if (journeyFase2Completed) {
-        // Start directly at Fase 3 node (since Fase 2 is completed)
+    // Reset all nodes/paths classes first to ensure clean state load
+    nodeFase1.classList.remove('node-active');
+    pathLineFase1.classList.remove('line-active');
+    
+    const nodeFase2 = document.getElementById('node-fase2');
+    const pathLineFase2 = document.querySelector('.line-fase2');
+    if (nodeFase2) {
+        nodeFase2.className = 'map-node node-locked';
+        const iconSpan = nodeFase2.querySelector('.node-icon');
+        if (iconSpan) iconSpan.textContent = '🔒';
+    }
+    if (pathLineFase2) pathLineFase2.classList.remove('line-active');
+    
+    const nodeFase3 = document.getElementById('node-fase3');
+    const pathLineFase3 = document.querySelector('.line-fase3');
+    if (nodeFase3) {
+        nodeFase3.className = 'map-node node-locked';
+        const iconSpan = nodeFase3.querySelector('.node-icon');
+        if (iconSpan) iconSpan.textContent = '🔒';
+    }
+    if (pathLineFase3) pathLineFase3.classList.remove('line-active');
+    
+    const nodeFase4 = document.getElementById('node-fase4');
+    const pathLineFase4 = document.querySelector('.line-fase4');
+    if (nodeFase4) {
+        nodeFase4.className = 'map-node node-locked';
+        const iconSpan = nodeFase4.querySelector('.node-icon');
+        if (iconSpan) iconSpan.textContent = '🔒';
+    }
+    if (pathLineFase4) pathLineFase4.classList.remove('line-active');
+
+    // Run map initialization to unlock correct nodes/paths
+    initJourneyMapState();
+    
+    if (journeyFase3Completed) {
+        // Starts at Fase 3 node (since Fase 3 is completed, standing there)
         journeyPlayerToken.style.left = '55%';
         journeyPlayerToken.style.top = '40%';
-        
-        // Make sure previous nodes/paths are visually active
-        nodeFase1.classList.add('node-active');
-        pathLineFase1.classList.add('line-active');
-        
-        const nodeFase2 = document.getElementById('node-fase2');
-        const pathLineFase2 = document.querySelector('.line-fase2');
-        if (nodeFase2) {
-            nodeFase2.className = 'map-node node-active';
-            const iconSpan = nodeFase2.querySelector('.node-icon');
-            if (iconSpan) iconSpan.textContent = '⚔️';
-        }
-        if (pathLineFase2) pathLineFase2.classList.add('line-active');
-        
-        const nodeFase3 = document.getElementById('node-fase3');
-        const pathLineFase3 = document.querySelector('.line-fase3');
-        if (nodeFase3) {
-            nodeFase3.className = 'map-node node-active';
-            const iconSpan = nodeFase3.querySelector('.node-icon');
-            if (iconSpan) iconSpan.textContent = '⚔️';
-        }
-        if (pathLineFase3) pathLineFase3.classList.add('line-active');
-        
+    } else if (journeyFase2Completed) {
+        // Starts at Fase 2 node (since Fase 2 is completed, standing there)
+        journeyPlayerToken.style.left = '40%';
+        journeyPlayerToken.style.top = '50%';
     } else if (journeyFase1Completed) {
-        // Start directly at Fase 1 node (already completed Kleber)
+        // Starts at Fase 1 node (already completed Kleber)
         journeyPlayerToken.style.left = '25%';
         journeyPlayerToken.style.top = '62%';
-        nodeFase1.classList.add('node-active');
-        pathLineFase1.classList.add('line-active');
-        
-        const nodeFase2 = document.getElementById('node-fase2');
-        const pathLineFase2 = document.querySelector('.line-fase2');
-        if (nodeFase2) {
-            nodeFase2.className = 'map-node node-active';
-            const iconSpan = nodeFase2.querySelector('.node-icon');
-            if (iconSpan) iconSpan.textContent = '⚔️';
-        }
-        if (pathLineFase2) pathLineFase2.classList.add('line-active');
     } else {
-        // Start at Início and walk to Fase 1
+        // Reset player token position to Start Node and walk to Fase 1
         journeyPlayerToken.style.left = '10%';
         journeyPlayerToken.style.top = '75%';
         
@@ -3022,7 +3031,7 @@ document.getElementById('node-fase4').addEventListener('click', () => {
 
 // Keydown listener for alternate key smashing (A and D or Left and Right arrows)
 window.addEventListener('keydown', (e) => {
-    if (!samGameActive || isSamTutorialOpen || isTutorialOpen || isGwenTutorialOpen) return;
+    if (!samGameActive || isSamTutorialOpen) return;
     
     const key = e.key.toUpperCase();
     

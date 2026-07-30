@@ -548,7 +548,7 @@
                     <!-- Sam Side -->
                     <div class="sam-boss-side">
                         <div class="sam-boss-portrait-wrapper">
-                            <img id="sam-avatar" src="img/sam.png" alt="Sam O Gordão do Esmaga" class="sam-avatar sam-pulse" onerror="this.onerror=null; this.src='kleber_clown.jpg';">
+                            <img id="sam-avatar" src="img/sam.png" alt="Sam O Gordão do Esmaga" class="sam-avatar sam-pulse" onerror="if (this.src.includes('.png')) { this.src = 'img/sam.jpg'; } else { this.src = 'kleber_clown.jpg'; }">
                         </div>
                         <h3 style="color: #ef4444; font-weight: 800; font-size: 1rem; text-transform: uppercase; margin: 2px 0;">Sam</h3>
                         <div class="sam-dialog-bubble">
