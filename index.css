@@ -3130,3 +3130,77 @@ body::before {
     100% { transform: translate(1px, -2px) rotate(-1deg); }
 }
 
+/* ---- Sam Rounds Tracker ---- */
+.sam-rounds-tracker {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 16px;
+    background: rgba(0,0,0,0.3);
+    border-radius: 10px;
+    border: 1px solid rgba(168, 85, 247, 0.25);
+    margin-bottom: 8px;
+}
+
+.sam-rounds-label {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: #94a3b8;
+    font-weight: 700;
+}
+
+.sam-rounds-dots {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.sam-round-dot {
+    width: 14px;
+    height: 14px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.25);
+    background: rgba(255,255,255,0.07);
+    transition: background 0.3s, border-color 0.3s, box-shadow 0.3s;
+}
+
+.sam-round-dot.player-win {
+    background: #a855f7;
+    border-color: #c084fc;
+    box-shadow: 0 0 8px rgba(168, 85, 247, 0.7);
+}
+
+.sam-round-dot.sam-win {
+    background: #ef4444;
+    border-color: #f87171;
+    box-shadow: 0 0 8px rgba(239, 68, 68, 0.7);
+}
+
+.sam-round-score {
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: #e2e8f0;
+    letter-spacing: 0.04em;
+}
+
+/* ---- Key Swap Notice ---- */
+.sam-key-swap-notice {
+    background: linear-gradient(135deg, #ef4444, #f59e0b);
+    color: #fff;
+    font-weight: 900;
+    font-size: 0.8rem;
+    letter-spacing: 0.06em;
+    text-align: center;
+    padding: 6px 14px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    animation: key-swap-pulse 0.4s ease-in-out infinite alternate;
+    text-transform: uppercase;
+}
+
+@keyframes key-swap-pulse {
+    from { opacity: 1; transform: scale(1); }
+    to   { opacity: 0.75; transform: scale(1.03); }
+}

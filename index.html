@@ -519,8 +519,8 @@
                 <!-- Win State Overlay -->
                 <div id="sam-win-overlay" class="sam-state-overlay" style="display: none;">
                     <h3 class="sam-state-title win">🏆 Vitória! 🏆</h3>
-                    <p class="sam-state-desc">Você esmagou mais comida que o Sam! Ele está empanturrado e não aguenta mais!</p>
-                    <button id="btn-sam-win-ok" class="btn btn-sum" style="width: 100%;">Finalizar Nível 3</button>
+                    <p id="sam-win-desc" class="sam-state-desc">Você esmagou mais comida que o Sam!</p>
+                    <button id="btn-sam-win-ok" class="btn btn-sum" style="width: 100%;">Ir para Próxima Fase</button>
                 </div>
                 
                 <!-- Lose State Overlay -->
@@ -543,7 +543,6 @@
                             <div id="sam-key-a" class="sam-key-box active">A</div>
                             <div id="sam-key-d" class="sam-key-box">D</div>
                         </div>
-                        <span style="font-size: 0.75rem; color: #94a3b8;">(ou Setas Esquerda/Direita)</span>
                     </div>
                     
                     <!-- Sam Side -->
@@ -558,6 +557,20 @@
                     </div>
                 </div>
                 
+                <!-- Rounds Tracker -->
+                <div class="sam-rounds-tracker">
+                    <div class="sam-rounds-label">Melhor de 3</div>
+                    <div class="sam-rounds-dots">
+                        <div id="sam-round-dot-1" class="sam-round-dot"></div>
+                        <div id="sam-round-dot-2" class="sam-round-dot"></div>
+                        <div id="sam-round-dot-3" class="sam-round-dot"></div>
+                    </div>
+                    <div id="sam-round-score" class="sam-round-score">Você 0 × 0 Sam</div>
+                </div>
+
+                <!-- Key Swap Notice -->
+                <div id="sam-key-swap-notice" class="sam-key-swap-notice" style="display:none;">⚠️ TECLAS TROCARAM!</div>
+
                 <!-- Tug of War Progress Bar -->
                 <div class="sam-tug-wrapper">
                     <div class="sam-tug-labels">
@@ -583,11 +596,14 @@
             <div class="tutorial-card">
                 <h2>Como Jogar Esmaga Comida do Sam</h2>
                 <div class="tutorial-body">
-                    <p>1. Esmague a comida alternando as teclas <strong>A</strong> e <strong>D</strong> (ou as <strong>Setas Esquerda e Direita</strong>) o mais rápido que puder!</p>
-                    <p>2. Pressionar a mesma tecla duas vezes seguidas <strong>não</strong> conta pontos. Mantenha o ritmo alternado!</p>
+                    <p>💻 <strong>Jogue no computador!</strong> Use as teclas do teclado para esmagar a comida.</p>
+                    <p>1. Alterne rapidamente as teclas <strong>A</strong> e <strong>D</strong> do teclado para esmagar a comida!</p>
+                    <p>2. Pressionar a mesma tecla duas vezes seguidas <strong>não</strong> conta. Mantenha o ritmo alternado!</p>
                     <p>3. Cada alternância bem-sucedida puxa o progresso <strong>+2%</strong> para o seu lado.</p>
-                    <p>4. O Sam come constantemente, puxando a barra <strong>-1.5%</strong> a cada 100ms.</p>
-                    <p>5. Mantenha a comida do seu lado (<strong>acima de 50%</strong>) até o tempo acabar, ou puxe <strong>até 100%</strong> para vencer de imediato!</p>
+                    <p>4. O Sam come constantemente, puxando a barra cada vez mais forte a cada rodada!</p>
+                    <p>5. ⚠️ <strong>Cuidado:</strong> As teclas podem trocar de hora em hora! Fique atento!</p>
+                    <p>6. São <strong>3 rodadas</strong> (melhor de 3). Vença 2 para ganhar o desafio!</p>
+                    <p>7. Mantenha a comida do seu lado (<strong>acima de 50%</strong>) até o tempo acabar, ou puxe <strong>até 100%</strong> para vencer de imediato!</p>
                 </div>
                 <button id="btn-close-sam-tutorial" class="btn btn-sum">Entendido!</button>
             </div>
