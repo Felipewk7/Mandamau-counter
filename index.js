@@ -3262,3 +3262,78 @@ window.addEventListener('keydown', (e) => {
         }
     }
 });
+
+// ============================================================
+// DEBUG PANEL — Cheat code: type "GGOPA" with the journey map open
+// ============================================================
+const debugPanel = document.getElementById('debug-panel');
+const btnDebugClose = document.getElementById('btn-debug-close');
+
+let debugKeyBuffer = '';
+const DEBUG_CODE = 'GGOPA';
+
+window.addEventListener('keydown', (e) => {
+    // Only capture if journey map is open and no minigame is active
+    if (!journeyOverlay.classList.contains('active')) {
+        debugKeyBuffer = '';
+        return;
+    }
+    if (samGameActive || gwenActive || isArmGameActive) return;
+
+    debugKeyBuffer += e.key.toUpperCase();
+
+    // Keep only the last N characters (length of the code)
+    if (debugKeyBuffer.length > DEBUG_CODE.length) {
+        debugKeyBuffer = debugKeyBuffer.slice(-DEBUG_CODE.length);
+    }
+
+    if (debugKeyBuffer === DEBUG_CODE) {
+        debugKeyBuffer = '';
+        const isVisible = debugPanel.style.display !== 'none';
+        debugPanel.style.display = isVisible ? 'none' : 'block';
+        if (!isVisible) playSound('rank_up_med');
+    }
+});
+
+btnDebugClose.addEventListener('click', () => {
+    debugPanel.style.display = 'none';
+});
+
+// Helper: complete a phase and refresh the map
+function debugCompletePhase(phase) {
+    if (phase >= 1) localStorage.setItem('mandamau_journey_fase1_completed', 'true');
+    if (phase >= 2) localStorage.setItem('mandamau_journey_fase2_completed', 'true');
+    if (phase >= 3) localStorage.setItem('mandamau_journey_fase3_completed', 'true');
+    playSound('rank_up_high');
+    // Refresh map state visually
+    openJourney();
+    // Keep panel visible after reopen
+    setTimeout(() => { debugPanel.style.display = 'block'; }, 50);
+}
+
+// Helper: reset from a phase onwards
+function debugResetPhase(fromPhase) {
+    if (fromPhase <= 1) localStorage.removeItem('mandamau_journey_fase1_completed');
+    if (fromPhase <= 2) localStorage.removeItem('mandamau_journey_fase2_completed');
+    if (fromPhase <= 3) localStorage.removeItem('mandamau_journey_fase3_completed');
+    playSound('reset');
+    openJourney();
+    setTimeout(() => { debugPanel.style.display = 'block'; }, 50);
+}
+
+document.getElementById('dbg-complete-1').addEventListener('click', () => debugCompletePhase(1));
+document.getElementById('dbg-complete-2').addEventListener('click', () => debugCompletePhase(2));
+document.getElementById('dbg-complete-3').addEventListener('click', () => debugCompletePhase(3));
+
+document.getElementById('dbg-reset-1').addEventListener('click', () => debugResetPhase(1));
+document.getElementById('dbg-reset-2').addEventListener('click', () => debugResetPhase(2));
+document.getElementById('dbg-reset-3').addEventListener('click', () => debugResetPhase(3));
+
+document.getElementById('dbg-reset-all').addEventListener('click', () => {
+    localStorage.removeItem('mandamau_journey_fase1_completed');
+    localStorage.removeItem('mandamau_journey_fase2_completed');
+    localStorage.removeItem('mandamau_journey_fase3_completed');
+    playSound('reset');
+    openJourney();
+    setTimeout(() => { debugPanel.style.display = 'block'; }, 50);
+});

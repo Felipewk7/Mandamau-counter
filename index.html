@@ -357,6 +357,29 @@
             </div>
         </div>
 
+        <!-- DEBUG Panel (activated by typing GGOPA on the journey map) -->
+        <div id="debug-panel" class="debug-panel" style="display: none;">
+            <div class="debug-panel-header">
+                <span class="debug-panel-title">🛠️ MODO DEBUG — GGOPA</span>
+                <button id="btn-debug-close" class="debug-close-btn" title="Fechar">✕</button>
+            </div>
+            <div class="debug-panel-body">
+                <p class="debug-hint">Marcar fase como concluída:</p>
+                <div class="debug-btn-row">
+                    <button id="dbg-complete-1" class="debug-action-btn">✅ Fase 1</button>
+                    <button id="dbg-complete-2" class="debug-action-btn">✅ Fase 2</button>
+                    <button id="dbg-complete-3" class="debug-action-btn">✅ Fase 3</button>
+                </div>
+                <p class="debug-hint" style="margin-top: 10px;">Resetar:</p>
+                <div class="debug-btn-row">
+                    <button id="dbg-reset-1" class="debug-action-btn debug-danger">🔄 Fase 1</button>
+                    <button id="dbg-reset-2" class="debug-action-btn debug-danger">🔄 Fase 2</button>
+                    <button id="dbg-reset-3" class="debug-action-btn debug-danger">🔄 Fase 3</button>
+                </div>
+                <button id="dbg-reset-all" class="debug-action-btn debug-danger" style="width: 100%; margin-top: 10px;">💀 Resetar Tudo</button>
+            </div>
+        </div>
+
         <!-- Dialogue Encounter Overlay -->
         <div id="journey-encounter-overlay" class="journey-encounter-overlay">
             <div class="journey-encounter-card">

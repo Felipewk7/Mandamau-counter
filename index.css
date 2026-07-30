@@ -3204,3 +3204,108 @@ body::before {
     from { opacity: 1; transform: scale(1); }
     to   { opacity: 0.75; transform: scale(1.03); }
 }
+
+/* ---- Debug Panel ---- */
+.debug-panel {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    z-index: 9999;
+    background: rgba(10, 10, 20, 0.97);
+    border: 1px solid rgba(234, 179, 8, 0.5);
+    border-radius: 12px;
+    min-width: 280px;
+    box-shadow: 0 0 24px rgba(234, 179, 8, 0.2), 0 8px 32px rgba(0,0,0,0.6);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    animation: debug-appear 0.25s ease;
+}
+
+@keyframes debug-appear {
+    from { opacity: 0; transform: translateY(-10px) scale(0.97); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.debug-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    border-bottom: 1px solid rgba(234, 179, 8, 0.2);
+}
+
+.debug-panel-title {
+    font-size: 0.75rem;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    color: #eab308;
+    text-transform: uppercase;
+}
+
+.debug-close-btn {
+    background: none;
+    border: none;
+    color: #94a3b8;
+    font-size: 1rem;
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: 4px;
+    transition: color 0.2s, background 0.2s;
+}
+
+.debug-close-btn:hover {
+    color: #f8fafc;
+    background: rgba(255,255,255,0.08);
+}
+
+.debug-panel-body {
+    padding: 12px 14px;
+}
+
+.debug-hint {
+    font-size: 0.65rem;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-weight: 700;
+    margin: 0 0 6px 0;
+}
+
+.debug-btn-row {
+    display: flex;
+    gap: 6px;
+}
+
+.debug-action-btn {
+    flex: 1;
+    padding: 7px 6px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    border-radius: 7px;
+    border: 1px solid rgba(168, 85, 247, 0.4);
+    background: rgba(168, 85, 247, 0.1);
+    color: #c084fc;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s, transform 0.1s;
+}
+
+.debug-action-btn:hover {
+    background: rgba(168, 85, 247, 0.25);
+    border-color: rgba(168, 85, 247, 0.7);
+    transform: translateY(-1px);
+}
+
+.debug-action-btn:active {
+    transform: scale(0.97);
+}
+
+.debug-action-btn.debug-danger {
+    border-color: rgba(239, 68, 68, 0.4);
+    background: rgba(239, 68, 68, 0.1);
+    color: #f87171;
+}
+
+.debug-action-btn.debug-danger:hover {
+    background: rgba(239, 68, 68, 0.25);
+    border-color: rgba(239, 68, 68, 0.7);
+}
