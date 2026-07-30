@@ -1213,7 +1213,7 @@ const bakoCheatQuotes = [
     "Você clicou errado, meu script corrigiu pra você.",
     "Eu não sou terrorista, mas explodi o seu X do tabuleiro.",
     "No Jogo da Velha do Bako, o O sempre ganha de primeira.",
-    "Eu gosto de mulheres e de ganhar no Jogo da Velha.",
+    "Eu gosto de cachorros mortos e de ganhar no Jogo da Velha.",
     "Você acha que sabe jogar? Eu treinei em segredo contra supercomputadores."
 ];
 
