@@ -304,9 +304,13 @@
     <!-- Journey Map Overlay -->
     <div id="journey-overlay" class="journey-overlay">
         <div class="journey-box">
-            <button id="btn-close-journey-view" class="btn-close-journey-view" title="Fechar Jornada">&times;</button>
             <h2 class="journey-title">A Jornada pelo Remédio Supremo</h2>
             <p class="journey-subtitle">Desbrave o caminho até a sede do GGOPA para curar a maldição do Bako</p>
+            <div class="journey-top-actions">
+                <button id="btn-open-achievements-map" class="btn-achievements-map" title="Ver Conquistas">
+                    🏆 Conquistas <span id="map-achievements-badge" class="achievements-badge-pill">0/10</span>
+                </button>
+            </div>
             
             <div id="journey-map-container" class="journey-map-container">
                 <!-- SVG connecting paths -->
@@ -949,6 +953,45 @@
             <div class="jumpscare-glitch-text">M̶O̶R̶R̶A̶!̶!̶!̶</div>
         </div>
 
+    </div>
+
+    <!-- Steam-Style Achievement Toast Notification -->
+    <div id="achievement-toast" class="achievement-toast">
+        <div class="toast-header-row">
+            <span class="toast-badge-icon">🏆</span>
+            <span class="toast-badge-text">CONQUISTA DESBLOQUEADA</span>
+        </div>
+        <div class="toast-content-body">
+            <div id="toast-icon-wrapper" class="toast-icon-wrapper">
+                <span id="toast-icon" class="toast-icon">👑</span>
+            </div>
+            <div class="toast-info">
+                <h4 id="toast-title" class="toast-title">Nome da Conquista</h4>
+                <p id="toast-desc" class="toast-desc">Descrição da conquista aqui</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Achievements Gallery Modal -->
+    <div id="achievements-modal" class="achievements-modal">
+        <div class="achievements-card">
+            <button id="btn-close-achievements" class="btn-close-achievements" title="Fechar">&times;</button>
+            <div class="achievements-card-header">
+                <div class="achievements-title-group">
+                    <h2 class="achievements-title">🏆 CONQUISTAS</h2>
+                    <p class="achievements-subtitle">Sua galeria de proezas e troféus na jornada</p>
+                </div>
+                <div class="achievements-progress-container">
+                    <div class="achievements-progress-bar">
+                        <div id="achievements-progress-fill" class="achievements-progress-fill" style="width: 0%;"></div>
+                    </div>
+                    <span id="achievements-count-text" class="achievements-count-text">0 / 10 Desbloqueadas (0%)</span>
+                </div>
+            </div>
+            <div id="achievements-grid" class="achievements-grid">
+                <!-- Rendered dynamically by JS -->
+            </div>
+        </div>
     </div>
 
     <!-- Theme Music Player (controlled by JS) -->

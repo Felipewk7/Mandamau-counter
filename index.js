@@ -90,6 +90,132 @@ function fadeOutTheme(duration) {
 }
 // ================================================================
 
+
+// ================================================================
+// ACHIEVEMENTS SYSTEM (10 ACHIEVEMENTS — 2 PER BOSS)
+// ================================================================
+const GAME_ACHIEVEMENTS = [
+    // Kleber (Fase 1)
+    { id: 'kleber_win', boss: 'Kleber (Fase 1)', title: 'Bruto na Queda', desc: 'Venceu Kleber na Queda de Braço.', icon: '💪' },
+    { id: 'kleber_no_pcd', boss: 'Kleber (Fase 1)', title: 'Orgulho Intacto', desc: 'Recusou a proposta do modo PCD do Kleber.', icon: '🗿' },
+    // Gwen (Fase 2)
+    { id: 'gwen_win', boss: 'Gwen (Fase 2)', title: 'Mestre do Quiz', desc: 'Respondeu todas as perguntas e venceu Gwen.', icon: '🧠' },
+    { id: 'gwen_bonus', boss: 'Gwen (Fase 2)', title: 'Gênio da Matemática', desc: 'Acertou a pergunta bônus de porcentagem da Gwen.', icon: '🎓' },
+    // Sam (Fase 3)
+    { id: 'sam_win', boss: 'Sam (Fase 3)', title: 'Esmagador Supremo', desc: 'Venceu Sam no duelo de esmagar teclas.', icon: '🍔' },
+    { id: 'sam_flawless', boss: 'Sam (Fase 3)', title: 'Invicto no Esmaga', desc: 'Venceu Sam sem perder nenhum round (2×0).', icon: '⚡' },
+    // Cláudio (Fase 4)
+    { id: 'claudio_win', boss: 'Cláudio (Fase 4)', title: 'Cubo Derrotado', desc: 'Venceu Cláudio no Genius da memória.', icon: '🧩' },
+    { id: 'claudio_flawless', boss: 'Cláudio (Fase 4)', title: 'Memória Perfeita', desc: 'Venceu Cláudio sem perder nenhuma vida (3/3 vidas).', icon: '👑' },
+    // Felifep (Fase 5)
+    { id: 'felifep_win', boss: 'Felifep (Fase 5)', title: 'Queda do Deus', desc: 'Derrotou Felifep, o Deus da Etiqueta e da Verdade.', icon: '⚔️' },
+    { id: 'felifep_no_powers', boss: 'Felifep (Fase 5)', title: 'Na Raça Pura', desc: 'Venceu Felifep no Blackjack sem usar nenhum poder especial.', icon: '🃏' }
+];
+
+let bjPowersUsedInMatch = false;
+
+function getUnlockedAchievements() {
+    try {
+        const data = localStorage.getItem('mandamau_achievements');
+        return data ? JSON.parse(data) : [];
+    } catch(e) {
+        return [];
+    }
+}
+
+function unlockAchievement(id) {
+    const unlocked = getUnlockedAchievements();
+    if (unlocked.includes(id)) return;
+    
+    unlocked.push(id);
+    localStorage.setItem('mandamau_achievements', JSON.stringify(unlocked));
+    
+    const ach = GAME_ACHIEVEMENTS.find(a => a.id === id);
+    if (ach) {
+        showAchievementToast(ach);
+    }
+    updateAchievementsUI();
+}
+
+let toastTimeout = null;
+function showAchievementToast(ach) {
+    const toast = document.getElementById('achievement-toast');
+    const toastIcon = document.getElementById('toast-icon');
+    const toastTitle = document.getElementById('toast-title');
+    const toastDesc = document.getElementById('toast-desc');
+    
+    if (!toast || !toastTitle) return;
+    
+    toastIcon.textContent = ach.icon || '🏆';
+    toastTitle.textContent = ach.title;
+    toastDesc.textContent = ach.desc;
+    
+    try { playSound('rank_up_god'); } catch(e) {}
+    
+    toast.classList.add('visible');
+    if (toastTimeout) clearTimeout(toastTimeout);
+    toastTimeout = setTimeout(() => {
+        toast.classList.remove('visible');
+    }, 4500);
+}
+
+function updateAchievementsUI() {
+    const unlocked = getUnlockedAchievements();
+    const totalCount = GAME_ACHIEVEMENTS.length;
+    const unlockedCount = unlocked.length;
+    const percent = Math.round((unlockedCount / totalCount) * 100);
+    
+    const mapBadge = document.getElementById('map-achievements-badge');
+    if (mapBadge) mapBadge.textContent = `${unlockedCount}/${totalCount}`;
+    
+    const fill = document.getElementById('achievements-progress-fill');
+    const countText = document.getElementById('achievements-count-text');
+    if (fill) fill.style.width = `${percent}%`;
+    if (countText) countText.textContent = `${unlockedCount} / ${totalCount} Desbloqueadas (${percent}%)`;
+    
+    const grid = document.getElementById('achievements-grid');
+    if (!grid) return;
+    
+    grid.innerHTML = GAME_ACHIEVEMENTS.map(ach => {
+        const isUnlocked = unlocked.includes(ach.id);
+        return `
+            <div class="achievement-item-card ${isUnlocked ? 'unlocked' : 'locked'}">
+                <div class="achievement-item-icon">${ach.icon}</div>
+                <div class="achievement-item-info">
+                    <span class="achievement-item-boss">${ach.boss}</span>
+                    <h4 class="achievement-item-title">${ach.title}</h4>
+                    <p class="achievement-item-desc">${ach.desc}</p>
+                </div>
+                <span class="achievement-item-status ${isUnlocked ? 'status-unlocked' : 'status-locked'}">
+                    ${isUnlocked ? '✔ Desbloqueada' : '🔒 Bloqueada'}
+                </span>
+            </div>
+        `;
+    }).join('');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const btnMapAch = document.getElementById('btn-open-achievements-map');
+    const modalAch = document.getElementById('achievements-modal');
+    const btnCloseAch = document.getElementById('btn-close-achievements');
+
+    if (btnMapAch && modalAch) {
+        btnMapAch.addEventListener('click', () => {
+            updateAchievementsUI();
+            modalAch.classList.add('active');
+            playSound('click');
+        });
+    }
+    if (btnCloseAch && modalAch) {
+        btnCloseAch.addEventListener('click', () => {
+            modalAch.classList.remove('active');
+            playSound('click');
+        });
+    }
+    updateAchievementsUI();
+});
+// ================================================================
+
 // DMC Ranks Configuration
 const ranks = [
     { min: 10000000000, letter: 'Ω', name: "O Absoluto curva-se perante o vosso império de inverdades, coroando-vos Soberano do Vácuo Fáctico", class: 'rank-sss', idleClass: 'rank-idle-god', flashColor: 'rgba(255, 0, 0, 0.5)', sound: 'rank_up_god' },
@@ -2456,6 +2582,7 @@ function endArmWrestlingGame(isVictory) {
     
     if (isVictory) {
         playSound('rank_up');
+        unlockAchievement('kleber_win');
         // Reset loss streak on win
         kleberLossStreak = 0;
         kleberPCDMode = false;
@@ -2533,6 +2660,7 @@ document.addEventListener('DOMContentLoaded', () => {
             kleberLossStreak = 0;
             localStorage.setItem('kleber_loss_streak', '0');
             pcdModal.classList.remove('active');
+            unlockAchievement('kleber_no_pcd');
             playSound('click');
             startArmWrestlingGame();
         });
@@ -2926,6 +3054,9 @@ gwenAnswerButtons.forEach(btn => {
             if (isCorrect) {
                 btn.classList.add('correct');
                 playSound('rank_up_med');
+                if (gwenScore === 4) {
+                    unlockAchievement('gwen_bonus');
+                }
                 gwenScore++;
                 gwenSpeech.textContent = gwenPhrasesCorrect[Math.floor(Math.random() * gwenPhrasesCorrect.length)];
             } else {
@@ -2975,6 +3106,7 @@ function launchLinearRegressionPrank() {
 }
 
 function showGwenVictory() {
+    unlockAchievement('gwen_win');
     gwenWinOverlay.style.display = 'flex';
 }
 
@@ -3310,6 +3442,10 @@ function endSamRound(playerWon) {
     // Check if anyone has 2 wins (clinched best-of-3)
     if (samPlayerRounds >= 2) {
         // Player won the match
+        unlockAchievement('sam_win');
+        if (samBossRounds === 0) {
+            unlockAchievement('sam_flawless');
+        }
         const winDesc = document.getElementById('sam-win-desc');
         if (winDesc) winDesc.textContent = `Você venceu ${samPlayerRounds}×${samBossRounds}! Sam está empanturrado e não aguenta mais!`;
         setTimeout(() => {
@@ -3846,6 +3982,10 @@ function handleClaudioPlayerInput(colorIndex) {
         if (claudioCurrentRound >= CLAUDIO_MAX_ROUNDS) {
             setTimeout(() => {
                 playSound('rank_up');
+                unlockAchievement('claudio_win');
+                if (claudioLives === 3) {
+                    unlockAchievement('claudio_flawless');
+                }
                 setClaudioSpeech(claudioPhrasesWin[Math.floor(Math.random() * claudioPhrasesWin.length)]);
                 claudioWinOverlay.style.display = 'flex';
                 claudioGameActive = false;
@@ -4265,6 +4405,7 @@ function bjActivatePowerAnim(btn) {
 
 // Power 1: Olho da Verdade
 btnBjPower1.addEventListener('click', () => {
+    bjPowersUsedInMatch = true;
     if (!bjPlayerTurn || bjPower1Uses <= 0) return;
     bjPower1Uses--;
     bjBossCardRevealed = true;
@@ -4277,6 +4418,7 @@ btnBjPower1.addEventListener('click', () => {
 
 // Power 2: Decreto de Etiqueta — cancela estouro removendo a última carta
 btnBjPower2.addEventListener('click', () => {
+    bjPowersUsedInMatch = true;
     if (!bjPlayerTurn || bjPower2Uses <= 0) return;
     const score = bjScore(bjPlayerHand);
     if (score <= 21) {
@@ -4296,6 +4438,7 @@ btnBjPower2.addEventListener('click', () => {
 
 // Power 3: Balança Divina — troca a última carta
 btnBjPower3.addEventListener('click', () => {
+    bjPowersUsedInMatch = true;
     if (!bjPlayerTurn || bjPower3Uses <= 0 || bjPlayerHand.length < 1) return;
     bjPower3Uses--;
     bjPlayerHand.pop();
@@ -4357,6 +4500,10 @@ btnBjNextRound.addEventListener('click', () => {
 // ---- Win / Lose Screens ----
 function bjShowWin() {
     bjGameActive = false;
+    unlockAchievement('felifep_win');
+    if (!bjPowersUsedInMatch) {
+        unlockAchievement('felifep_no_powers');
+    }
     bjSetSpeech(bjRandSpeech(bjSpeechWin));
     bjRoundResult.style.display = 'none';
     bjWinScreen.style.display = '';
@@ -4502,6 +4649,7 @@ btnCloseBjTutorial.addEventListener('click', () => {
 
 // ---- Init ----
 function bjInitGame() {
+    bjPowersUsedInMatch = false;
     try {
         bjDeck      = bjShuffle(bjBuildDeck());
         bjPlayerHP  = BJ_MAX_HP;
