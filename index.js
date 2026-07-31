@@ -3765,10 +3765,12 @@ btnClaudioWinOk.addEventListener('click', () => {
     setTimeout(() => {
         journeyPlayerToken.style.left = '90%';
         journeyPlayerToken.style.top = '20%';
+        // Automatically trigger Felifep encounter
         setTimeout(() => {
-            playSound('rank_up_high');
-            alert('🏗️ Fase 5 — Sede do GGOPA: Novidades em breve!');
-        }, 1500);
+            currentBossEncounter = 'felifep';
+            setupBossEncounterUI();
+            journeyEncounterOverlay.classList.add('active');
+        }, 1200);
     }, 800);
 });
 
@@ -4273,32 +4275,51 @@ btnCloseBjTutorial.addEventListener('click', () => {
 
 // ---- Init ----
 function bjInitGame() {
-    bjDeck      = bjShuffle(bjBuildDeck());
-    bjPlayerHP  = BJ_MAX_HP;
-    bjBossHP    = BJ_MAX_HP;
-    bjRound     = 0;
-    bjPower1Uses= 1;
-    bjPower2Uses= 1;
-    bjPower3Uses= 2;
-    bjGameActive = true;
-    bjPlayerTurn = false;
-    bjJudgmentBadge.classList.remove('active');
-    bjUpdateHP();
-    bjUpdatePowerUI();
-    bjBossCards.innerHTML   = '';
-    bjPlayerCards.innerHTML = '';
-    bjBossScore.textContent   = '?';
-    bjPlayerScore.textContent = '0';
-    bjRoundResult.style.display = 'none';
-    bjSetSpeech("Sua falta de etiqueta me diverte. Compre uma carta!");
-    bjSetControls(false);
+    try {
+        bjDeck      = bjShuffle(bjBuildDeck());
+        bjPlayerHP  = BJ_MAX_HP;
+        bjBossHP    = BJ_MAX_HP;
+        bjRound     = 0;
+        bjPower1Uses= 1;
+        bjPower2Uses= 1;
+        bjPower3Uses= 2;
+        bjGameActive = true;
+        bjPlayerTurn = false;
+        if (bjJudgmentBadge) bjJudgmentBadge.classList.remove('active');
+        bjUpdateHP();
+        bjUpdatePowerUI();
+        if (bjBossCards)   bjBossCards.innerHTML   = '';
+        if (bjPlayerCards) bjPlayerCards.innerHTML = '';
+        if (bjBossScore)   bjBossScore.textContent   = '?';
+        if (bjPlayerScore) bjPlayerScore.textContent = '0';
+        if (bjRoundResult) bjRoundResult.style.display = 'none';
+        // Reset end screens
+        if (bjWinScreen)  { bjWinScreen.classList.remove('active');  bjWinScreen.style.display = ''; }
+        if (bjLoseScreen) { bjLoseScreen.classList.remove('active'); bjLoseScreen.style.display = ''; }
+        if (bjFireworks)  bjFireworks.innerHTML = '';
+        bjSetSpeech('Sua falta de etiqueta me diverte. Compre uma carta!');
+        bjSetControls(false);
+        console.log('[BJ] bjInitGame OK');
+    } catch(e) {
+        console.error('[BJ] bjInitGame error:', e);
+        alert('ERRO bjInitGame: ' + e.message);
+    }
 }
 
 function openBlackjack() {
-    blackjackOverlay.classList.add('active');
-    bjInitGame();
-    bjTutorialOpen = true;
-    bjTutorialModal.classList.add('active');
+    try {
+        console.log('[BJ] openBlackjack called');
+        if (!blackjackOverlay) { alert('ERRO: blackjack-overlay nao encontrado!'); return; }
+        blackjackOverlay.classList.add('active');
+        bjInitGame();
+        bjTutorialOpen = true;
+        if (!bjTutorialModal) { alert('ERRO: bj-tutorial-modal nao encontrado!'); return; }
+        bjTutorialModal.classList.add('active');
+        console.log('[BJ] OK - overlay and tutorial active');
+    } catch(e) {
+        console.error('[BJ] openBlackjack error:', e);
+        alert('ERRO no Blackjack: ' + e.message + '\n' + e.stack);
+    }
 }
 
 // ---- Journey map: GGOPA node click ----
@@ -4317,3 +4338,10 @@ document.getElementById('node-ggopa').addEventListener('click', () => {
 });
 
 // (felifep case handled in setupBossEncounterUI and btnAcceptChallenge above)
+
+// ---- Debug: direct Blackjack launch ----
+document.getElementById('dbg-launch-bj').addEventListener('click', () => {
+    debugPanel.style.display = 'none';
+    journeyOverlay.classList.remove('active');
+    openBlackjack();
+});

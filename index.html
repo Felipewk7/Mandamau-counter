@@ -381,6 +381,7 @@
                     <button id="dbg-reset-5" class="debug-action-btn debug-danger">🔄 Fase 5</button>
                 </div>
                 <button id="dbg-reset-all" class="debug-action-btn debug-danger" style="width: 100%; margin-top: 10px;">💀 Resetar Tudo</button>
+                <button id="dbg-launch-bj" class="debug-action-btn" style="width:100%; margin-top:6px; background:linear-gradient(135deg,#7c3aed,#c026d3); color:#fff;">⚔️ Abrir Blackjack (Fase 5)</button>
             </div>
         </div>
 
@@ -826,23 +827,23 @@
         </div>
 
         <!-- Felifep Blackjack Tutorial Modal -->
-        <div id="bj-tutorial-modal" class="arm-tutorial-modal">
-            <div class="tutorial-content bj-tutorial-content">
-                <h2 class="bj-tutorial-title">⚖️ Confronto Final: Felifep</h2>
-                <p><strong>O Deus da Etiqueta e da Verdade</strong> aguarda você em uma partida épica de Blackjack!</p>
+        <div id="bj-tutorial-modal" class="bj-tutorial-modal-fixed">
+            <div class="tutorial-card bj-tutorial-content" style="max-width:520px; color:#fff; max-height:90vh; overflow-y:auto;">
+                <h2 class="bj-tutorial-title" style="color:#f8d862; font-size:1.4rem; margin-bottom:12px;">⚖️ Confronto Final: Felifep</h2>
+                <p style="color:#e9d5ff; margin-bottom:8px;"><strong style="color:#f8d862;">O Deus da Etiqueta e da Verdade</strong> aguarda você em uma partida épica de Blackjack!</p>
                 <div class="bj-tutorial-rules">
                     <p>🃏 <strong>Regras do Blackjack:</strong> Chegue o mais perto de <strong>21</strong> sem ultrapassar. Quem ultrapassar perde a rodada.</p>
-                    <p>❤️ <strong>Sistema de Vida:</strong> Cada um tem <strong>100 HP</strong>. Quem vencer uma rodada causa <strong>25 de dano</strong> ao oponente. Blackjack natural (21 exato com 2 cartas) causa <strong>50 de dano!</strong></p>
+                    <p>❤️ <strong>Sistema de Vida:</strong> Cada um tem <strong>100 HP</strong>. Quem vencer uma rodada causa <strong>25 de dano</strong>. Blackjack natural (21 com 2 cartas) causa <strong>50 de dano!</strong></p>
                     <p>⚖️ <strong>Modo Julgamento:</strong> Quando o HP do Felifep cair abaixo de 50%, ele fica mais inteligente!</p>
                     <p>🔮 <strong>Poderes Divinos:</strong></p>
-                    <ul style="text-align:left; margin:0 0 8px 16px;">
-                        <li><strong>Olho da Verdade (1×):</strong> Revela a carta oculta do Felifep.</li>
-                        <li><strong>Decreto de Etiqueta (1×):</strong> Se você estourar 21, cancela o estouro removendo a última carta.</li>
-                        <li><strong>Balança Divina (2×):</strong> Troca sua última carta por uma nova do baralho.</li>
+                    <ul style="text-align:left; margin:0 0 8px 16px; color:#e9d5ff;">
+                        <li><strong style="color:#f8d862;">🔮 Olho da Verdade (1×):</strong> Revela a carta oculta do Felifep.</li>
+                        <li><strong style="color:#f8d862;">📜 Decreto de Etiqueta (1×):</strong> Se você estourar 21, cancela removendo a última carta.</li>
+                        <li><strong style="color:#f8d862;">⚖️ Balança Divina (2×):</strong> Troca sua última carta por uma nova do baralho.</li>
                     </ul>
                     <p>🏆 Derrote Felifep para <strong>ZERAR O JOGO!</strong></p>
                 </div>
-                <button id="btn-close-bj-tutorial" class="btn btn-sum" style="margin-top:16px;">⚔️ Iniciar Confronto Final!</button>
+                <button id="btn-close-bj-tutorial" class="btn btn-sum" style="margin-top:16px; width:100%; font-size:1rem;">⚔️ Iniciar Confronto Final!</button>
             </div>
         </div>
 
