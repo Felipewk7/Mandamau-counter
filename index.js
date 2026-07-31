@@ -4017,7 +4017,8 @@ function bjBossPlay() {
 
     function drawNext() {
         const bScore = bjScore(bjBossHand);
-        const threshold = bjBossHP <= BJ_MAX_HP / 2 ? 17 : 17; // Judgment: smarter draw
+        // Normal: stand at 17+. Judgment Mode (HP <= 50): stand at 19+ (smarter)
+        const threshold = bjBossHP <= BJ_MAX_HP / 2 ? 19 : 17;
         if (bScore >= threshold) {
             // Stand
             setTimeout(() => bjResolveRound(false), 800);
@@ -4131,25 +4132,26 @@ btnBjPower1.addEventListener('click', () => {
     playSound('rank_up_med');
 });
 
-// Power 2: Decreto de Etiqueta (cancels bust - activate after bust is detected via player clicking it)
+// Power 2: Decreto de Etiqueta — cancela estouro removendo a última carta
 btnBjPower2.addEventListener('click', () => {
     if (!bjPlayerTurn || bjPower2Uses <= 0) return;
     const score = bjScore(bjPlayerHand);
     if (score <= 21) {
-        bjSetSpeech("Este poder so cancela um estouro, senhor.");
+        bjSetSpeech('Este poder só cancela um estouro, senhor.');
         return;
     }
-    // Remove last card
     bjPower2Uses--;
     bjPlayerHand.pop();
     bjActivatePowerAnim(btnBjPower2);
     bjRedrawPlayerCards();
-    bjSetSpeech("O Decreto de Etiqueta... salvo desta vez.");
+    bjSetSpeech('O Decreto de Etiqueta... salvo desta vez.');
     bjUpdatePowerUI();
+    // Re-enable Hit if no longer busted
+    if (bjScore(bjPlayerHand) <= 21) btnBjHit.disabled = false;
     playSound('rank_up_med');
 });
 
-// Power 3: Balanca Divina — swap last card
+// Power 3: Balança Divina — troca a última carta
 btnBjPower3.addEventListener('click', () => {
     if (!bjPlayerTurn || bjPower3Uses <= 0 || bjPlayerHand.length < 1) return;
     bjPower3Uses--;
@@ -4157,13 +4159,14 @@ btnBjPower3.addEventListener('click', () => {
     bjPlayerHand.push(bjDraw());
     bjActivatePowerAnim(btnBjPower3);
     bjRedrawPlayerCards();
-    bjSetSpeech("A Balanca oscila... nova carta, nova chance.");
+    bjSetSpeech('A Balança oscila... nova carta, nova chance.');
     bjUpdatePowerUI();
+    const newScore = bjScore(bjPlayerHand);
+    // Re-enable or disable Hit based on new score
+    btnBjHit.disabled = newScore > 21;
+    // If still busted, enable Decreto if available
+    if (newScore > 21) btnBjPower2.disabled = bjPower2Uses <= 0;
     playSound('rank_up_med');
-    // Check bust
-    if (bjScore(bjPlayerHand) > 21 && bjPower2Uses > 0) {
-        btnBjPower2.disabled = false;
-    }
 });
 
 // ---- Hit ----
@@ -4174,11 +4177,15 @@ btnBjHit.addEventListener('click', () => {
     bjRedrawPlayerCards();
     bjSetSpeech(bjRandSpeech(bjSpeechPlayerHit));
     const score = bjScore(bjPlayerHand);
-    // Enable decree button if busted
     if (score > 21) {
+        // Busted: disable Hit, only allow Decreto/Balança
+        btnBjHit.disabled = true;
         btnBjPower2.disabled = bjPower2Uses <= 0;
+        btnBjPower3.disabled = bjPower3Uses <= 0 || bjPlayerHand.length < 1;
     }
     bjUpdatePowerUI();
+    // Re-disable hit if still busted after powerup
+    if (bjScore(bjPlayerHand) > 21) btnBjHit.disabled = true;
     playSound('click');
 });
 
@@ -4198,6 +4205,7 @@ btnBjStand.addEventListener('click', () => {
 
 // ---- Next Round ----
 btnBjNextRound.addEventListener('click', () => {
+    if (!bjGameActive) return; // guard: don't allow after game ends
     bjRoundResult.style.display = 'none';
     bjStartRound();
     playSound('click');
@@ -4208,6 +4216,7 @@ function bjShowWin() {
     bjGameActive = false;
     bjSetSpeech(bjRandSpeech(bjSpeechWin));
     bjRoundResult.style.display = 'none';
+    bjWinScreen.style.display = '';
     bjWinScreen.classList.add('active');
     bjSpawnFireworks();
 }
@@ -4215,6 +4224,7 @@ function bjShowWin() {
 function bjShowLose() {
     bjGameActive = false;
     bjRoundResult.style.display = 'none';
+    bjLoseScreen.style.display = '';
     bjLoseScreen.classList.add('active');
 }
 
@@ -4250,8 +4260,10 @@ btnBjWinOk.addEventListener('click', () => {
 
 btnBjRestart.addEventListener('click', () => {
     bjLoseScreen.classList.remove('active');
+    bjLoseScreen.style.display = '';
     playSound('click');
     bjInitGame();
+    bjStartRound();
 });
 
 btnBjQuit.addEventListener('click', () => {
