@@ -14,43 +14,52 @@ const THEMES = {
 };
 
 // --- Background music (tela principal / mapa) ---
+let bgMusicStarted  = false; // true apos o primeiro clique
+let bgMusicActive   = false; // true quando a musica de fundo DEVE estar tocando
+
 function startBgMusic() {
     if (!bgMusicAudio) return;
+    bgMusicStarted = true;
+    bgMusicActive  = true;
     bgMusicAudio.volume = 0.25;
     bgMusicAudio.play().catch(function() {});
 }
 
 function pauseBgMusic() {
-    if (!bgMusicAudio || bgMusicAudio.paused) return;
-    bgMusicAudio.pause();
+    if (!bgMusicAudio) return;
+    bgMusicActive = false;
+    bgMusicAudio.pause(); // Sempre pausa — sem verificar .paused (evita race condition)
 }
 
 function resumeBgMusic() {
-    if (!bgMusicAudio) return;
-    // So retoma se nao houver tema de fase tocando
-    if (!gameThemeAudio || gameThemeAudio.paused) {
-        bgMusicAudio.volume = 0.25;
-        bgMusicAudio.play().catch(function() {});
-    }
+    if (!bgMusicAudio || !bgMusicStarted) return;
+    bgMusicActive = true;
+    bgMusicAudio.volume = 0.25;
+    bgMusicAudio.play().catch(function() {});
 }
 
-// Inicia a musica de fundo apos interacao do usuario (politica de autoplay)
-document.addEventListener('click', function startBg() {
+// Inicia a musica de fundo no primeiro clique do usuario
+var _bgStarted = false;
+document.addEventListener('click', function() {
+    if (_bgStarted) return;
+    _bgStarted = true;
     startBgMusic();
-    document.removeEventListener('click', startBg);
-}, { once: true });
+});
 
 // --- Musica de fase (minigames) ---
 function playTheme(fase) {
     const file = THEMES[fase];
     if (!file || !gameThemeAudio) return;
     if (currentThemeFile === file && !gameThemeAudio.paused) return;
-    pauseBgMusic(); // Para a musica de fundo ao entrar na fase
+    pauseBgMusic(); // Para a musica de fundo imediatamente
     currentThemeFile = file;
-    gameThemeAudio.src = file;
-    gameThemeAudio.volume = 0.25;
-    gameThemeAudio.currentTime = 0;
-    gameThemeAudio.play().catch(function() {});
+    // Pequeno delay para o browser processar o pause antes de iniciar o tema
+    setTimeout(function() {
+        gameThemeAudio.src = file;
+        gameThemeAudio.volume = 0.25;
+        gameThemeAudio.currentTime = 0;
+        gameThemeAudio.play().catch(function() {});
+    }, 80);
 }
 
 function stopTheme() {
