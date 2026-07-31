@@ -4249,14 +4249,84 @@ function bjSpawnFireworks() {
     }
 }
 
+// ================================================================
+// EPILOGUE — Felifep Dialogue Sequence
+// ================================================================
+
+const bjEpilogue      = document.getElementById('bj-epilogue');
+const bjEpiText       = document.getElementById('bj-epi-text');
+const bjEpiSpeaker    = document.getElementById('bj-epi-speaker');
+const bjEpiPortrait   = document.getElementById('bj-epi-portrait');
+const btnBjEpiNext    = document.getElementById('btn-bj-epi-next');
+const bjChapter2      = document.getElementById('bj-chapter2');
+const btnBjCh2Close   = document.getElementById('btn-bj-ch2-close');
+
+// WHO: 'felifep' | 'player'
+const BJ_EPILOGUE_LINES = [
+    { who: 'felifep', text: 'Parabéns... você nos condenou.' },
+    { who: 'player',  text: 'Como assim?' },
+    { who: 'felifep', text: 'Você libertou o Deus da Mentira e da Deselegância no mundo. Agora as fake news vão aumentar, as pessoas serão deselegantes umas com as outras... você trouxe o caos ao mundo!' },
+    { who: 'player',  text: 'Foi mal, eu não sabia... eu vou consertar!' },
+    { who: 'felifep', text: 'Melhor você estar falando a verdade. Vai logo!' },
+];
+
+let bjEpiIndex = 0;
+
+function bjShowEpiLine(index) {
+    if (index >= BJ_EPILOGUE_LINES.length) {
+        // All lines done → show Chapter 2
+        bjEpilogue.classList.remove('active');
+        bjChapter2.classList.add('active');
+        return;
+    }
+    const line = BJ_EPILOGUE_LINES[index];
+    const isPlayer = line.who === 'player';
+
+    // Update speaker label and portrait style
+    bjEpiSpeaker.textContent = isPlayer ? 'Você' : 'Felifep';
+    bjEpiSpeaker.style.color = isPlayer ? '#c4b5fd' : '#f8d862';
+    bjEpiPortrait.className  = 'bj-epi-portrait' + (isPlayer ? ' player-turn' : '');
+
+    // Animate text
+    bjEpiText.style.animation = 'none';
+    void bjEpiText.offsetWidth; // reflow
+    bjEpiText.style.animation  = '';
+    bjEpiText.className = 'bj-epi-text' + (isPlayer ? ' player-bubble' : '');
+    bjEpiText.textContent = line.text;
+
+    // Last line → change button text
+    const isLast = index === BJ_EPILOGUE_LINES.length - 1;
+    btnBjEpiNext.textContent = isLast ? '▶ Finalizar' : '▶ Continuar';
+}
+
+btnBjEpiNext.addEventListener('click', () => {
+    bjEpiIndex++;
+    bjShowEpiLine(bjEpiIndex);
+    playSound('click');
+});
+
+// "fim?" button — transition from win screen to epilogue
 btnBjWinOk.addEventListener('click', () => {
-    bjWinScreen.classList.remove('active');
-    blackjackOverlay.classList.remove('active');
     bjFireworks.innerHTML = '';
+    bjWinScreen.classList.remove('active');
+    bjWinScreen.style.display = '';
+    blackjackOverlay.classList.remove('active');
+    playSound('click');
+
+    // Init and open epilogue
+    bjEpiIndex = 0;
+    bjEpilogue.classList.add('active');
+    bjShowEpiLine(0);
+});
+
+// "Voltar ao início" — save progress and return to journey map
+btnBjCh2Close.addEventListener('click', () => {
+    bjChapter2.classList.remove('active');
     playSound('rank_up_high');
     localStorage.setItem('mandamau_journey_fase5_completed', 'true');
     openJourney();
 });
+
 
 btnBjRestart.addEventListener('click', () => {
     bjLoseScreen.classList.remove('active');

@@ -847,15 +847,58 @@
             </div>
         </div>
 
-        <!-- Win Screen (Final Victory) -->
+        <!-- Win Screen (Final Victory — minimal) -->
         <div id="bj-win-screen" class="bj-endgame-screen" style="display:none">
             <div id="bj-fireworks" class="bj-fireworks"></div>
             <div class="bj-endgame-content bj-win-content">
-                <div class="bj-win-trophy">🏆</div>
-                <h1 class="bj-win-title">ZEROU O JOGO!</h1>
-                <p class="bj-win-subtitle">Você derrotou Felifep, o Deus da Etiqueta e da Verdade!</p>
-                <p class="bj-win-flavor">A maldição do Bako foi quebrada. O GGOPA é seu!</p>
-                <button id="btn-bj-win-ok" class="bj-btn bj-btn-win">🎉 Fim Glorioso!</button>
+                <h1 class="bj-win-title" style="font-size:3.5rem; margin-bottom:16px;">Vitória</h1>
+                <p class="bj-win-subtitle" style="font-size:1.1rem; color:#e9d5ff; margin-bottom:32px;">
+                    Você derrotou o Deus da Verdade e da Etiqueta.
+                </p>
+                <button id="btn-bj-win-ok" class="bj-btn" style="
+                    background: transparent;
+                    border: 2px solid rgba(248,216,98,0.5);
+                    color: rgba(248,216,98,0.7);
+                    font-size: 1rem;
+                    padding: 12px 36px;
+                    letter-spacing: 0.15em;
+                    transition: all 0.3s;
+                    cursor: pointer;
+                    font-family: 'Outfit', sans-serif;
+                    font-weight: 600;
+                ">fim?</button>
+            </div>
+        </div>
+
+        <!-- Felifep Epilogue Dialogue -->
+        <div id="bj-epilogue" class="bj-epilogue-overlay">
+            <div class="bj-epi-scene">
+                <!-- Portrait area -->
+                <div class="bj-epi-portrait-wrap">
+                    <img id="bj-epi-portrait" src="img/felifep.png" alt="Felifep"
+                         onerror="this.style.opacity='0'"
+                         class="bj-epi-portrait">
+                    <div id="bj-epi-speaker" class="bj-epi-speaker-name">Felifep</div>
+                </div>
+                <!-- Dialogue bubble -->
+                <div class="bj-epi-bubble-area">
+                    <p id="bj-epi-text" class="bj-epi-text"></p>
+                    <button id="btn-bj-epi-next" class="bj-epi-next-btn">▶ Continuar</button>
+                </div>
+            </div>
+            <!-- Skip hint -->
+            <div class="bj-epi-hint">Clique em Continuar para avançar</div>
+        </div>
+
+        <!-- Chapter 2 Teaser -->
+        <div id="bj-chapter2" class="bj-chapter2-overlay">
+            <div class="bj-ch2-content">
+                <div class="bj-ch2-logo">📖</div>
+                <p class="bj-ch2-sub">FIM DO CAPÍTULO 1</p>
+                <h1 class="bj-ch2-title">CHAPTER 2</h1>
+                <p class="bj-ch2-em">Em Breve...</p>
+                <p class="bj-ch2-flavor">O caos foi solto. A jornada continua.</p>
+                <button id="btn-bj-ch2-close" class="bj-ch2-btn">Voltar ao início</button>
             </div>
         </div>
 

@@ -3909,3 +3909,212 @@ body::before {
 .bj-tutorial-modal-fixed.active {
     display: flex;
 }
+
+/* ================================================================
+   EPILOGUE DIALOGUE + CHAPTER 2
+   ================================================================ */
+
+/* Hover on "fim?" button */
+#btn-bj-win-ok:hover {
+    border-color: rgba(248,216,98,0.9) !important;
+    color: #f8d862 !important;
+    box-shadow: 0 0 24px rgba(248,216,98,0.25);
+}
+
+/* ---- Epilogue Overlay ---- */
+.bj-epilogue-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1600;
+    background: #000;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    padding-bottom: 0;
+    font-family: 'Outfit', sans-serif;
+}
+.bj-epilogue-overlay.active { display: flex; }
+
+.bj-epi-scene {
+    width: 100%;
+    max-width: 720px;
+    display: flex;
+    align-items: flex-end;
+    gap: 0;
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+/* Portrait */
+.bj-epi-portrait-wrap {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0 0 0 24px;
+    position: absolute;
+    bottom: 100px;
+    left: 0;
+}
+.bj-epi-portrait {
+    width: 130px;
+    height: 130px;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 3px solid #c89b00;
+    box-shadow: 0 0 30px rgba(200,155,0,0.4);
+    transition: opacity 0.4s;
+}
+.bj-epi-portrait.player-turn {
+    border-color: #6d28d9;
+    box-shadow: 0 0 30px rgba(109,40,217,0.5);
+    filter: hue-rotate(180deg);
+}
+.bj-epi-speaker-name {
+    margin-top: 6px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: #f8d862;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-shadow: 0 0 10px rgba(248,216,98,0.5);
+}
+
+/* Dialogue bubble */
+.bj-epi-bubble-area {
+    width: 100%;
+    background: linear-gradient(180deg, rgba(10,0,20,0) 0%, rgba(10,0,20,0.95) 30%);
+    padding: 40px 24px 100px 180px;
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    gap: 20px;
+}
+
+.bj-epi-text {
+    font-size: 1.15rem;
+    color: #f1f5f9;
+    line-height: 1.7;
+    margin: 0;
+    min-height: 60px;
+    animation: epiTextFade 0.4s ease;
+}
+@keyframes epiTextFade {
+    0%   { opacity: 0; transform: translateY(8px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+.bj-epi-text.player-bubble { color: #c4b5fd; }
+
+.bj-epi-next-btn {
+    align-self: flex-end;
+    background: transparent;
+    border: 2px solid rgba(255,255,255,0.25);
+    color: rgba(255,255,255,0.7);
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    padding: 10px 28px;
+    border-radius: 8px;
+    cursor: pointer;
+    letter-spacing: 0.1em;
+    transition: all 0.2s;
+}
+.bj-epi-next-btn:hover {
+    border-color: rgba(248,216,98,0.6);
+    color: #f8d862;
+    box-shadow: 0 0 16px rgba(248,216,98,0.2);
+}
+
+.bj-epi-hint {
+    position: fixed;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.62rem;
+    color: rgba(255,255,255,0.2);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    pointer-events: none;
+}
+
+/* ---- Chapter 2 Overlay ---- */
+.bj-chapter2-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 1700;
+    background: #000;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Outfit', sans-serif;
+}
+.bj-chapter2-overlay.active { display: flex; }
+
+.bj-ch2-content {
+    text-align: center;
+    padding: 40px;
+    animation: ch2Appear 1.2s ease forwards;
+}
+@keyframes ch2Appear {
+    0%   { opacity: 0; transform: scale(0.92); }
+    100% { opacity: 1; transform: scale(1); }
+}
+
+.bj-ch2-logo {
+    font-size: 3.5rem;
+    margin-bottom: 24px;
+    filter: grayscale(1) brightness(0.5);
+}
+.bj-ch2-sub {
+    font-size: 0.75rem;
+    font-weight: 800;
+    color: rgba(255,255,255,0.3);
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    margin: 0 0 16px;
+}
+.bj-ch2-title {
+    font-size: 5rem;
+    font-weight: 900;
+    color: #fff;
+    margin: 0 0 12px;
+    letter-spacing: 0.15em;
+    text-shadow: 0 0 60px rgba(255,255,255,0.15);
+}
+.bj-ch2-em {
+    font-size: 1.2rem;
+    color: rgba(248,216,98,0.6);
+    font-style: italic;
+    margin: 0 0 8px;
+    letter-spacing: 0.06em;
+    animation: ch2EmPulse 3s ease-in-out infinite;
+}
+@keyframes ch2EmPulse {
+    0%,100% { opacity: 0.6; }
+    50%      { opacity: 1; }
+}
+.bj-ch2-flavor {
+    font-size: 0.9rem;
+    color: rgba(255,255,255,0.25);
+    margin: 0 0 40px;
+    font-style: italic;
+}
+.bj-ch2-btn {
+    background: transparent;
+    border: 1px solid rgba(255,255,255,0.15);
+    color: rgba(255,255,255,0.4);
+    font-family: 'Outfit', sans-serif;
+    font-size: 0.8rem;
+    padding: 10px 28px;
+    border-radius: 8px;
+    cursor: pointer;
+    letter-spacing: 0.12em;
+    transition: all 0.3s;
+}
+.bj-ch2-btn:hover {
+    border-color: rgba(255,255,255,0.35);
+    color: rgba(255,255,255,0.7);
+}
