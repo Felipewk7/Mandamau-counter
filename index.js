@@ -1,39 +1,89 @@
+// ================================================================
+// THEME MUSIC SYSTEM
+// ================================================================
+const gameThemeAudio = document.getElementById('game-theme');
+let currentThemeFile = '';
+
+const THEMES = {
+    fase1: 'audio/fase1_kleber.mp3',
+    fase2: 'audio/fase2_gwen.mp3',
+    fase3: 'audio/fase3_sam.mp3',
+    fase4: 'audio/fase4_claudio.mp3',
+    fase5: 'audio/fase5_felifep.mp3',
+};
+
+function playTheme(fase) {
+    const file = THEMES[fase];
+    if (!file || !gameThemeAudio) return;
+    if (currentThemeFile === file && !gameThemeAudio.paused) return; // ja tocando
+    currentThemeFile = file;
+    gameThemeAudio.src = file;
+    gameThemeAudio.volume = 0.45;
+    gameThemeAudio.currentTime = 0;
+    gameThemeAudio.play().catch(() => {}); // ignora erro de autoplay policy
+}
+
+function stopTheme() {
+    if (!gameThemeAudio) return;
+    gameThemeAudio.pause();
+    gameThemeAudio.currentTime = 0;
+    currentThemeFile = '';
+}
+
+function fadeOutTheme(duration = 800) {
+    if (!gameThemeAudio || gameThemeAudio.paused) return;
+    const startVol = gameThemeAudio.volume;
+    const steps = 20;
+    const interval = duration / steps;
+    const decrement = startVol / steps;
+    let step = 0;
+    const fade = setInterval(() => {
+        step++;
+        gameThemeAudio.volume = Math.max(0, startVol - decrement * step);
+        if (step >= steps) {
+            clearInterval(fade);
+            stopTheme();
+            gameThemeAudio.volume = 0.45;
+        }
+    }, interval);
+}
+// ================================================================
 // DMC Ranks Configuration
 const ranks = [
-    { min: 10000000000, letter: 'Ω', name: "O Absoluto curva-se perante o vosso império de inverdades, coroando-vos Soberano do Vácuo Fáctico", class: 'rank-sss', idleClass: 'rank-idle-god', flashColor: 'rgba(255, 0, 0, 0.5)', sound: 'rank_up_god' },
-    { min: 1000000000, letter: 'μ', name: "Vós sois a própria personificação do sofisma universal, cujo verbo desfaz constelações de factos", class: 'rank-sss', idleClass: 'rank-idle-god', flashColor: 'rgba(255, 127, 0, 0.5)', sound: 'rank_up_god' },
-    { min: 500000000, letter: 'λ', name: "Com maestria sem igual, transmutais a mentira em dogma inapelável para as mentes incautas", class: 'rank-sss', idleClass: 'rank-idle-god', flashColor: 'rgba(255, 255, 0, 0.5)', sound: 'rank_up_god' },
-    { min: 250000000, letter: 'κ', name: "Os vossos ardis retóricos transcendem a mera falsidade, erigindo uma cosmologia de ficções eternas", class: 'rank-sss', idleClass: 'rank-idle-god', flashColor: 'rgba(0, 255, 0, 0.5)', sound: 'rank_up_god' },
-    { min: 100000000, letter: 'ι', name: "Navegais com maestria singular no oceano da tergiversação, onde a verdade é mero mito esquecido", class: 'rank-sss', idleClass: 'rank-idle-god', flashColor: 'rgba(0, 255, 255, 0.5)', sound: 'rank_up_god' },
-    { min: 50000000, letter: 'θ', name: "A substância do real dissolve-se perante a vossa formidável e inabalável volúpia de ludibriar", class: 'rank-sss', idleClass: 'rank-idle-god', flashColor: 'rgba(0, 0, 255, 0.5)', sound: 'rank_up_god' },
-    { min: 25000000, letter: 'η', name: "Percebe-se uma simetria sublime na arquitetura de vossos enganos transcendentais", class: 'rank-sss', idleClass: 'rank-idle-god', flashColor: 'rgba(127, 0, 255, 0.5)', sound: 'rank_up_god' },
-    { min: 10000000, letter: 'ζ', name: "Uma catedral de falsidades edifica-se sob o sussurro de vossos lábios insaciáveis", class: 'rank-sss', idleClass: 'rank-idle-god', flashColor: 'rgba(255, 0, 255, 0.5)', sound: 'rank_up_god' },
-    { min: 5000000, letter: 'ε', name: "Vossas asserções, destituídas de lastro fáctico, adquirem uma beleza trágica e quase poética", class: 'rank-sss', idleClass: 'rank-idle-god', flashColor: 'rgba(255, 255, 255, 0.5)', sound: 'rank_up_god' },
-    { min: 2500000, letter: 'δ', name: "O tecido da verdade é por vós desfeito e reconfigurado em intrincadas tapeçarias de quimeras", class: 'rank-sss', idleClass: 'rank-idle-god', flashColor: 'rgba(255, 105, 180, 0.5)', sound: 'rank_up_god' },
-    { min: 1000000, letter: 'γ', name: "Ergueis monumentos de sofismas que rivalizam com as maiores construções do intelecto humano", class: 'rank-sss', idleClass: 'rank-idle-god', flashColor: 'rgba(255, 215, 0, 0.5)', sound: 'rank_up_god' },
-    { min: 500000, letter: 'β', name: "Constata-se que a veracidade claudica perante o vosso império de narrativas fabulosas", class: 'rank-sss', idleClass: 'rank-idle-god', flashColor: 'rgba(173, 216, 230, 0.5)', sound: 'rank_up_god' },
-    { min: 250000, letter: 'α', name: "Vossa eloquência mendaz oblitera a barreira entre a realidade e o devaneio", class: 'rank-sss', idleClass: 'rank-idle-god', flashColor: 'rgba(255, 69, 0, 0.5)', sound: 'rank_up_god' },
-    { min: 100000, letter: 'SSS', name: "você atingiu a gnose de tanto mentir e se tornou o demiurgo", class: 'rank-sss', idleClass: 'rank-idle-god', flashColor: 'rgba(255, 0, 127, 0.4)', sound: 'rank_up_god' },
+    { min: 10000000000, letter: 'Î©', name: "O Absoluto curva-se perante o vosso impÃ©rio de inverdades, coroando-vos Soberano do VÃ¡cuo FÃ¡ctico", class: 'rank-sss', idleClass: 'rank-idle-god', flashColor: 'rgba(255, 0, 0, 0.5)', sound: 'rank_up_god' },
+    { min: 1000000000, letter: 'Î¼', name: "VÃ³s sois a prÃ³pria personificaÃ§Ã£o do sofisma universal, cujo verbo desfaz constelaÃ§Ãµes de factos", class: 'rank-sss', idleClass: 'rank-idle-god', flashColor: 'rgba(255, 127, 0, 0.5)', sound: 'rank_up_god' },
+    { min: 500000000, letter: 'Î»', name: "Com maestria sem igual, transmutais a mentira em dogma inapelÃ¡vel para as mentes incautas", class: 'rank-sss', idleClass: 'rank-idle-god', flashColor: 'rgba(255, 255, 0, 0.5)', sound: 'rank_up_god' },
+    { min: 250000000, letter: 'Îº', name: "Os vossos ardis retÃ³ricos transcendem a mera falsidade, erigindo uma cosmologia de ficÃ§Ãµes eternas", class: 'rank-sss', idleClass: 'rank-idle-god', flashColor: 'rgba(0, 255, 0, 0.5)', sound: 'rank_up_god' },
+    { min: 100000000, letter: 'Î¹', name: "Navegais com maestria singular no oceano da tergiversaÃ§Ã£o, onde a verdade Ã© mero mito esquecido", class: 'rank-sss', idleClass: 'rank-idle-god', flashColor: 'rgba(0, 255, 255, 0.5)', sound: 'rank_up_god' },
+    { min: 50000000, letter: 'Î¸', name: "A substÃ¢ncia do real dissolve-se perante a vossa formidÃ¡vel e inabalÃ¡vel volÃºpia de ludibriar", class: 'rank-sss', idleClass: 'rank-idle-god', flashColor: 'rgba(0, 0, 255, 0.5)', sound: 'rank_up_god' },
+    { min: 25000000, letter: 'Î·', name: "Percebe-se uma simetria sublime na arquitetura de vossos enganos transcendentais", class: 'rank-sss', idleClass: 'rank-idle-god', flashColor: 'rgba(127, 0, 255, 0.5)', sound: 'rank_up_god' },
+    { min: 10000000, letter: 'Î¶', name: "Uma catedral de falsidades edifica-se sob o sussurro de vossos lÃ¡bios insaciÃ¡veis", class: 'rank-sss', idleClass: 'rank-idle-god', flashColor: 'rgba(255, 0, 255, 0.5)', sound: 'rank_up_god' },
+    { min: 5000000, letter: 'Îµ', name: "Vossas asserÃ§Ãµes, destituÃ­das de lastro fÃ¡ctico, adquirem uma beleza trÃ¡gica e quase poÃ©tica", class: 'rank-sss', idleClass: 'rank-idle-god', flashColor: 'rgba(255, 255, 255, 0.5)', sound: 'rank_up_god' },
+    { min: 2500000, letter: 'Î´', name: "O tecido da verdade Ã© por vÃ³s desfeito e reconfigurado em intrincadas tapeÃ§arias de quimeras", class: 'rank-sss', idleClass: 'rank-idle-god', flashColor: 'rgba(255, 105, 180, 0.5)', sound: 'rank_up_god' },
+    { min: 1000000, letter: 'Î³', name: "Ergueis monumentos de sofismas que rivalizam com as maiores construÃ§Ãµes do intelecto humano", class: 'rank-sss', idleClass: 'rank-idle-god', flashColor: 'rgba(255, 215, 0, 0.5)', sound: 'rank_up_god' },
+    { min: 500000, letter: 'Î²', name: "Constata-se que a veracidade claudica perante o vosso impÃ©rio de narrativas fabulosas", class: 'rank-sss', idleClass: 'rank-idle-god', flashColor: 'rgba(173, 216, 230, 0.5)', sound: 'rank_up_god' },
+    { min: 250000, letter: 'Î±', name: "Vossa eloquÃªncia mendaz oblitera a barreira entre a realidade e o devaneio", class: 'rank-sss', idleClass: 'rank-idle-god', flashColor: 'rgba(255, 69, 0, 0.5)', sound: 'rank_up_god' },
+    { min: 100000, letter: 'SSS', name: "vocÃª atingiu a gnose de tanto mentir e se tornou o demiurgo", class: 'rank-sss', idleClass: 'rank-idle-god', flashColor: 'rgba(255, 0, 127, 0.4)', sound: 'rank_up_god' },
     { min: 50000, letter: 'SS', name: "mentiu tanto que transcendeu a materia", class: 'rank-ss', idleClass: 'rank-idle-high', flashColor: 'rgba(236, 72, 153, 0.4)', sound: 'rank_up_high' },
-    { min: 10000, letter: 'S', name: "Deus da mentira e desinformação", class: 'rank-s', idleClass: 'rank-idle-high', flashColor: 'rgba(168, 85, 247, 0.4)', sound: 'rank_up_high' },
-    { min: 5000, letter: 'A', name: "O ser mais mentiroso que já existiu", class: 'rank-a', idleClass: 'rank-idle-med', flashColor: 'rgba(245, 158, 11, 0.3)', sound: 'rank_up_med' },
-    { min: 1000, letter: 'B', name: "mentir pra você é como respirar", class: 'rank-b', idleClass: 'rank-idle-med', flashColor: 'rgba(6, 182, 212, 0.3)', sound: 'rank_up_med' },
-    { min: 500, letter: 'C', name: "você nasceu pra mentir", class: 'rank-c', idleClass: 'rank-idle-low', flashColor: 'rgba(16, 185, 129, 0.2)', sound: 'rank_up_low' },
+    { min: 10000, letter: 'S', name: "Deus da mentira e desinformaÃ§Ã£o", class: 'rank-s', idleClass: 'rank-idle-high', flashColor: 'rgba(168, 85, 247, 0.4)', sound: 'rank_up_high' },
+    { min: 5000, letter: 'A', name: "O ser mais mentiroso que jÃ¡ existiu", class: 'rank-a', idleClass: 'rank-idle-med', flashColor: 'rgba(245, 158, 11, 0.3)', sound: 'rank_up_med' },
+    { min: 1000, letter: 'B', name: "mentir pra vocÃª Ã© como respirar", class: 'rank-b', idleClass: 'rank-idle-med', flashColor: 'rgba(6, 182, 212, 0.3)', sound: 'rank_up_med' },
+    { min: 500, letter: 'C', name: "vocÃª nasceu pra mentir", class: 'rank-c', idleClass: 'rank-idle-low', flashColor: 'rgba(16, 185, 129, 0.2)', sound: 'rank_up_low' },
     { min: 100, letter: 'D', name: "mentiu bem", class: 'rank-d', idleClass: 'rank-idle-low', flashColor: 'rgba(148, 163, 184, 0.2)', sound: 'rank_up_low' }
 ];
 
 // Bako's Classic Lie Phrases
 const bakoPhrases = [
-    "Foi só pra rir",
+    "Foi sÃ³ pra rir",
     "Minha conta foi hackeada",
-    "Eu não molestei os patinhos",
-    "Eu não gosto de animais",
-    "Eu não sou terrorista",
-    "Eu não dei a bunda pro molok",
-    "Eu não meti o pal num formigueiro",
-    "Eu não mijo em peixes",
+    "Eu nÃ£o molestei os patinhos",
+    "Eu nÃ£o gosto de animais",
+    "Eu nÃ£o sou terrorista",
+    "Eu nÃ£o dei a bunda pro molok",
+    "Eu nÃ£o meti o pal num formigueiro",
+    "Eu nÃ£o mijo em peixes",
     "Eu gosto de mulheres",
-    "Eu não sou censurador"
+    "Eu nÃ£o sou censurador"
 ];
 
 // State Management
@@ -43,8 +93,8 @@ let currentRankIndex = -1;
 let rankAnimTimeout = null;
 const resetQuestions = [
     "Tem certeza que quer apagar?",
-    "O Bako ainda está mentindo, quer prosseguir?",
-    "Se apagar você compactua com as mentiras e atrocidades do Bako, quer apagar mesmo?"
+    "O Bako ainda estÃ¡ mentindo, quer prosseguir?",
+    "Se apagar vocÃª compactua com as mentiras e atrocidades do Bako, quer apagar mesmo?"
 ];
 
 // Statistics State
@@ -1203,18 +1253,18 @@ let bakoScoreCount = 999;
 let playerScoreCount = 0;
 
 const bakoCheatQuotes = [
-    "Isso é coisa do navegador!",
-    "Eu não molestei os patinhos, e essa jogada também não é sua!",
+    "Isso Ã© coisa do navegador!",
+    "Eu nÃ£o molestei os patinhos, e essa jogada tambÃ©m nÃ£o Ã© sua!",
     "Meu navegador bugou, a minha jogada vale por duas.",
-    "O juiz de inteligência artificial disse que esse espaço agora é meu.",
-    "Eu joguei ali sim! Você que não viu.",
-    "Essa regra de alinhar 3 em diagonal foi inventada pela mídia.",
+    "O juiz de inteligÃªncia artificial disse que esse espaÃ§o agora Ã© meu.",
+    "Eu joguei ali sim! VocÃª que nÃ£o viu.",
+    "Essa regra de alinhar 3 em diagonal foi inventada pela mÃ­dia.",
     "Bako venceu! Eu mesmo confirmei.",
-    "Você clicou errado, meu script corrigiu pra você.",
-    "Eu não sou terrorista, mas explodi o seu X do tabuleiro.",
+    "VocÃª clicou errado, meu script corrigiu pra vocÃª.",
+    "Eu nÃ£o sou terrorista, mas explodi o seu X do tabuleiro.",
     "No Jogo da Velha do Bako, o O sempre ganha de primeira.",
     "Eu gosto de cachorros mortos e de ganhar no Jogo da Velha.",
-    "Você acha que sabe jogar? Eu treinei em segredo contra supercomputadores."
+    "VocÃª acha que sabe jogar? Eu treinei em segredo contra supercomputadores."
 ];
 
 function initDuel() {
@@ -1226,7 +1276,7 @@ function initDuel() {
         cell.className = 'duel-cell';
     });
     
-    bakoSpeech.textContent = "Duvido você ganhar de mim no Jogo da Velha! Eu nunca perdi na minha vida.";
+    bakoSpeech.textContent = "Duvido vocÃª ganhar de mim no Jogo da Velha! Eu nunca perdi na minha vida.";
     document.querySelector('.bako-dialog-bubble').className = 'bako-dialog-bubble';
     
     duelScoreBako.textContent = bakoScoreCount.toLocaleString('pt-BR');
@@ -1338,7 +1388,7 @@ function bakoPlay() {
                 emptyCell.className = 'duel-cell o-played';
             }
             
-            cheatSpeech = "O sistema cancelou sua jogada por suspeita de mentira deslavada. Esse X agora é um O.";
+            cheatSpeech = "O sistema cancelou sua jogada por suspeita de mentira deslavada. Esse X agora Ã© um O.";
         } else {
             const threatLine = playerThreatLines[0];
             const emptyIdx = threatLine.find(idx => duelBoard[idx] === null);
@@ -1359,7 +1409,7 @@ function bakoPlay() {
                 triggerCellGlitch(cell2);
             }
             
-            cheatSpeech = "Joguei duas vezes porque achei você meio lento. E o sistema permite nas minhas regras.";
+            cheatSpeech = "Joguei duas vezes porque achei vocÃª meio lento. E o sistema permite nas minhas regras.";
         }
     } 
     // 2. Random cheat: Bako steals an X or claims win
@@ -1377,7 +1427,7 @@ function bakoPlay() {
                 cell.textContent = 'O';
                 cell.className = 'duel-cell o-played';
                 triggerCellGlitch(cell);
-                cheatSpeech = "Desculpe, esse espaço foi confiscado para fins de desinformação pública.";
+                cheatSpeech = "Desculpe, esse espaÃ§o foi confiscado para fins de desinformaÃ§Ã£o pÃºblica.";
             } else {
                 cheated = false;
             }
@@ -1400,7 +1450,7 @@ function bakoPlay() {
                     const randIdx = Math.floor(Math.random() * 9);
                     if (!cellsToHighlight.includes(randIdx)) cellsToHighlight.push(randIdx);
                 }
-                triggerBakoWin(cellsToHighlight, "Ganhei com minha formação triangular secreta! Você não conhece as regras novas?");
+                triggerBakoWin(cellsToHighlight, "Ganhei com minha formaÃ§Ã£o triangular secreta! VocÃª nÃ£o conhece as regras novas?");
                 return;
             }
         }
@@ -1462,7 +1512,7 @@ function bakoPlay() {
 
     const bakoWinnerPattern = checkWinnerSymbol('O');
     if (bakoWinnerPattern) {
-        triggerBakoWin(bakoWinnerPattern, "Venci! Puro raciocínio lógico e velocidade. Habilidade pura.");
+        triggerBakoWin(bakoWinnerPattern, "Venci! Puro raciocÃ­nio lÃ³gico e velocidade. Habilidade pura.");
         return;
     }
 
@@ -1480,7 +1530,7 @@ function bakoPlay() {
         triggerCellGlitch(cell);
         playSound('bako_cheat');
         
-        triggerBakoWin([0, 4, 8], "Empate? Não toleramos empates. Fui declarado vencedor por WO técnico.");
+        triggerBakoWin([0, 4, 8], "Empate? NÃ£o toleramos empates. Fui declarado vencedor por WO tÃ©cnico.");
     }
 }
 
@@ -1538,7 +1588,7 @@ duelCells.forEach(cell => {
 btnDuelReset.addEventListener('click', () => {
     bakoScoreCount += 100;
     initDuel();
-    triggerBakoCheatEffects("Reiniciou? Adicionei +100 vitórias para mim por conta do tempo que gastei esperando você.");
+    triggerBakoCheatEffects("Reiniciou? Adicionei +100 vitÃ³rias para mim por conta do tempo que gastei esperando vocÃª.");
     playSound('reset');
 });
 
@@ -1602,18 +1652,18 @@ function setupBossEncounterUI() {
     
     if (currentBossEncounter === 'kleber') {
         portrait.src = "kleber_clown.jpg";
-        portrait.alt = "Kleber O palhaço dos mil dentes";
+        portrait.alt = "Kleber O palhaÃ§o dos mil dentes";
         nameText.textContent = "Kleber";
-        titleText.textContent = "O palhaço dos mil dentes";
+        titleText.textContent = "O palhaÃ§o dos mil dentes";
         authorText.textContent = "Kleber";
-        bubblePara.textContent = "pra passar de mim terá que me vencer numa queda de braço krl";
+        bubblePara.textContent = "pra passar de mim terÃ¡ que me vencer numa queda de braÃ§o krl";
     } else if (currentBossEncounter === 'gwen') {
         portrait.src = "img/gwen.jpg";
         portrait.alt = "Gwen";
         nameText.textContent = "Gwen";
         titleText.textContent = "A mestre do quiz";
         authorText.textContent = "Gwen";
-        bubblePara.textContent = "Eai porra, vc é bom em matematica ? Não ? que pena vai ter que ser pra passar Hahahaha!!!";
+        bubblePara.textContent = "Eai porra, vc Ã© bom em matematica ? NÃ£o ? que pena vai ter que ser pra passar Hahahaha!!!";
     } else if (currentBossEncounter === 'sam') {
         portrait.onerror = function() {
             if (!this.src.endsWith('kleber_clown.jpg')) {
@@ -1625,17 +1675,17 @@ function setupBossEncounterUI() {
         portrait.src = 'img/sam.png';
         portrait.alt = 'Sam';
         nameText.textContent = 'Sam';
-        titleText.textContent = 'O Gordão do Esmaga';
+        titleText.textContent = 'O GordÃ£o do Esmaga';
         authorText.textContent = 'Sam';
-        bubblePara.textContent = 'Eai porra, vc é bom em esmagar comida? Não? que pena vai ter que ser pra passar Hahahaha!!!';
+        bubblePara.textContent = 'Eai porra, vc Ã© bom em esmagar comida? NÃ£o? que pena vai ter que ser pra passar Hahahaha!!!';
     } else if (currentBossEncounter === 'claudio') {
         portrait.src = 'img/claudio.png';
-        portrait.alt = 'Cláudio O Cubo Gey';
+        portrait.alt = 'ClÃ¡udio O Cubo Gey';
         portrait.onerror = function() { this.src = 'kleber_clown.jpg'; };
-        nameText.textContent = 'Cláudio';
+        nameText.textContent = 'ClÃ¡udio';
         titleText.textContent = 'O Cubo Gey';
-        authorText.textContent = 'Cláudio';
-        bubblePara.textContent = 'Eu sou um cubo gey, me vença se for capaz!';
+        authorText.textContent = 'ClÃ¡udio';
+        bubblePara.textContent = 'Eu sou um cubo gey, me venÃ§a se for capaz!';
     } else if (currentBossEncounter === 'felifep') {
 
         portrait.onerror = function() { if (!this.src.endsWith('kleber_clown.jpg')) this.src = 'kleber_clown.jpg'; };
@@ -1645,7 +1695,7 @@ function setupBossEncounterUI() {
         nameText.textContent  = 'Felifep';
         titleText.textContent = 'O Deus da Etiqueta e da Verdade';
         authorText.textContent= 'Felifep';
-        bubblePara.textContent= 'Você chegou até aqui? Impressionante. Prepare-se para o Julgamento Final!';
+        bubblePara.textContent= 'VocÃª chegou atÃ© aqui? Impressionante. Prepare-se para o Julgamento Final!';
     }
 }
 
@@ -1730,7 +1780,7 @@ function openJourney() {
     if (nodeFase2) {
         nodeFase2.className = 'map-node node-locked';
         const iconSpan = nodeFase2.querySelector('.node-icon');
-        if (iconSpan) iconSpan.textContent = '🔒';
+        if (iconSpan) iconSpan.textContent = 'ðŸ”’';
     }
     if (pathLineFase2) pathLineFase2.classList.remove('line-active');
     
@@ -1739,7 +1789,7 @@ function openJourney() {
     if (nodeFase3) {
         nodeFase3.className = 'map-node node-locked';
         const iconSpan = nodeFase3.querySelector('.node-icon');
-        if (iconSpan) iconSpan.textContent = '🔒';
+        if (iconSpan) iconSpan.textContent = 'ðŸ”’';
     }
     if (pathLineFase3) pathLineFase3.classList.remove('line-active');
     
@@ -1748,7 +1798,7 @@ function openJourney() {
     if (nodeFase4) {
         nodeFase4.className = 'map-node node-locked';
         const iconSpan = nodeFase4.querySelector('.node-icon');
-        if (iconSpan) iconSpan.textContent = '🔒';
+        if (iconSpan) iconSpan.textContent = 'ðŸ”’';
     }
     if (pathLineFase4) pathLineFase4.classList.remove('line-active');
 
@@ -1757,7 +1807,7 @@ function openJourney() {
     if (nodeGgopa) {
         nodeGgopa.className = 'map-node node-locked';
         const iconSpan = nodeGgopa.querySelector('.node-icon');
-        if (iconSpan) iconSpan.textContent = '🏗️';
+        if (iconSpan) iconSpan.textContent = 'ðŸ—ï¸';
     }
     if (pathLineFase5) pathLineFase5.classList.remove('line-active');
 
@@ -1803,17 +1853,17 @@ function openJourney() {
 const bakoChats = {
     patinhos: {
         question: "Bako pq vc fez aquilo com os patinhos?",
-        bakoAnswer: "eu gosto de patinhos sabe, só de pensar nas penas deles eu tenho um orgasmo",
+        bakoAnswer: "eu gosto de patinhos sabe, sÃ³ de pensar nas penas deles eu tenho um orgasmo",
         playerReply: "ok..."
     },
     terrorista: {
-        question: "bako vc é um terrorista?",
+        question: "bako vc Ã© um terrorista?",
         bakoAnswer: "eu gosto de explodir coisas,o osama era meu brother",
-        playerReply: "Misericórdia..."
+        playerReply: "MisericÃ³rdia..."
     },
     peixes: {
         question: "Bako pq vc gosta de mijar em peixes?",
-        bakoAnswer: "isso me acalma sabe , mijar neles enqunto se debatem no chão é prazeroso, e meter na boca deles depois  é melhor ainda",
+        bakoAnswer: "isso me acalma sabe , mijar neles enqunto se debatem no chÃ£o Ã© prazeroso, e meter na boca deles depois  Ã© melhor ainda",
         playerReply: "..."
     }
 };
@@ -1842,7 +1892,7 @@ function renderChatOptions() {
     if (chatCompleted) {
         const titleSpan = document.createElement('span');
         titleSpan.className = 'options-title';
-        titleSpan.textContent = 'Mapeamento Concluído';
+        titleSpan.textContent = 'Mapeamento ConcluÃ­do';
         chatOptionsPanel.appendChild(titleSpan);
         return;
     }
@@ -1859,7 +1909,7 @@ function renderChatOptions() {
         btn.className = 'chat-opt-btn';
         btn.style.borderColor = 'rgba(234, 179, 8, 0.5)';
         btn.style.background = 'rgba(234, 179, 8, 0.05)';
-        btn.innerHTML = '❓ Bako ta tudo bem ?';
+        btn.innerHTML = 'â“ Bako ta tudo bem ?';
         btn.addEventListener('click', () => {
             triggerSecretConversation();
         });
@@ -1873,21 +1923,21 @@ function renderChatOptions() {
         if (!askedQuestions.patinhos) {
             const btn = document.createElement('button');
             btn.className = 'chat-opt-btn';
-            btn.textContent = '🦆 Bako pq vc fez aquilo com os patinhos?';
+            btn.textContent = 'ðŸ¦† Bako pq vc fez aquilo com os patinhos?';
             btn.addEventListener('click', () => triggerConversation('patinhos'));
             chatOptionsPanel.appendChild(btn);
         }
         if (!askedQuestions.terrorista) {
             const btn = document.createElement('button');
             btn.className = 'chat-opt-btn';
-            btn.textContent = '💣 bako vc é um terrorista?';
+            btn.textContent = 'ðŸ’£ bako vc Ã© um terrorista?';
             btn.addEventListener('click', () => triggerConversation('terrorista'));
             chatOptionsPanel.appendChild(btn);
         }
         if (!askedQuestions.peixes) {
             const btn = document.createElement('button');
             btn.className = 'chat-opt-btn';
-            btn.textContent = '🐟 Bako pq vc gosta de mijar em peixes?';
+            btn.textContent = 'ðŸŸ Bako pq vc gosta de mijar em peixes?';
             btn.addEventListener('click', () => triggerConversation('peixes'));
             chatOptionsPanel.appendChild(btn);
         }
@@ -1903,7 +1953,7 @@ function triggerConversation(key) {
     chatOptionsPanel.style.opacity = '0.4';
     
     // 1. Send Player Question
-    appendChatMessage(chat.question, true, 'Você');
+    appendChatMessage(chat.question, true, 'VocÃª');
     
     // 2. Typing indicator delay
     setTimeout(() => {
@@ -1918,7 +1968,7 @@ function triggerConversation(key) {
             
             // 4. Send Player Reply
             setTimeout(() => {
-                appendChatMessage(chat.playerReply, true, 'Você');
+                appendChatMessage(chat.playerReply, true, 'VocÃª');
                 
                 // 5. Finalize this question and enable remaining options
                 setTimeout(() => {
@@ -1942,7 +1992,7 @@ function triggerSecretConversation() {
     chatOptionsPanel.style.opacity = '0.4';
     
     // 1. Player Question: Bako ta tudo bem ?
-    appendChatMessage("Bako ta tudo bem ?", true, 'Você');
+    appendChatMessage("Bako ta tudo bem ?", true, 'VocÃª');
     
     // 2. Typing indicator -> Bako Answer
     setTimeout(() => {
@@ -1951,12 +2001,12 @@ function triggerSecretConversation() {
         
         setTimeout(() => {
             chatTypingIndicator.style.display = 'none';
-            appendChatMessage("na real não , eu fui amaldiçoado pra sempre mentir , mas tem um jeito de me curar , vc precisa apenas pegar o remedio supremo", false, 'Bako');
+            appendChatMessage("na real nÃ£o , eu fui amaldiÃ§oado pra sempre mentir , mas tem um jeito de me curar , vc precisa apenas pegar o remedio supremo", false, 'Bako');
             playSound('rank_up_low');
             
             // 3. Player: onde consigo isso ?
             setTimeout(() => {
-                appendChatMessage("onde consigo isso ?", true, 'Você');
+                appendChatMessage("onde consigo isso ?", true, 'VocÃª');
                 
                 // 4. Typing indicator -> Bako: va ate a cede do GGOPA , depois que passar dos desafios vai conseguir
                 setTimeout(() => {
@@ -1970,7 +2020,7 @@ function triggerSecretConversation() {
                         
                         // 5. Player: ok , vamos tentar
                         setTimeout(() => {
-                            appendChatMessage("ok , vamos tentar", true, 'Você');
+                            appendChatMessage("ok , vamos tentar", true, 'VocÃª');
                             
                             // 6. Complete and Unlock Map Icon (persisted)
                             setTimeout(() => {
@@ -2000,7 +2050,7 @@ function initPhoneChat() {
         chatMessagesContainer.innerHTML = `
             <div class="msg-bubble bako-msg">
                 <span class="msg-author">Bako</span>
-                <p>Obrigado pela ajuda! Vá até a sede da GGOPA para conseguir o remédio supremo e quebrar a minha maldição!</p>
+                <p>Obrigado pela ajuda! VÃ¡ atÃ© a sede da GGOPA para conseguir o remÃ©dio supremo e quebrar a minha maldiÃ§Ã£o!</p>
             </div>
         `;
     } else {
@@ -2008,7 +2058,7 @@ function initPhoneChat() {
         chatMessagesContainer.innerHTML = `
             <div class="msg-bubble bako-msg">
                 <span class="msg-author">Bako</span>
-                <p>Diga lá, o que você quer me perguntar? Sem mentiras, hein! 😉</p>
+                <p>Diga lÃ¡, o que vocÃª quer me perguntar? Sem mentiras, hein! ðŸ˜‰</p>
             </div>
         `;
     }
@@ -2019,7 +2069,7 @@ function initPhoneChat() {
 // Start Phone system
 initPhoneChat();
 
-// Queda de Braço Minigame System
+// Queda de BraÃ§o Minigame System
 const armWrestlingOverlay = document.getElementById('arm-wrestling-overlay');
 const armScoreText = document.getElementById('arm-score-text');
 const armWrestlingImg = document.getElementById('arm-wrestling-img');
@@ -2097,11 +2147,11 @@ function getArmSVG(state) {
             
             <!-- Locked Hands Center -->
             <circle cx="150" cy="80" r="18" fill="#1e293b" stroke="url(#neonGlow)" stroke-width="3" filter="url(#glow)" />
-            <text x="150" y="86" font-size="16" text-anchor="middle" dominant-baseline="middle">🤝</text>
+            <text x="150" y="86" font-size="16" text-anchor="middle" dominant-baseline="middle">ðŸ¤</text>
         </g>
         
         <!-- Side HUD labels -->
-        <text x="250" y="40" fill="#ec4899" font-size="11" font-weight="900" text-anchor="middle" font-family="'Courier New', monospace" filter="url(#glow)">VOCÊ</text>
+        <text x="250" y="40" fill="#ec4899" font-size="11" font-weight="900" text-anchor="middle" font-family="'Courier New', monospace" filter="url(#glow)">VOCÃŠ</text>
         <text x="250" y="55" fill="#a855f7" font-size="9" text-anchor="middle" font-family="'Courier New', monospace">PLAYER</text>
         
         <text x="50" y="40" fill="#ef4444" font-size="11" font-weight="900" text-anchor="middle" font-family="'Courier New', monospace" filter="url(#glow)">KLEBER</text>
@@ -2114,8 +2164,8 @@ function getArmSVG(state) {
 function randomizeTargetZone() {
     // In PCD mode, target zone is 12% wider
     const baseWidth = kleberPCDMode
-        ? Math.random() * 10 + 28   // 28–38% wide
-        : Math.random() * 10 + 16;  // 16–26% wide
+        ? Math.random() * 10 + 28   // 28â€“38% wide
+        : Math.random() * 10 + 16;  // 16â€“26% wide
     const maxLeft = 96 - baseWidth;
     const left = Math.random() * maxLeft + 2;
     armTargetZone.style.left  = `${left}%`;
@@ -2144,14 +2194,14 @@ function randomizeButtonPosition() {
 function triggerUpsideDown() {
     isUpsideDown = true;
     armWrestlingCard.classList.add('arm-upside-down');
-    armCurseWarning.textContent = "🌀 BAKO CURSE: GRAVIDADE INVERTIDA!";
+    armCurseWarning.textContent = "ðŸŒ€ BAKO CURSE: GRAVIDADE INVERTIDA!";
     playSound('bako_cheat');
     
     setTimeout(() => {
         armWrestlingCard.classList.remove('arm-upside-down');
         isUpsideDown = false;
         if (isArmGameActive) {
-            armCurseWarning.textContent = armWrestlingState > 2 ? "⚠️ MALDIÇÃO: TREMOR DETECTADO!" : "";
+            armCurseWarning.textContent = armWrestlingState > 2 ? "âš ï¸ MALDIÃ‡ÃƒO: TREMOR DETECTADO!" : "";
         }
     }, 3000);
 }
@@ -2215,7 +2265,7 @@ function triggerJumpscare() {
             isArmGameActive = true;
             // Extremely small target for final blow (calibrated)
             armTargetZone.style.width = '8%';
-            armCurseWarning.textContent = "💀 SÓ MAIS UM GOLPE!";
+            armCurseWarning.textContent = "ðŸ’€ SÃ“ MAIS UM GOLPE!";
         }
     }, 1500);
 }
@@ -2261,7 +2311,7 @@ function animatePointer(time) {
 }
 
 function updateArmWrestlingUI() {
-    armScoreText.textContent = `Força: ${armWrestlingState > 0 ? '+' : ''}${armWrestlingState}`;
+    armScoreText.textContent = `ForÃ§a: ${armWrestlingState > 0 ? '+' : ''}${armWrestlingState}`;
     
     if (armWrestlingState > 5) {
         armScoreText.style.color = '#10b981';
@@ -2286,13 +2336,13 @@ function updateArmWrestlingUI() {
     // Curse Effects mapping
     if (armWrestlingState > 2) {
         armWrestlingCard.classList.add('arm-shake');
-        armCurseWarning.textContent = "⚠️ MALDIÇÃO: TREMOR DETECTADO!";
+        armCurseWarning.textContent = "âš ï¸ MALDIÃ‡ÃƒO: TREMOR DETECTADO!";
     } else {
         armWrestlingCard.classList.remove('arm-shake');
         if (armWrestlingState <= 0) {
             armCurseWarning.textContent = "";
         } else {
-            armCurseWarning.textContent = "⚠️ MALDIÇÃO EM ESTADO PASSIVO";
+            armCurseWarning.textContent = "âš ï¸ MALDIÃ‡ÃƒO EM ESTADO PASSIVO";
         }
     }
     
@@ -2314,7 +2364,7 @@ function startArmWrestlingGame() {
     pointerPercent = 2;
     pointerDirection = 1;
     lastTime = 0;
-    
+    playTheme('fase1'); // 🎵 Tema Fase 1
     randomizeTargetZone();
     updateArmWrestlingUI();
     
@@ -2342,19 +2392,17 @@ function cleanupArmWrestlingEffects() {
         cancelAnimationFrame(armAnimationId);
         armAnimationId = null;
     }
-    
+    fadeOutTheme(); // 🎵 Para tema Fase 1
     armWrestlingCard.classList.remove('arm-shake');
     armWrestlingCard.classList.remove('arm-upside-down');
     document.body.classList.remove('arm-shake');
     armJumpscareOverlay.classList.remove('active');
     armTutorialModal.classList.remove('active');
     isTutorialOpen = false;
-    
     btnArmAction.style.position = '';
     btnArmAction.style.left = '';
     btnArmAction.style.top = '';
     btnArmAction.style.width = '';
-    
     armCurseWarning.textContent = '';
     isUpsideDown = false;
 }
@@ -2368,7 +2416,7 @@ function endArmWrestlingGame(isVictory) {
         kleberLossStreak = 0;
         kleberPCDMode = false;
         localStorage.setItem('kleber_loss_streak', '0');
-        alert('VITÓRIA! Você derrotou Kleber em uma intensa queda de braço! O caminho da sua jornada avança!');
+        alert('VITÃ“RIA! VocÃª derrotou Kleber em uma intensa queda de braÃ§o! O caminho da sua jornada avanÃ§a!');
         
         localStorage.setItem('mandamau_journey_fase1_completed', 'true');
         
@@ -2376,9 +2424,9 @@ function endArmWrestlingGame(isVictory) {
         const pathLineFase2 = document.querySelector('.line-fase2');
         if (nodeFase2) {
             nodeFase2.className = 'map-node node-active';
-            nodeFase2.title = 'Fase 2 - Disponível';
+            nodeFase2.title = 'Fase 2 - DisponÃ­vel';
             const iconSpan = nodeFase2.querySelector('.node-icon');
-            if (iconSpan) iconSpan.textContent = '⚔️';
+            if (iconSpan) iconSpan.textContent = 'âš”ï¸';
         }
         if (pathLineFase2) {
             pathLineFase2.classList.add('line-active');
@@ -2517,9 +2565,9 @@ function initJourneyMapState() {
         const pathLineFase2 = document.querySelector('.line-fase2');
         if (nodeFase2) {
             nodeFase2.className = 'map-node node-active';
-            nodeFase2.title = 'Fase 2 - Disponível';
+            nodeFase2.title = 'Fase 2 - DisponÃ­vel';
             const iconSpan = nodeFase2.querySelector('.node-icon');
-            if (iconSpan) iconSpan.textContent = '⚔️';
+            if (iconSpan) iconSpan.textContent = 'âš”ï¸';
         }
         if (pathLineFase2) {
             pathLineFase2.classList.add('line-active');
@@ -2532,9 +2580,9 @@ function initJourneyMapState() {
         const pathLineFase3 = document.querySelector('.line-fase3');
         if (nodeFase3) {
             nodeFase3.className = 'map-node node-active';
-            nodeFase3.title = 'Fase 3 - Disponível';
+            nodeFase3.title = 'Fase 3 - DisponÃ­vel';
             const iconSpan = nodeFase3.querySelector('.node-icon');
-            if (iconSpan) iconSpan.textContent = '⚔️';
+            if (iconSpan) iconSpan.textContent = 'âš”ï¸';
         }
         if (pathLineFase3) {
             pathLineFase3.classList.add('line-active');
@@ -2547,9 +2595,9 @@ function initJourneyMapState() {
         const pathLineFase4 = document.querySelector('.line-fase4');
         if (nodeFase4) {
             nodeFase4.className = 'map-node node-active';
-            nodeFase4.title = 'Fase 4 - Disponível';
+            nodeFase4.title = 'Fase 4 - DisponÃ­vel';
             const iconSpan = nodeFase4.querySelector('.node-icon');
-            if (iconSpan) iconSpan.textContent = '⚔️';
+            if (iconSpan) iconSpan.textContent = 'âš”ï¸';
         }
         if (pathLineFase4) {
             pathLineFase4.classList.add('line-active');
@@ -2564,7 +2612,7 @@ function initJourneyMapState() {
             nodeGgopa.className = 'map-node node-active';
             nodeGgopa.title = 'Fase 5 - Sede do GGOPA';
             const iconSpan = nodeGgopa.querySelector('.node-icon');
-            if (iconSpan) iconSpan.textContent = '🏗️';
+            if (iconSpan) iconSpan.textContent = 'ðŸ—ï¸';
         }
         if (pathLineFase5) {
             pathLineFase5.classList.add('line-active');
@@ -2643,27 +2691,27 @@ let currentCorrectAnswer = 0;
 let isPrankQuestion = false;
 
 const gwenPhrasesNormal = [
-    "Resolve essa se for capaz! 🧠",
-    "Mais uma! Quero ver se você aguenta o ritmo! ⚡",
-    "Hum... essa é um pouco mais chata, hein?",
-    "Não vale usar calculadora! 📱❌",
-    "Aposto que você vai vacilar nessa."
+    "Resolve essa se for capaz! ðŸ§ ",
+    "Mais uma! Quero ver se vocÃª aguenta o ritmo! âš¡",
+    "Hum... essa Ã© um pouco mais chata, hein?",
+    "NÃ£o vale usar calculadora! ðŸ“±âŒ",
+    "Aposto que vocÃª vai vacilar nessa."
 ];
 
 const gwenPhrasesCorrect = [
-    "Humph... você deu sorte! 😤",
-    "Acertou? Tá bom, mas a próxima vai te derrubar!",
-    "Ok, talvez você não seja tão burro assim.",
-    "Ah! Essa era muito fácil mesmo.",
-    "Blergh... continue assim e eu vou ter que me esforçar."
+    "Humph... vocÃª deu sorte! ðŸ˜¤",
+    "Acertou? TÃ¡ bom, mas a prÃ³xima vai te derrubar!",
+    "Ok, talvez vocÃª nÃ£o seja tÃ£o burro assim.",
+    "Ah! Essa era muito fÃ¡cil mesmo.",
+    "Blergh... continue assim e eu vou ter que me esforÃ§ar."
 ];
 
 const gwenPhrasesIncorrect = [
-    "Hahaha! Errado! Tente de novo, novato! 😜",
-    "Poxa, sério? Essa era nível pré-escola! 👶",
-    "Errou feio, errou rude! 😂",
-    "Ih, travou? Que vergonha! 🤭",
-    "Erradíssimo! Minha avó resolveria essa mais rápido!"
+    "Hahaha! Errado! Tente de novo, novato! ðŸ˜œ",
+    "Poxa, sÃ©rio? Essa era nÃ­vel prÃ©-escola! ðŸ‘¶",
+    "Errou feio, errou rude! ðŸ˜‚",
+    "Ih, travou? Que vergonha! ðŸ¤­",
+    "ErradÃ­ssimo! Minha avÃ³ resolveria essa mais rÃ¡pido!"
 ];
 
 function openGwenQuiz() {
@@ -2685,7 +2733,7 @@ function updateGwenUI() {
     
     let hearts = "";
     for (let i = 0; i < 3; i++) {
-        hearts += i < gwenLives ? "❤️" : "🖤";
+        hearts += i < gwenLives ? "â¤ï¸" : "ðŸ–¤";
     }
     gwenLivesHearts.textContent = hearts;
 }
@@ -2706,7 +2754,7 @@ function generateGwenQuestion() {
         
         currentCorrectAnswer = (x * y) / 100;
         gwenEquationDisplay.textContent = `${x}% de ${y} = ?`;
-        gwenSpeech.textContent = "Olha só: a quinta pergunta é de porcentagem! Vai encarar? 😈";
+        gwenSpeech.textContent = "Olha sÃ³: a quinta pergunta Ã© de porcentagem! Vai encarar? ðŸ˜ˆ";
         
         setupGwenChoices(currentCorrectAnswer, false);
         startGwenTimer();
@@ -2728,13 +2776,13 @@ function generateGwenQuestion() {
             const a = Math.floor(Math.random() * 9) + 2;
             const b = Math.floor(Math.random() * 11) + 2;
             currentCorrectAnswer = a * b;
-            equationText = `${a} × ${b} = ?`;
+            equationText = `${a} Ã— ${b} = ?`;
         } else {
             const b = Math.floor(Math.random() * 9) + 2;
             const ans = Math.floor(Math.random() * 9) + 2;
             const a = b * ans;
             currentCorrectAnswer = ans;
-            equationText = `${a} ÷ ${b} = ?`;
+            equationText = `${a} Ã· ${b} = ?`;
         }
         
         gwenEquationDisplay.textContent = equationText;
@@ -2798,7 +2846,7 @@ function startGwenTimer() {
 
 function handleGwenTimeout() {
     playSound('bako_cheat');
-    gwenSpeech.textContent = "Tempo esgotado! Dormiu no ponto? 😴";
+    gwenSpeech.textContent = "Tempo esgotado! Dormiu no ponto? ðŸ˜´";
     
     gwenScore = Math.max(0, gwenScore - 1);
     gwenLives--;
@@ -2825,9 +2873,9 @@ gwenAnswerButtons.forEach(btn => {
         
         if (isPrankQuestion) {
             if (isCorrect) {
-                gwenWinSpeech.textContent = "Caraca, você é um NERD mesmo! Como você acertou isso de cabeça?! Enfim, você passou, pegue o seu acesso.";
+                gwenWinSpeech.textContent = "Caraca, vocÃª Ã© um NERD mesmo! Como vocÃª acertou isso de cabeÃ§a?! Enfim, vocÃª passou, pegue o seu acesso.";
             } else {
-                gwenWinSpeech.textContent = "Hahaha, era zoeira! Como se alguém soubesse isso de cabeça! Você passou, toma aqui o acesso à próxima fase.";
+                gwenWinSpeech.textContent = "Hahaha, era zoeira! Como se alguÃ©m soubesse isso de cabeÃ§a! VocÃª passou, toma aqui o acesso Ã  prÃ³xima fase.";
             }
             showGwenVictory();
         } else {
@@ -2874,7 +2922,7 @@ function launchLinearRegressionPrank() {
     
     gwenEquationDisplay.textContent = "y = a + bx";
     gwenEquationDisplay.style.fontSize = "2.2rem";
-    gwenSpeech.textContent = "Calcule o coeficiente angular b1 da reta de regressão linear para os pontos: (1,2), (2,3), (3,5), (4,4), (5,6) 😈";
+    gwenSpeech.textContent = "Calcule o coeficiente angular b1 da reta de regressÃ£o linear para os pontos: (1,2), (2,3), (3,5), (4,4), (5,6) ðŸ˜ˆ";
     
     gwenTimerBar.style.width = "0%";
     gwenTimerText.textContent = "Sem tempo limite";
@@ -2893,6 +2941,7 @@ function showGwenGameOver() {
 function closeGwenQuiz() {
     gwenActive = false;
     clearInterval(gwenTimer);
+    fadeOutTheme(); // 🎵 Para tema Fase 2
     gwenQuizOverlay.classList.remove('active');
     gwenTutorialModal.classList.remove('active');
     isGwenTutorialOpen = false;
@@ -2914,9 +2963,9 @@ btnGwenWinOk.addEventListener('click', () => {
     const pathLineFase3 = document.querySelector('.line-fase3');
     if (nodeFase3) {
         nodeFase3.className = 'map-node node-active';
-        nodeFase3.title = 'Fase 3 - Disponível';
+        nodeFase3.title = 'Fase 3 - DisponÃ­vel';
         const iconSpan = nodeFase3.querySelector('.node-icon');
-        if (iconSpan) iconSpan.textContent = '⚔️';
+        if (iconSpan) iconSpan.textContent = 'âš”ï¸';
     }
     if (pathLineFase3) {
         pathLineFase3.classList.add('line-active');
@@ -2978,7 +3027,7 @@ btnCloseGwenTutorial.addEventListener('click', () => {
     isGwenTutorialOpen = false;
     gwenTutorialModal.classList.remove('active');
     playSound('click');
-    
+    playTheme('fase2'); // 🎵 Tema Fase 2
     gwenActive = true;
     startGwenTimer();
     generateGwenQuestion();
@@ -3026,12 +3075,12 @@ const samKeyPairs = [
 let samActiveKeyPair = ['A', 'D']; // currently active pair
 
 const samPhrases = [
-    "Eu esmago mais rápido que você! 🍔",
-    "Nhac nhac nhac! Mais comida! 🍕",
-    "Você já era, magrelo! 🌭",
-    "Vou te esmagar! 🍰",
-    "Sinta o poder do Gordão do Esmaga! 🍟",
-    "Está comendo poeira! 🍩"
+    "Eu esmago mais rÃ¡pido que vocÃª! ðŸ”",
+    "Nhac nhac nhac! Mais comida! ðŸ•",
+    "VocÃª jÃ¡ era, magrelo! ðŸŒ­",
+    "Vou te esmagar! ðŸ°",
+    "Sinta o poder do GordÃ£o do Esmaga! ðŸŸ",
+    "EstÃ¡ comendo poeira! ðŸ©"
 ];
 
 function updateSamRoundsUI() {
@@ -3047,13 +3096,13 @@ function updateSamRoundsUI() {
         if (dots[dotIdx]) dots[dotIdx].classList.add('player-win');
         dotIdx++;
     }
-    // Fill Sam wins (red) – continuing from where player wins left off
+    // Fill Sam wins (red) â€“ continuing from where player wins left off
     for (let i = 0; i < samBossRounds; i++) {
         if (dots[dotIdx]) dots[dotIdx].classList.add('sam-win');
         dotIdx++;
     }
     
-    if (roundScore) roundScore.textContent = `Você ${samPlayerRounds} × ${samBossRounds} Sam`;
+    if (roundScore) roundScore.textContent = `VocÃª ${samPlayerRounds} Ã— ${samBossRounds} Sam`;
     
     // Update key indicators to show active pair
     samKeyA.textContent = samActiveKeyPair[0];
@@ -3068,7 +3117,7 @@ function pickNewKeyPair() {
     
     const notice = document.getElementById('sam-key-swap-notice');
     if (notice) {
-        notice.textContent = `⚠️ TECLAS TROCARAM! Use: ${samActiveKeyPair[0]} e ${samActiveKeyPair[1]}`;
+        notice.textContent = `âš ï¸ TECLAS TROCARAM! Use: ${samActiveKeyPair[0]} e ${samActiveKeyPair[1]}`;
         notice.style.display = 'block';
         setTimeout(() => { notice.style.display = 'none'; }, 2500);
     }
@@ -3091,9 +3140,9 @@ function updateSamTugUI() {
 
 function updateSamSpeech() {
     if (samTugProgress < 30) {
-        samSpeech.textContent = "Hahaha! Você não aguenta o tranco! 😈";
+        samSpeech.textContent = "Hahaha! VocÃª nÃ£o aguenta o tranco! ðŸ˜ˆ";
     } else if (samTugProgress > 70) {
-        samSpeech.textContent = "Ei! Deixe um pouco pra mim! 😢";
+        samSpeech.textContent = "Ei! Deixe um pouco pra mim! ðŸ˜¢";
     } else {
         samSpeech.textContent = samPhrases[Math.floor(Math.random() * samPhrases.length)];
     }
@@ -3138,7 +3187,7 @@ function startSamRound(round) {
     if (round >= 2) {
         const scheduleKeySwap = () => {
             if (!samGameActive) return;
-            const delay = 4000 + Math.random() * 3000; // 4–7 seconds
+            const delay = 4000 + Math.random() * 3000; // 4â€“7 seconds
             samKeySwapInterval = setTimeout(() => {
                 if (samGameActive) {
                     pickNewKeyPair();
@@ -3203,11 +3252,11 @@ function endSamRound(playerWon) {
     if (playerWon) {
         samPlayerRounds++;
         playSound('rank_up_med');
-        samSpeech.textContent = "Não… como?! Você é bom nisso! 😡";
+        samSpeech.textContent = "NÃ£oâ€¦ como?! VocÃª Ã© bom nisso! ðŸ˜¡";
     } else {
         samBossRounds++;
         playSound('bako_cheat');
-        samSpeech.textContent = "Hahahaha! Eu sou IMBATÍVEL! 😈";
+        samSpeech.textContent = "Hahahaha! Eu sou IMBATÃVEL! ðŸ˜ˆ";
     }
     
     updateSamRoundsUI();
@@ -3218,7 +3267,7 @@ function endSamRound(playerWon) {
     if (samPlayerRounds >= 2) {
         // Player won the match
         const winDesc = document.getElementById('sam-win-desc');
-        if (winDesc) winDesc.textContent = `Você venceu ${samPlayerRounds}×${samBossRounds}! Sam está empanturrado e não aguenta mais!`;
+        if (winDesc) winDesc.textContent = `VocÃª venceu ${samPlayerRounds}Ã—${samBossRounds}! Sam estÃ¡ empanturrado e nÃ£o aguenta mais!`;
         setTimeout(() => {
             playSound('rank_up');
             samWinOverlay.style.display = 'flex';
@@ -3231,7 +3280,7 @@ function endSamRound(playerWon) {
         }, 1200);
     } else {
         // Next round
-        const roundMsg = playerWon ? `Rodada ${samCurrentRound} sua! Próxima rodada fica mais difícil… 🔥` : `Rodada ${samCurrentRound} do Sam! Se prepare… 🔥`;
+        const roundMsg = playerWon ? `Rodada ${samCurrentRound} sua! PrÃ³xima rodada fica mais difÃ­cilâ€¦ ðŸ”¥` : `Rodada ${samCurrentRound} do Sam! Se prepareâ€¦ ðŸ”¥`;
         samSpeech.textContent = roundMsg;
         setTimeout(() => {
             startSamRound(nextRound);
@@ -3258,6 +3307,7 @@ function closeSamGame() {
     if (samKeySwapInterval) { clearTimeout(samKeySwapInterval); samKeySwapInterval = null; }
     const notice = document.getElementById('sam-key-swap-notice');
     if (notice) notice.style.display = 'none';
+    fadeOutTheme(); // 🎵 Para tema Fase 3
     samSmashOverlay.classList.remove('active');
     samTutorialModal.classList.remove('active');
     isSamTutorialOpen = false;
@@ -3291,9 +3341,9 @@ btnSamWinOk.addEventListener('click', () => {
     const pathLineFase4 = document.querySelector('.line-fase4');
     if (nodeFase4) {
         nodeFase4.className = 'map-node node-active';
-        nodeFase4.title = 'Fase 4 - Disponível';
+        nodeFase4.title = 'Fase 4 - DisponÃ­vel';
         const iconSpan = nodeFase4.querySelector('.node-icon');
-        if (iconSpan) iconSpan.textContent = '⚔️';
+        if (iconSpan) iconSpan.textContent = 'âš”ï¸';
     }
     if (pathLineFase4) {
         pathLineFase4.classList.add('line-active');
@@ -3317,7 +3367,7 @@ btnCloseSamTutorial.addEventListener('click', () => {
     isSamTutorialOpen = false;
     samTutorialModal.classList.remove('active');
     playSound('click');
-    
+    playTheme('fase3'); // 🎵 Tema Fase 3
     // Initialize fresh best-of-3 match from round 1
     samPlayerRounds = 0;
     samBossRounds = 0;
@@ -3326,7 +3376,7 @@ btnCloseSamTutorial.addEventListener('click', () => {
     startSamRound(1);
 });
 
-// Click listener for Fase 4 Node — Cláudio Genius
+// Click listener for Fase 4 Node â€” ClÃ¡udio Genius
 document.getElementById('node-fase4').addEventListener('click', () => {
     const journeyFase3Completed = localStorage.getItem('mandamau_journey_fase3_completed') === 'true';
     if (journeyFase3Completed) {
@@ -3341,7 +3391,7 @@ document.getElementById('node-fase4').addEventListener('click', () => {
     }
 });
 
-// Keydown listener for Sam minigame — computer only, NO arrow keys
+// Keydown listener for Sam minigame â€” computer only, NO arrow keys
 window.addEventListener('keydown', (e) => {
     if (!samGameActive || isSamTutorialOpen) return;
     
@@ -3386,7 +3436,7 @@ window.addEventListener('keydown', (e) => {
 });
 
 // ============================================================
-// DEBUG PANEL — Cheat code: type "GGOPA" with the journey map open
+// DEBUG PANEL â€” Cheat code: type "GGOPA" with the journey map open
 // ============================================================
 const debugPanel = document.getElementById('debug-panel');
 const btnDebugClose = document.getElementById('btn-debug-close');
@@ -3468,7 +3518,7 @@ document.getElementById('dbg-reset-all').addEventListener('click', () => {
 });
 
 // ================================================================
-// FASE 4 — CLÁUDIO GENIUS MINIGAME (ESCALATING DIFFICULTY)
+// FASE 4 â€” CLÃUDIO GENIUS MINIGAME (ESCALATING DIFFICULTY)
 // ================================================================
 
 const claudioGeniusOverlay   = document.getElementById('claudio-genius-overlay');
@@ -3489,7 +3539,7 @@ const geniusAnnouncement     = document.getElementById('genius-announcement');
 
 // ---- Button Definitions (index = data-color) ----
 const GENIUS_BTN_DEFS = [
-    // Rounds 1–3
+    // Rounds 1â€“3
     { css: 'genius-red',     label: '' },
     { css: 'genius-blue',    label: '' },
     { css: 'genius-green',   label: '' },
@@ -3498,9 +3548,9 @@ const GENIUS_BTN_DEFS = [
     { css: 'genius-purple',  label: '' },
     { css: 'genius-pink',    label: '' },
     // Round 5+ (Greek letters)
-    { css: 'genius-orange',  label: 'Α' },
-    { css: 'genius-cyan',    label: 'Β' },
-    { css: 'genius-magenta', label: 'Γ' },
+    { css: 'genius-orange',  label: 'Î‘' },
+    { css: 'genius-cyan',    label: 'Î’' },
+    { css: 'genius-magenta', label: 'Î“' },
 ];
 
 // ---- Per-round config: seqLen = how many to memorize, activeBtns = how many buttons ----
@@ -3508,8 +3558,8 @@ const GENIUS_ROUND_CONFIG = [
     { seqLen: 5, activeBtns: 4, msg: null },
     { seqLen: 6, activeBtns: 4, msg: null },
     { seqLen: 6, activeBtns: 4, msg: null },
-    { seqLen: 6, activeBtns: 6, msg: '⚠️ NOVOS BOTÕES APARECEM!' },
-    { seqLen: 7, activeBtns: 9, msg: '🔮 LETRAS GREGAS INVADEM O JOGO!' },
+    { seqLen: 6, activeBtns: 6, msg: 'âš ï¸ NOVOS BOTÃ•ES APARECEM!' },
+    { seqLen: 7, activeBtns: 9, msg: 'ðŸ”® LETRAS GREGAS INVADEM O JOGO!' },
 ];
 
 // ---- Game state ----
@@ -3525,30 +3575,30 @@ let claudioActiveBtns    = 4; // how many buttons are currently in the grid
 
 // ---- Phrases ----
 const claudioPhrasesNormal = [
-    "Eu sou um cubo gey, me vença se for capaz!",
-    "Você vai errar, tenho certeza! 🟥🟦🟩🟨",
-    "Minha memória é perfeita. A sua? Hehe.",
+    "Eu sou um cubo gey, me venÃ§a se for capaz!",
+    "VocÃª vai errar, tenho certeza! ðŸŸ¥ðŸŸ¦ðŸŸ©ðŸŸ¨",
+    "Minha memÃ³ria Ã© perfeita. A sua? Hehe.",
     "Continue tentando, mortal.",
-    "Cada cor que você erra, eu rio! 😈"
+    "Cada cor que vocÃª erra, eu rio! ðŸ˜ˆ"
 ];
 const claudioPhrasesCorrect = [
-    "Hmph... você teve sorte!",
-    "Ok, talvez você não seja tão idiota.",
-    "Continue... mas a próxima vai te quebrar.",
-    "Acertou? Impossível...",
-    "Bem jogado. Mas não vai durar."
+    "Hmph... vocÃª teve sorte!",
+    "Ok, talvez vocÃª nÃ£o seja tÃ£o idiota.",
+    "Continue... mas a prÃ³xima vai te quebrar.",
+    "Acertou? ImpossÃ­vel...",
+    "Bem jogado. Mas nÃ£o vai durar."
 ];
 const claudioPhrasesWrong = [
-    "HAHAHAHA! ERROU! Que vergonha! 😂",
-    "Sabia que você ia errar! Cubo gey 1 x 0 você!",
-    "Que memória fraca! Vai estudar mais!",
+    "HAHAHAHA! ERROU! Que vergonha! ðŸ˜‚",
+    "Sabia que vocÃª ia errar! Cubo gey 1 x 0 vocÃª!",
+    "Que memÃ³ria fraca! Vai estudar mais!",
     "Errou feio! Tenta de novo, panaca!",
-    "KKKKKK que fail! A cor era óbvia!"
+    "KKKKKK que fail! A cor era Ã³bvia!"
 ];
 const claudioPhrasesWin = [
-    "Impossível! Você me venceu?! Não acredito!",
-    "Ok ok... você é melhor que eu esperava. Por hoje.",
-    "Você é bom nisso... cubo gey derrotado! 😤"
+    "ImpossÃ­vel! VocÃª me venceu?! NÃ£o acredito!",
+    "Ok ok... vocÃª Ã© melhor que eu esperava. Por hoje.",
+    "VocÃª Ã© bom nisso... cubo gey derrotado! ðŸ˜¤"
 ];
 
 // ---- Helpers ----
@@ -3562,7 +3612,7 @@ function setClaudioSpeech(text) {
 
 function updateClaudioLives() {
     let h = '';
-    for (let i = 0; i < 3; i++) h += i < claudioLives ? '❤️' : '🖤';
+    for (let i = 0; i < 3; i++) h += i < claudioLives ? 'â¤ï¸' : 'ðŸ–¤';
     claudioLivesDisplay.textContent = h;
 }
 
@@ -3622,7 +3672,7 @@ function litButton(colorIndex, duration = 450) {
 async function playSequence() {
     claudioIsPlaying = true;
     geniusGrid.classList.remove('player-active');
-    claudioTurnText.textContent = 'Preste atenção!';
+    claudioTurnText.textContent = 'Preste atenÃ§Ã£o!';
     claudioTurnText.classList.remove('player-turn');
 
     await new Promise(r => setTimeout(r, 700));
@@ -3657,9 +3707,9 @@ function resetClaudioGame() {
     updateClaudioLives();
     updateClaudioRoundDots();
     claudioRoundText.textContent = `Rodada: 1/${CLAUDIO_MAX_ROUNDS}`;
-    claudioTurnText.textContent = 'Preste atenção!';
+    claudioTurnText.textContent = 'Preste atenÃ§Ã£o!';
     claudioTurnText.classList.remove('player-turn');
-    setClaudioSpeech('Eu sou um cubo gey, me vença se for capaz!');
+    setClaudioSpeech('Eu sou um cubo gey, me venÃ§a se for capaz!');
 }
 
 function startClaudioGame() {
@@ -3724,7 +3774,7 @@ function handleClaudioPlayerInput(colorIndex) {
         setTimeout(() => claudioGeniusCard.classList.remove('claudio-error'), 500);
 
         geniusGrid.classList.remove('player-active');
-        claudioTurnText.textContent = 'Preste atenção!';
+        claudioTurnText.textContent = 'Preste atenÃ§Ã£o!';
         claudioTurnText.classList.remove('player-turn');
 
         if (claudioLives <= 0) {
@@ -3745,7 +3795,7 @@ function handleClaudioPlayerInput(colorIndex) {
         // Round complete!
         playSound('rank_up_med');
         geniusGrid.classList.remove('player-active');
-        claudioTurnText.textContent = 'Preste atenção!';
+        claudioTurnText.textContent = 'Preste atenÃ§Ã£o!';
         claudioTurnText.classList.remove('player-turn');
         setClaudioSpeech(claudioPhrasesCorrect[Math.floor(Math.random() * claudioPhrasesCorrect.length)]);
 
@@ -3766,6 +3816,7 @@ function handleClaudioPlayerInput(colorIndex) {
 function closeClaudioGame() {
     claudioGameActive = false;
     claudioIsPlaying = false;
+    fadeOutTheme(); // 🎵 Para tema Fase 4
     claudioGeniusOverlay.classList.remove('active');
     claudioTutorialModal.classList.remove('active');
     isClaudioTutorialOpen = false;
@@ -3790,6 +3841,7 @@ btnCloseClaudioTutorial.addEventListener('click', () => {
     isClaudioTutorialOpen = false;
     claudioTutorialModal.classList.remove('active');
     playSound('click');
+    playTheme('fase4'); // 🎵 Tema Fase 4
     startClaudioGame();
 });
 
@@ -3805,7 +3857,7 @@ btnClaudioWinOk.addEventListener('click', () => {
         nodeGgopa.className = 'map-node node-active';
         nodeGgopa.title = 'Fase 5 - Sede do GGOPA';
         const iconSpan = nodeGgopa.querySelector('.node-icon');
-        if (iconSpan) iconSpan.textContent = '🏗️';
+        if (iconSpan) iconSpan.textContent = 'ðŸ—ï¸';
     }
     if (pathLineFase5) pathLineFase5.classList.add('line-active');
 
@@ -3824,7 +3876,7 @@ btnClaudioWinOk.addEventListener('click', () => {
 
 
 // ================================================================
-// LEVEL 5 — FELIFEP BLACKJACK (BOSS FINAL)
+// LEVEL 5 â€” FELIFEP BLACKJACK (BOSS FINAL)
 // ================================================================
 
 // ---- DOM References ----
@@ -3947,7 +3999,7 @@ function bjScore(hand) {
 
 // ---- Card Rendering ----
 function bjSuitChar(suit) {
-    return { spades:'♠', hearts:'♥', diamonds:'♦', clubs:'♣' }[suit];
+    return { spades:'â™ ', hearts:'â™¥', diamonds:'â™¦', clubs:'â™£' }[suit];
 }
 function bjIsRed(suit) { return suit === 'hearts' || suit === 'diamonds'; }
 
@@ -4114,32 +4166,32 @@ function bjResolveRound(naturalBlackjack) {
         damage = BJ_CRIT_DAMAGE;
         bjBossHP -= damage;
         bjFlash(true);
-        resultMsg = `🃏 BLACKJACK NATURAL! Dano critico: -${damage} HP do Felifep!`;
+        resultMsg = `ðŸƒ BLACKJACK NATURAL! Dano critico: -${damage} HP do Felifep!`;
         bjSetSpeech(bjRandSpeech(bjSpeechPlayerWin));
     } else if (pScore > 21) {
         // Player bust
         bjPlayerHP -= damage;
         bjFlash(false);
-        resultMsg = `💥 Voce ESTOUROU (${pScore})! -${damage} HP`;
+        resultMsg = `ðŸ’¥ Voce ESTOUROU (${pScore})! -${damage} HP`;
         bjSetSpeech(bjRandSpeech(bjSpeechPlayerBust));
     } else if (bScore > 21) {
         // Boss bust
         bjBossHP -= damage;
         bjFlash(true);
-        resultMsg = `✨ Felifep ESTOUROU (${bScore})! -${damage} HP do Felifep!`;
+        resultMsg = `âœ¨ Felifep ESTOUROU (${bScore})! -${damage} HP do Felifep!`;
         bjSetSpeech(bjRandSpeech(bjSpeechPlayerWin));
     } else if (pScore > bScore) {
         bjBossHP -= damage;
         bjFlash(true);
-        resultMsg = `⚔️ Voce venceu (${pScore} vs ${bScore})! -${damage} HP do Felifep!`;
+        resultMsg = `âš”ï¸ Voce venceu (${pScore} vs ${bScore})! -${damage} HP do Felifep!`;
         bjSetSpeech(bjRandSpeech(bjSpeechPlayerWin));
     } else if (bScore > pScore) {
         bjPlayerHP -= damage;
         bjFlash(false);
-        resultMsg = `💀 Felifep venceu (${bScore} vs ${pScore})! -${damage} HP seus!`;
+        resultMsg = `ðŸ’€ Felifep venceu (${bScore} vs ${pScore})! -${damage} HP seus!`;
         bjSetSpeech(bjRandSpeech(bjSpeechBossWin));
     } else {
-        resultMsg = `🤝 Empate (${pScore} vs ${bScore})! Sem dano.`;
+        resultMsg = `ðŸ¤ Empate (${pScore} vs ${bScore})! Sem dano.`;
         bjSetSpeech("Um empate... aceito, mas com reservas.");
     }
 
@@ -4179,12 +4231,12 @@ btnBjPower1.addEventListener('click', () => {
     playSound('rank_up_med');
 });
 
-// Power 2: Decreto de Etiqueta — cancela estouro removendo a última carta
+// Power 2: Decreto de Etiqueta â€” cancela estouro removendo a Ãºltima carta
 btnBjPower2.addEventListener('click', () => {
     if (!bjPlayerTurn || bjPower2Uses <= 0) return;
     const score = bjScore(bjPlayerHand);
     if (score <= 21) {
-        bjSetSpeech('Este poder só cancela um estouro, senhor.');
+        bjSetSpeech('Este poder sÃ³ cancela um estouro, senhor.');
         return;
     }
     bjPower2Uses--;
@@ -4198,7 +4250,7 @@ btnBjPower2.addEventListener('click', () => {
     playSound('rank_up_med');
 });
 
-// Power 3: Balança Divina — troca a última carta
+// Power 3: BalanÃ§a Divina â€” troca a Ãºltima carta
 btnBjPower3.addEventListener('click', () => {
     if (!bjPlayerTurn || bjPower3Uses <= 0 || bjPlayerHand.length < 1) return;
     bjPower3Uses--;
@@ -4206,7 +4258,7 @@ btnBjPower3.addEventListener('click', () => {
     bjPlayerHand.push(bjDraw());
     bjActivatePowerAnim(btnBjPower3);
     bjRedrawPlayerCards();
-    bjSetSpeech('A Balança oscila... nova carta, nova chance.');
+    bjSetSpeech('A BalanÃ§a oscila... nova carta, nova chance.');
     bjUpdatePowerUI();
     const newScore = bjScore(bjPlayerHand);
     // Re-enable or disable Hit based on new score
@@ -4225,7 +4277,7 @@ btnBjHit.addEventListener('click', () => {
     bjSetSpeech(bjRandSpeech(bjSpeechPlayerHit));
     const score = bjScore(bjPlayerHand);
     if (score > 21) {
-        // Busted: disable Hit, only allow Decreto/Balança
+        // Busted: disable Hit, only allow Decreto/BalanÃ§a
         btnBjHit.disabled = true;
         btnBjPower2.disabled = bjPower2Uses <= 0;
         btnBjPower3.disabled = bjPower3Uses <= 0 || bjPlayerHand.length < 1;
@@ -4297,7 +4349,7 @@ function bjSpawnFireworks() {
 }
 
 // ================================================================
-// EPILOGUE — Felifep Dialogue Sequence
+// EPILOGUE â€” Felifep Dialogue Sequence
 // ================================================================
 
 const bjEpilogue      = document.getElementById('bj-epilogue');
@@ -4310,18 +4362,18 @@ const btnBjCh2Close   = document.getElementById('btn-bj-ch2-close');
 
 // WHO: 'felifep' | 'player'
 const BJ_EPILOGUE_LINES = [
-    { who: 'felifep', text: 'Parabéns... você nos condenou.' },
+    { who: 'felifep', text: 'ParabÃ©ns... vocÃª nos condenou.' },
     { who: 'player',  text: 'Como assim?' },
-    { who: 'felifep', text: 'Você libertou o Deus da Mentira e da Deselegância no mundo. Agora as fake news vão aumentar, as pessoas serão deselegantes umas com as outras... você trouxe o caos ao mundo!' },
-    { who: 'player',  text: 'Foi mal, eu não sabia... eu vou consertar!' },
-    { who: 'felifep', text: 'Melhor você estar falando a verdade. Vai logo!' },
+    { who: 'felifep', text: 'VocÃª libertou o Deus da Mentira e da DeselegÃ¢ncia no mundo. Agora as fake news vÃ£o aumentar, as pessoas serÃ£o deselegantes umas com as outras... vocÃª trouxe o caos ao mundo!' },
+    { who: 'player',  text: 'Foi mal, eu nÃ£o sabia... eu vou consertar!' },
+    { who: 'felifep', text: 'Melhor vocÃª estar falando a verdade. Vai logo!' },
 ];
 
 let bjEpiIndex = 0;
 
 function bjShowEpiLine(index) {
     if (index >= BJ_EPILOGUE_LINES.length) {
-        // All lines done → show Chapter 2
+        // All lines done â†’ show Chapter 2
         bjEpilogue.classList.remove('active');
         bjChapter2.classList.add('active');
         return;
@@ -4330,7 +4382,7 @@ function bjShowEpiLine(index) {
     const isPlayer = line.who === 'player';
 
     // Update speaker label and portrait style
-    bjEpiSpeaker.textContent = isPlayer ? 'Você' : 'Felifep';
+    bjEpiSpeaker.textContent = isPlayer ? 'VocÃª' : 'Felifep';
     bjEpiSpeaker.style.color = isPlayer ? '#c4b5fd' : '#f8d862';
     bjEpiPortrait.className  = 'bj-epi-portrait' + (isPlayer ? ' player-turn' : '');
 
@@ -4341,9 +4393,9 @@ function bjShowEpiLine(index) {
     bjEpiText.className = 'bj-epi-text' + (isPlayer ? ' player-bubble' : '');
     bjEpiText.textContent = line.text;
 
-    // Last line → change button text
+    // Last line â†’ change button text
     const isLast = index === BJ_EPILOGUE_LINES.length - 1;
-    btnBjEpiNext.textContent = isLast ? '▶ Finalizar' : '▶ Continuar';
+    btnBjEpiNext.textContent = isLast ? 'â–¶ Finalizar' : 'â–¶ Continuar';
 }
 
 btnBjEpiNext.addEventListener('click', () => {
@@ -4352,7 +4404,7 @@ btnBjEpiNext.addEventListener('click', () => {
     playSound('click');
 });
 
-// "fim?" button — transition from win screen to epilogue
+// "fim?" button â€” transition from win screen to epilogue
 btnBjWinOk.addEventListener('click', () => {
     bjFireworks.innerHTML = '';
     bjWinScreen.classList.remove('active');
@@ -4366,7 +4418,7 @@ btnBjWinOk.addEventListener('click', () => {
     bjShowEpiLine(0);
 });
 
-// "Voltar ao início" — save progress and return to journey map
+// "Voltar ao inÃ­cio" â€” save progress and return to journey map
 btnBjCh2Close.addEventListener('click', () => {
     bjChapter2.classList.remove('active');
     playSound('rank_up_high');
@@ -4385,6 +4437,7 @@ btnBjRestart.addEventListener('click', () => {
 
 btnBjQuit.addEventListener('click', () => {
     bjGameActive = false;
+    fadeOutTheme(); // 🎵 Para tema Fase 5
     blackjackOverlay.classList.remove('active');
     bjWinScreen.classList.remove('active');
     bjLoseScreen.classList.remove('active');
@@ -4399,6 +4452,7 @@ btnCloseBjTutorial.addEventListener('click', () => {
     bjTutorialModal.classList.remove('active');
     bjTutorialOpen = false;
     playSound('click');
+    playTheme('fase5'); // 🎵 Tema Fase 5 começa quando o tutorial fecha
     bjStartRound();
 });
 
@@ -4474,3 +4528,4 @@ document.getElementById('dbg-launch-bj').addEventListener('click', () => {
     journeyOverlay.classList.remove('active');
     openBlackjack();
 });
+
