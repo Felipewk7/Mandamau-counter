@@ -1802,10 +1802,12 @@ btnJourneyTrigger.addEventListener('click', () => {
     openJourney();
 });
 
-btnCloseJourneyView.addEventListener('click', () => {
-    journeyOverlay.classList.remove('active');
-    playSound('click');
-});
+if (btnCloseJourneyView) {
+    btnCloseJourneyView.addEventListener('click', () => {
+        journeyOverlay.classList.remove('active');
+        playSound('click');
+    });
+}
 
 let currentBossEncounter = 'kleber';
 let isGwenTutorialOpen = false;
