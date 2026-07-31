@@ -14,46 +14,46 @@ const THEMES = {
 };
 
 // --- Background music (tela principal / mapa) ---
-let bgMusicStarted  = false; // true apos o primeiro clique
-let bgMusicActive   = false; // true quando a musica de fundo DEVE estar tocando
+let _bgUnlocked  = false; // true apos primeira interacao do usuario
+let _inMinigame  = false; // true enquanto qualquer minigame esta ativo
 
 function startBgMusic() {
     if (!bgMusicAudio) return;
-    bgMusicStarted = true;
-    bgMusicActive  = true;
     bgMusicAudio.volume = 0.25;
     bgMusicAudio.play().catch(function() {});
 }
 
 function pauseBgMusic() {
     if (!bgMusicAudio) return;
-    bgMusicActive = false;
-    bgMusicAudio.pause(); // Sempre pausa — sem verificar .paused (evita race condition)
+    bgMusicAudio.pause(); // incondicional - sem checar .paused
 }
 
 function resumeBgMusic() {
-    if (!bgMusicAudio || !bgMusicStarted) return;
-    bgMusicActive = true;
-    bgMusicAudio.volume = 0.25;
-    bgMusicAudio.play().catch(function() {});
+    _inMinigame = false;
+    if (!_bgUnlocked || !bgMusicAudio) return;
+    startBgMusic();
 }
 
-// Inicia a musica de fundo no primeiro clique do usuario
-var _bgStarted = false;
+// Usa capture (true) para rodar ANTES dos handlers dos botoes,
+// depois usa setTimeout(0) para esperar todos os handlers terminarem
+// Assim so inicia a musica se nenhuma fase foi ativada nesse mesmo clique
 document.addEventListener('click', function() {
-    if (_bgStarted) return;
-    _bgStarted = true;
-    startBgMusic();
-});
+    if (_bgUnlocked) return;
+    _bgUnlocked = true;
+    setTimeout(function() {
+        if (!_inMinigame) startBgMusic();
+    }, 0);
+}, true);
 
 // --- Musica de fase (minigames) ---
+
 function playTheme(fase) {
     const file = THEMES[fase];
     if (!file || !gameThemeAudio) return;
     if (currentThemeFile === file && !gameThemeAudio.paused) return;
-    pauseBgMusic(); // Para a musica de fundo imediatamente
+    _inMinigame = true;  // sinaliza que minigame esta ativo
+    pauseBgMusic();      // para a musica de fundo imediatamente
     currentThemeFile = file;
-    // Pequeno delay para o browser processar o pause antes de iniciar o tema
     setTimeout(function() {
         gameThemeAudio.src = file;
         gameThemeAudio.volume = 0.25;
