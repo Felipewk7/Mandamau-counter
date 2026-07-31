@@ -18,7 +18,7 @@ function playTheme(fase) {
     if (currentThemeFile === file && !gameThemeAudio.paused) return;
     currentThemeFile = file;
     gameThemeAudio.src = file;
-    gameThemeAudio.volume = 0.45;
+    gameThemeAudio.volume = 0.25;
     gameThemeAudio.currentTime = 0;
     gameThemeAudio.play().catch(function() {});
 }
@@ -44,7 +44,7 @@ function fadeOutTheme(duration) {
         if (step >= steps) {
             clearInterval(fade);
             stopTheme();
-            gameThemeAudio.volume = 0.45;
+            gameThemeAudio.volume = 0.25;
         }
     }, interval);
 }
