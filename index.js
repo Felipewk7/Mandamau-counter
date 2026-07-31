@@ -2,6 +2,7 @@
 // THEME MUSIC SYSTEM
 // ================================================================
 const gameThemeAudio = document.getElementById('game-theme');
+const bgMusicAudio   = document.getElementById('bg-music');
 let currentThemeFile = '';
 
 const THEMES = {
@@ -12,10 +13,39 @@ const THEMES = {
     fase5: 'audio/fase5_felifep.mp3',
 };
 
+// --- Background music (tela principal / mapa) ---
+function startBgMusic() {
+    if (!bgMusicAudio) return;
+    bgMusicAudio.volume = 0.25;
+    bgMusicAudio.play().catch(function() {});
+}
+
+function pauseBgMusic() {
+    if (!bgMusicAudio || bgMusicAudio.paused) return;
+    bgMusicAudio.pause();
+}
+
+function resumeBgMusic() {
+    if (!bgMusicAudio) return;
+    // So retoma se nao houver tema de fase tocando
+    if (!gameThemeAudio || gameThemeAudio.paused) {
+        bgMusicAudio.volume = 0.25;
+        bgMusicAudio.play().catch(function() {});
+    }
+}
+
+// Inicia a musica de fundo apos interacao do usuario (politica de autoplay)
+document.addEventListener('click', function startBg() {
+    startBgMusic();
+    document.removeEventListener('click', startBg);
+}, { once: true });
+
+// --- Musica de fase (minigames) ---
 function playTheme(fase) {
     const file = THEMES[fase];
     if (!file || !gameThemeAudio) return;
     if (currentThemeFile === file && !gameThemeAudio.paused) return;
+    pauseBgMusic(); // Para a musica de fundo ao entrar na fase
     currentThemeFile = file;
     gameThemeAudio.src = file;
     gameThemeAudio.volume = 0.25;
@@ -45,10 +75,12 @@ function fadeOutTheme(duration) {
             clearInterval(fade);
             stopTheme();
             gameThemeAudio.volume = 0.25;
+            resumeBgMusic(); // Retoma a musica de fundo ao sair da fase
         }
     }, interval);
 }
 // ================================================================
+
 // DMC Ranks Configuration
 const ranks = [
     { min: 10000000000, letter: 'Ω', name: "O Absoluto curva-se perante o vosso império de inverdades, coroando-vos Soberano do Vácuo Fáctico", class: 'rank-sss', idleClass: 'rank-idle-god', flashColor: 'rgba(255, 0, 0, 0.5)', sound: 'rank_up_god' },
