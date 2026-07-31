@@ -370,6 +370,7 @@
                     <button id="dbg-complete-2" class="debug-action-btn">✅ Fase 2</button>
                     <button id="dbg-complete-3" class="debug-action-btn">✅ Fase 3</button>
                     <button id="dbg-complete-4" class="debug-action-btn">✅ Fase 4</button>
+                    <button id="dbg-complete-5" class="debug-action-btn">✅ Fase 5</button>
                 </div>
                 <p class="debug-hint" style="margin-top: 10px;">Resetar:</p>
                 <div class="debug-btn-row">
@@ -377,6 +378,7 @@
                     <button id="dbg-reset-2" class="debug-action-btn debug-danger">🔄 Fase 2</button>
                     <button id="dbg-reset-3" class="debug-action-btn debug-danger">🔄 Fase 3</button>
                     <button id="dbg-reset-4" class="debug-action-btn debug-danger">🔄 Fase 4</button>
+                    <button id="dbg-reset-5" class="debug-action-btn debug-danger">🔄 Fase 5</button>
                 </div>
                 <button id="dbg-reset-all" class="debug-action-btn debug-danger" style="width: 100%; margin-top: 10px;">💀 Resetar Tudo</button>
             </div>
@@ -705,11 +707,174 @@
             </div>
         </div>
 
+        <!-- =============================================
+             LEVEL 5 — FELIFEP BLACKJACK (BOSS FINAL)
+             ============================================= -->
+        <div id="blackjack-overlay" class="blackjack-overlay">
+            <div class="bj-scene">
+
+                <!-- Felifep Boss Top Section -->
+                <div class="bj-boss-section">
+                    <div class="bj-boss-portrait-wrap">
+                        <img id="bj-felifep-img" src="img/felifep.png" alt="Felifep"
+                             class="bj-boss-portrait"
+                             onerror="if(!this.src.endsWith('kleber_clown.jpg')){this.src='kleber_clown.jpg';}">
+                        <div class="bj-judgment-badge" id="bj-judgment-badge">⚖️ MODO JULGAMENTO</div>
+                    </div>
+                    <div class="bj-boss-info">
+                        <div class="bj-boss-nameplate">
+                            <span class="bj-boss-name">Felifep</span>
+                            <span class="bj-boss-title">O Deus da Etiqueta e da Verdade</span>
+                        </div>
+                        <div class="bj-hp-wrap">
+                            <span class="bj-hp-label">HP Divino</span>
+                            <div class="bj-hp-track bj-boss-track">
+                                <div id="bj-boss-hp-fill" class="bj-hp-fill bj-boss-fill" style="width:100%"></div>
+                            </div>
+                            <span id="bj-boss-hp-text" class="bj-hp-num">100</span>
+                        </div>
+                        <div id="bj-boss-speech" class="bj-speech-bubble">
+                            Sua falta de etiqueta me diverte. Compre uma carta!
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card Table -->
+                <div class="bj-table">
+                    <!-- Round counter -->
+                    <div id="bj-round-counter" class="bj-round-counter">Rodada <span id="bj-round-num">1</span></div>
+
+                    <!-- Boss hand -->
+                    <div class="bj-hand-zone">
+                        <div class="bj-hand-label">
+                            Mão do Felifep
+                            <span id="bj-boss-score" class="bj-score-badge">?</span>
+                        </div>
+                        <div id="bj-boss-cards" class="bj-cards-row"></div>
+                    </div>
+
+                    <!-- Divider -->
+                    <div class="bj-table-divider">
+                        <span class="bj-divider-label">— ♠ MESA DO DESTINO ♠ —</span>
+                    </div>
+
+                    <!-- Player hand -->
+                    <div class="bj-hand-zone">
+                        <div class="bj-hand-label">
+                            Sua Mão
+                            <span id="bj-player-score" class="bj-score-badge">0</span>
+                        </div>
+                        <div id="bj-player-cards" class="bj-cards-row"></div>
+                    </div>
+                </div>
+
+                <!-- Player Controls Section -->
+                <div class="bj-controls-section">
+                    <!-- Player HP bar -->
+                    <div class="bj-hp-wrap bj-player-hp-wrap">
+                        <span class="bj-hp-label">Sua Vida</span>
+                        <div class="bj-hp-track bj-player-track">
+                            <div id="bj-player-hp-fill" class="bj-hp-fill bj-player-fill" style="width:100%"></div>
+                        </div>
+                        <span id="bj-player-hp-text" class="bj-hp-num">100</span>
+                    </div>
+
+                    <!-- Action buttons -->
+                    <div class="bj-action-row">
+                        <button id="btn-bj-hit"   class="bj-btn bj-btn-hit">🃏 Pedir Carta</button>
+                        <button id="btn-bj-stand" class="bj-btn bj-btn-stand">✋ Parar</button>
+                    </div>
+
+                    <!-- Divine Powers -->
+                    <div class="bj-powers-bar">
+                        <div class="bj-powers-title">⚡ Poderes Divinos</div>
+                        <div class="bj-powers-row">
+                            <button id="btn-bj-power1" class="bj-power-btn" data-power="1">
+                                <span class="bj-power-icon">🔮</span>
+                                <span class="bj-power-name">Olho da Verdade</span>
+                                <span class="bj-power-desc">Revela a carta oculta</span>
+                                <span class="bj-power-uses" id="bj-p1-uses">1×</span>
+                            </button>
+                            <button id="btn-bj-power2" class="bj-power-btn" data-power="2">
+                                <span class="bj-power-icon">📜</span>
+                                <span class="bj-power-name">Decreto de Etiqueta</span>
+                                <span class="bj-power-desc">Cancela 1 estouro</span>
+                                <span class="bj-power-uses" id="bj-p2-uses">1×</span>
+                            </button>
+                            <button id="btn-bj-power3" class="bj-power-btn" data-power="3">
+                                <span class="bj-power-icon">⚖️</span>
+                                <span class="bj-power-name">Balança Divina</span>
+                                <span class="bj-power-desc">Troca última carta</span>
+                                <span class="bj-power-uses" id="bj-p3-uses">2×</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Round Result Banner -->
+                <div id="bj-round-result" class="bj-round-result" style="display:none">
+                    <div id="bj-round-result-text" class="bj-round-result-text"></div>
+                    <button id="btn-bj-next-round" class="bj-btn bj-btn-next">Próxima Rodada ▶</button>
+                </div>
+
+                <!-- Quit button -->
+                <button id="btn-bj-quit" class="bj-quit-btn">✕</button>
+
+                <!-- Damage flash overlay -->
+                <div id="bj-damage-flash" class="bj-damage-flash" style="display:none"></div>
+            </div>
+        </div>
+
+        <!-- Felifep Blackjack Tutorial Modal -->
+        <div id="bj-tutorial-modal" class="arm-tutorial-modal">
+            <div class="tutorial-content bj-tutorial-content">
+                <h2 class="bj-tutorial-title">⚖️ Confronto Final: Felifep</h2>
+                <p><strong>O Deus da Etiqueta e da Verdade</strong> aguarda você em uma partida épica de Blackjack!</p>
+                <div class="bj-tutorial-rules">
+                    <p>🃏 <strong>Regras do Blackjack:</strong> Chegue o mais perto de <strong>21</strong> sem ultrapassar. Quem ultrapassar perde a rodada.</p>
+                    <p>❤️ <strong>Sistema de Vida:</strong> Cada um tem <strong>100 HP</strong>. Quem vencer uma rodada causa <strong>25 de dano</strong> ao oponente. Blackjack natural (21 exato com 2 cartas) causa <strong>50 de dano!</strong></p>
+                    <p>⚖️ <strong>Modo Julgamento:</strong> Quando o HP do Felifep cair abaixo de 50%, ele fica mais inteligente!</p>
+                    <p>🔮 <strong>Poderes Divinos:</strong></p>
+                    <ul style="text-align:left; margin:0 0 8px 16px;">
+                        <li><strong>Olho da Verdade (1×):</strong> Revela a carta oculta do Felifep.</li>
+                        <li><strong>Decreto de Etiqueta (1×):</strong> Se você estourar 21, cancela o estouro removendo a última carta.</li>
+                        <li><strong>Balança Divina (2×):</strong> Troca sua última carta por uma nova do baralho.</li>
+                    </ul>
+                    <p>🏆 Derrote Felifep para <strong>ZERAR O JOGO!</strong></p>
+                </div>
+                <button id="btn-close-bj-tutorial" class="btn btn-sum" style="margin-top:16px;">⚔️ Iniciar Confronto Final!</button>
+            </div>
+        </div>
+
+        <!-- Win Screen (Final Victory) -->
+        <div id="bj-win-screen" class="bj-endgame-screen" style="display:none">
+            <div id="bj-fireworks" class="bj-fireworks"></div>
+            <div class="bj-endgame-content bj-win-content">
+                <div class="bj-win-trophy">🏆</div>
+                <h1 class="bj-win-title">ZEROU O JOGO!</h1>
+                <p class="bj-win-subtitle">Você derrotou Felifep, o Deus da Etiqueta e da Verdade!</p>
+                <p class="bj-win-flavor">A maldição do Bako foi quebrada. O GGOPA é seu!</p>
+                <button id="btn-bj-win-ok" class="bj-btn bj-btn-win">🎉 Fim Glorioso!</button>
+            </div>
+        </div>
+
+        <!-- Game Over Screen -->
+        <div id="bj-lose-screen" class="bj-endgame-screen bj-lose-screen" style="display:none">
+            <div class="bj-endgame-content bj-lose-content">
+                <div class="bj-lose-icon">💀</div>
+                <h1 class="bj-lose-title">GAME OVER</h1>
+                <p class="bj-lose-subtitle">Felifep julgou sua alma e a encontrou indigna.</p>
+                <p class="bj-lose-flavor">"Etiqueta, meu caro, é tudo."</p>
+                <button id="btn-bj-restart" class="bj-btn bj-btn-restart">🔄 Tentar Novamente</button>
+            </div>
+        </div>
+
         <!-- Jumpscare Overlay -->
         <div id="arm-jumpscare-overlay" class="arm-jumpscare-overlay">
             <img src="kleber_clown.jpg" alt="Kleber Jumpscare" class="jumpscare-portrait">
             <div class="jumpscare-glitch-text">M̶O̶R̶R̶A̶!̶!̶!̶</div>
         </div>
+
     </div>
     <script src="background.js"></script>
     <script src="index.js"></script>

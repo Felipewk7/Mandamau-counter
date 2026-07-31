@@ -1629,13 +1629,23 @@ function setupBossEncounterUI() {
         authorText.textContent = 'Sam';
         bubblePara.textContent = 'Eai porra, vc é bom em esmagar comida? Não? que pena vai ter que ser pra passar Hahahaha!!!';
     } else if (currentBossEncounter === 'claudio') {
-        portrait.src = "img/claudio.png";
-        portrait.alt = "Cláudio O Cubo Gey";
+        portrait.src = 'img/claudio.png';
+        portrait.alt = 'Cláudio O Cubo Gey';
         portrait.onerror = function() { this.src = 'kleber_clown.jpg'; };
-        nameText.textContent = "Cláudio";
-        titleText.textContent = "O Cubo Gey";
-        authorText.textContent = "Cláudio";
-        bubblePara.textContent = "Eu sou um cubo gey, me vença se for capaz!";
+        nameText.textContent = 'Cláudio';
+        titleText.textContent = 'O Cubo Gey';
+        authorText.textContent = 'Cláudio';
+        bubblePara.textContent = 'Eu sou um cubo gey, me vença se for capaz!';
+    } else if (currentBossEncounter === 'felifep') {
+
+        portrait.onerror = function() { if (!this.src.endsWith('kleber_clown.jpg')) this.src = 'kleber_clown.jpg'; };
+        portrait.src = '';
+        portrait.src = 'img/felifep.png';
+        portrait.alt = 'Felifep';
+        nameText.textContent  = 'Felifep';
+        titleText.textContent = 'O Deus da Etiqueta e da Verdade';
+        authorText.textContent= 'Felifep';
+        bubblePara.textContent= 'Você chegou até aqui? Impressionante. Prepare-se para o Julgamento Final!';
     }
 }
 
@@ -1681,12 +1691,17 @@ btnAcceptChallenge.addEventListener('click', () => {
         cleanupArmWrestlingEffects();
         closeGwenQuiz();
         closeSamGame();
-        
+
         claudioGeniusOverlay.classList.add('active');
         claudioTutorialModal.classList.add('active');
         isClaudioTutorialOpen = true;
         claudioGameActive = false;
         resetClaudioGame();
+    } else if (currentBossEncounter === 'felifep') {
+        cleanupArmWrestlingEffects();
+        closeGwenQuiz();
+        closeSamGame();
+        openBlackjack();
     }
 });
 
@@ -3365,19 +3380,18 @@ function debugCompletePhase(phase) {
     if (phase >= 2) localStorage.setItem('mandamau_journey_fase2_completed', 'true');
     if (phase >= 3) localStorage.setItem('mandamau_journey_fase3_completed', 'true');
     if (phase >= 4) localStorage.setItem('mandamau_journey_fase4_completed', 'true');
+    if (phase >= 5) localStorage.setItem('mandamau_journey_fase5_completed', 'true');
     playSound('rank_up_high');
-    // Refresh map state visually
     openJourney();
-    // Keep panel visible after reopen
     setTimeout(() => { debugPanel.style.display = 'block'; }, 50);
 }
 
-// Helper: reset from a phase onwards
 function debugResetPhase(fromPhase) {
     if (fromPhase <= 1) localStorage.removeItem('mandamau_journey_fase1_completed');
     if (fromPhase <= 2) localStorage.removeItem('mandamau_journey_fase2_completed');
     if (fromPhase <= 3) localStorage.removeItem('mandamau_journey_fase3_completed');
     if (fromPhase <= 4) localStorage.removeItem('mandamau_journey_fase4_completed');
+    if (fromPhase <= 5) localStorage.removeItem('mandamau_journey_fase5_completed');
     playSound('reset');
     openJourney();
     setTimeout(() => { debugPanel.style.display = 'block'; }, 50);
@@ -3387,17 +3401,20 @@ document.getElementById('dbg-complete-1').addEventListener('click', () => debugC
 document.getElementById('dbg-complete-2').addEventListener('click', () => debugCompletePhase(2));
 document.getElementById('dbg-complete-3').addEventListener('click', () => debugCompletePhase(3));
 document.getElementById('dbg-complete-4').addEventListener('click', () => debugCompletePhase(4));
+document.getElementById('dbg-complete-5').addEventListener('click', () => debugCompletePhase(5));
 
 document.getElementById('dbg-reset-1').addEventListener('click', () => debugResetPhase(1));
 document.getElementById('dbg-reset-2').addEventListener('click', () => debugResetPhase(2));
 document.getElementById('dbg-reset-3').addEventListener('click', () => debugResetPhase(3));
 document.getElementById('dbg-reset-4').addEventListener('click', () => debugResetPhase(4));
+document.getElementById('dbg-reset-5').addEventListener('click', () => debugResetPhase(5));
 
 document.getElementById('dbg-reset-all').addEventListener('click', () => {
     localStorage.removeItem('mandamau_journey_fase1_completed');
     localStorage.removeItem('mandamau_journey_fase2_completed');
     localStorage.removeItem('mandamau_journey_fase3_completed');
     localStorage.removeItem('mandamau_journey_fase4_completed');
+    localStorage.removeItem('mandamau_journey_fase5_completed');
     playSound('reset');
     openJourney();
     setTimeout(() => { debugPanel.style.display = 'block'; }, 50);
@@ -3756,3 +3773,547 @@ btnClaudioWinOk.addEventListener('click', () => {
 });
 
 
+
+// ================================================================
+// LEVEL 5 — FELIFEP BLACKJACK (BOSS FINAL)
+// ================================================================
+
+// ---- DOM References ----
+const blackjackOverlay    = document.getElementById('blackjack-overlay');
+const bjBossHpFill        = document.getElementById('bj-boss-hp-fill');
+const bjBossHpText        = document.getElementById('bj-boss-hp-text');
+const bjPlayerHpFill      = document.getElementById('bj-player-hp-fill');
+const bjPlayerHpText      = document.getElementById('bj-player-hp-text');
+const bjBossSpeech        = document.getElementById('bj-boss-speech');
+const bjBossCards         = document.getElementById('bj-boss-cards');
+const bjPlayerCards       = document.getElementById('bj-player-cards');
+const bjBossScore         = document.getElementById('bj-boss-score');
+const bjPlayerScore       = document.getElementById('bj-player-score');
+const bjRoundNum          = document.getElementById('bj-round-num');
+const bjJudgmentBadge     = document.getElementById('bj-judgment-badge');
+const bjRoundResult       = document.getElementById('bj-round-result');
+const bjRoundResultText   = document.getElementById('bj-round-result-text');
+const btnBjNextRound      = document.getElementById('btn-bj-next-round');
+const btnBjHit            = document.getElementById('btn-bj-hit');
+const btnBjStand          = document.getElementById('btn-bj-stand');
+const btnBjPower1         = document.getElementById('btn-bj-power1');
+const btnBjPower2         = document.getElementById('btn-bj-power2');
+const btnBjPower3         = document.getElementById('btn-bj-power3');
+const bjP1Uses            = document.getElementById('bj-p1-uses');
+const bjP2Uses            = document.getElementById('bj-p2-uses');
+const bjP3Uses            = document.getElementById('bj-p3-uses');
+const bjDamageFlash       = document.getElementById('bj-damage-flash');
+const bjWinScreen         = document.getElementById('bj-win-screen');
+const bjLoseScreen        = document.getElementById('bj-lose-screen');
+const bjFireworks         = document.getElementById('bj-fireworks');
+const btnBjWinOk          = document.getElementById('btn-bj-win-ok');
+const btnBjRestart        = document.getElementById('btn-bj-restart');
+const btnBjQuit           = document.getElementById('btn-bj-quit');
+const bjTutorialModal     = document.getElementById('bj-tutorial-modal');
+const btnCloseBjTutorial  = document.getElementById('btn-close-bj-tutorial');
+
+// ---- Game State ----
+let bjDeck         = [];
+let bjPlayerHand   = [];
+let bjBossHand     = [];
+let bjPlayerHP     = 100;
+let bjBossHP       = 100;
+let bjRound        = 0;
+let bjGameActive   = false;
+let bjPlayerTurn   = false;
+let bjTutorialOpen = false;
+let bjPower1Uses   = 1; // Olho da Verdade
+let bjPower2Uses   = 1; // Decreto de Etiqueta
+let bjPower3Uses   = 2; // Balanca Divina
+let bjBossCardRevealed = false;
+let bjDecreeUsed   = false; // Decreto used this game
+let bjBossHiddenIndex = 1; // index of boss hidden card in bjBossHand
+
+const BJ_MAX_HP      = 100;
+const BJ_DAMAGE_BASE = 25;
+const BJ_CRIT_DAMAGE = 50;
+
+// ---- Felifep Dialogue ----
+const bjSpeechIdle = [
+    "Sua falta de etiqueta me diverte. Compre uma carta!",
+    "A verdade e absoluta: 21!",
+    "Nao se preocupe... voce nao vai ganhar mesmo.",
+    "Interessante escolha. Mas inutil.",
+    "O Deus da Etiqueta nao perde."
+];
+const bjSpeechPlayerHit  = ["Ah, ganancia... classico.", "Mais uma carta? Que desesperado.", "Isso... se destrua sozinho."];
+const bjSpeechPlayerBust = ["KKKK ESTOUROU! Sem etiqueta, sem sorte!", "Ha! A verdade e crua: voce estourou!", "Previsto. Nao tem class nenhuma."];
+const bjSpeechBossWin    = ["A etiqueta triunfa, como sempre.", "Eu disse que ganharia. Jamais duvide.", "Previsivel... mas satisfatorio."];
+const bjSpeechPlayerWin  = ["Impossivel! Isso e... insulto!", "Voce teve sorte. SO sorte.", "Aprecie este momento. Nao vai durar."];
+const bjSpeechJudgment   = ["MODO JULGAMENTO ATIVADO. Agora ficou serio.", "Voce me subestimou. Erro fatal.", "O Julgamento comeca AGORA!"];
+const bjSpeechWin        = ["Derrotado... pelo proprio jogo da verdade.", "Voce... merece este titulo. Cuide-se.", "Incrivel. Genuinamente incrivel."];
+
+function bjSetSpeech(text) {
+    bjBossSpeech.style.opacity = '0';
+    setTimeout(() => { bjBossSpeech.textContent = text; bjBossSpeech.style.opacity = '1'; }, 200);
+}
+function bjRandSpeech(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+// ---- Deck ----
+function bjBuildDeck() {
+    const suits  = ['spades', 'hearts', 'diamonds', 'clubs'];
+    const values = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
+    const deck   = [];
+    for (const suit of suits)
+        for (const val of values)
+            deck.push({ suit, value: val });
+    // Use 2 decks for more cards
+    return [...deck, ...deck];
+}
+
+function bjShuffle(deck) {
+    for (let i = deck.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [deck[i], deck[j]] = [deck[j], deck[i]];
+    }
+    return deck;
+}
+
+function bjDraw() {
+    if (bjDeck.length < 5) bjDeck = bjShuffle(bjBuildDeck());
+    return bjDeck.pop();
+}
+
+// ---- Scoring ----
+function bjCardNum(val) {
+    if (['J','Q','K'].includes(val)) return 10;
+    if (val === 'A') return 11;
+    return parseInt(val);
+}
+
+function bjScore(hand) {
+    let total = 0, aces = 0;
+    for (const c of hand) {
+        if (c.value === 'A') { aces++; total += 11; }
+        else total += bjCardNum(c.value);
+    }
+    while (total > 21 && aces > 0) { total -= 10; aces--; }
+    return total;
+}
+
+// ---- Card Rendering ----
+function bjSuitChar(suit) {
+    return { spades:'♠', hearts:'♥', diamonds:'♦', clubs:'♣' }[suit];
+}
+function bjIsRed(suit) { return suit === 'hearts' || suit === 'diamonds'; }
+
+function bjRenderCard(card, hidden = false) {
+    const div = document.createElement('div');
+    div.className = 'bj-card' + (hidden ? ' bj-card-hidden' : '') + (bjIsRed(card.suit) && !hidden ? ' bj-card-red' : '');
+    if (!hidden) {
+        const sym = bjSuitChar(card.suit);
+        div.innerHTML = `<span class="bj-card-top">${card.value}${sym}</span><span class="bj-card-center">${sym}</span><span class="bj-card-bottom">${card.value}${sym}</span>`;
+    }
+    return div;
+}
+
+function bjRedrawBossCards(revealAll = false) {
+    bjBossCards.innerHTML = '';
+    for (let i = 0; i < bjBossHand.length; i++) {
+        const hidden = (i === bjBossHiddenIndex) && !revealAll && !bjBossCardRevealed;
+        bjBossCards.appendChild(bjRenderCard(bjBossHand[i], hidden));
+    }
+    if (revealAll || bjBossCardRevealed) {
+        bjBossScore.textContent = bjScore(bjBossHand);
+    } else {
+        bjBossScore.textContent = '?';
+    }
+}
+
+function bjRedrawPlayerCards() {
+    bjPlayerCards.innerHTML = '';
+    for (const c of bjPlayerHand) bjPlayerCards.appendChild(bjRenderCard(c, false));
+    bjPlayerScore.textContent = bjScore(bjPlayerHand);
+}
+
+// ---- HP Update ----
+function bjUpdateHP() {
+    const bPct = Math.max(0, (bjBossHP / BJ_MAX_HP) * 100);
+    const pPct = Math.max(0, (bjPlayerHP / BJ_MAX_HP) * 100);
+    bjBossHpFill.style.width   = bPct + '%';
+    bjBossHpText.textContent   = Math.max(0, bjBossHP);
+    bjPlayerHpFill.style.width = pPct + '%';
+    bjPlayerHpText.textContent = Math.max(0, bjPlayerHP);
+    // Judgment Mode
+    if (bjBossHP <= BJ_MAX_HP / 2 && !bjJudgmentBadge.classList.contains('active')) {
+        bjJudgmentBadge.classList.add('active');
+        bjSetSpeech(bjRandSpeech(bjSpeechJudgment));
+    }
+}
+
+// ---- Damage Flash ----
+function bjFlash(isBoss = false) {
+    bjDamageFlash.className = 'bj-damage-flash' + (isBoss ? ' boss-damage' : '');
+    bjDamageFlash.style.display = 'block';
+    bjDamageFlash.style.animation = 'none';
+    void bjDamageFlash.offsetWidth;
+    bjDamageFlash.style.animation = '';
+    setTimeout(() => { bjDamageFlash.style.display = 'none'; }, 450);
+}
+
+// ---- Buttons Enable/Disable ----
+function bjSetControls(enabled) {
+    btnBjHit.disabled   = !enabled;
+    btnBjStand.disabled = !enabled;
+    const p1Disabled = !enabled || bjPower1Uses <= 0;
+    const p2Disabled = !enabled || bjPower2Uses <= 0 || bjScore(bjPlayerHand) <= 21;
+    const p3Disabled = !enabled || bjPower3Uses <= 0 || bjPlayerHand.length < 1;
+    btnBjPower1.disabled = p1Disabled;
+    btnBjPower2.disabled = p2Disabled;
+    btnBjPower3.disabled = p3Disabled;
+}
+
+function bjUpdatePowerUI() {
+    bjP1Uses.textContent = bjPower1Uses + 'x';
+    bjP2Uses.textContent = bjPower2Uses + 'x';
+    bjP3Uses.textContent = bjPower3Uses + 'x';
+    btnBjPower1.disabled = bjPower1Uses <= 0;
+    btnBjPower2.disabled = bjPower2Uses <= 0;
+    btnBjPower3.disabled = bjPower3Uses <= 0 || bjPlayerHand.length < 1;
+}
+
+// ---- Deal Round ----
+function bjStartRound() {
+    bjRound++;
+    bjRoundNum.textContent = bjRound;
+    bjPlayerHand = [];
+    bjBossHand   = [];
+    bjBossCardRevealed = false;
+    bjBossHiddenIndex  = 1;
+    bjRoundResult.style.display = 'none';
+
+    // Deal 2 cards each
+    bjPlayerHand.push(bjDraw(), bjDraw());
+    bjBossHand.push(bjDraw(), bjDraw());
+
+    bjRedrawPlayerCards();
+    bjRedrawBossCards(false);
+    bjUpdateHP();
+    bjSetControls(true);
+    bjPlayerTurn = true;
+    bjSetSpeech(bjRandSpeech(bjSpeechIdle));
+
+    // Natural blackjack check
+    const pScore = bjScore(bjPlayerHand);
+    if (pScore === 21 && bjPlayerHand.length === 2) {
+        bjSetControls(false);
+        bjPlayerTurn = false;
+        setTimeout(() => bjResolveRound(true), 600);
+    }
+}
+
+// ---- Boss AI Turn ----
+function bjBossPlay() {
+    bjSetControls(false);
+    bjPlayerTurn = false;
+    bjRedrawBossCards(true); // reveal hidden
+
+    function drawNext() {
+        const bScore = bjScore(bjBossHand);
+        const threshold = bjBossHP <= BJ_MAX_HP / 2 ? 17 : 17; // Judgment: smarter draw
+        if (bScore >= threshold) {
+            // Stand
+            setTimeout(() => bjResolveRound(false), 800);
+            return;
+        }
+        // In Judgment Mode, pick a safe card if possible
+        let card;
+        if (bjBossHP <= BJ_MAX_HP / 2) {
+            // Peek top 5, prefer cards that wont bust
+            const preview = bjDeck.slice(-5);
+            const safeCards = preview.filter(c => {
+                let t = bScore + bjCardNum(c.value);
+                if (c.value === 'A' && t > 21) t -= 10;
+                return t <= 21;
+            });
+            if (safeCards.length > 0 && Math.random() < 0.8) {
+                card = safeCards[Math.floor(Math.random() * safeCards.length)];
+                // remove from deck
+                const idx = bjDeck.lastIndexOf(card);
+                if (idx !== -1) bjDeck.splice(idx, 1);
+            }
+        }
+        if (!card) card = bjDraw();
+        bjBossHand.push(card);
+        bjRedrawBossCards(true);
+        const newScore = bjScore(bjBossHand);
+        if (newScore > 21 || newScore >= threshold) {
+            setTimeout(() => bjResolveRound(false), 600);
+        } else {
+            setTimeout(drawNext, 700);
+        }
+    }
+    setTimeout(drawNext, 900);
+}
+
+// ---- Round Resolution ----
+function bjResolveRound(naturalBlackjack) {
+    bjRedrawBossCards(true);
+    const pScore = bjScore(bjPlayerHand);
+    const bScore = bjScore(bjBossHand);
+    let resultMsg = '';
+    let damage = BJ_DAMAGE_BASE;
+
+    if (naturalBlackjack && pScore === 21 && bjPlayerHand.length === 2) {
+        // Natural BJ
+        damage = BJ_CRIT_DAMAGE;
+        bjBossHP -= damage;
+        bjFlash(true);
+        resultMsg = `🃏 BLACKJACK NATURAL! Dano critico: -${damage} HP do Felifep!`;
+        bjSetSpeech(bjRandSpeech(bjSpeechPlayerWin));
+    } else if (pScore > 21) {
+        // Player bust
+        bjPlayerHP -= damage;
+        bjFlash(false);
+        resultMsg = `💥 Voce ESTOUROU (${pScore})! -${damage} HP`;
+        bjSetSpeech(bjRandSpeech(bjSpeechPlayerBust));
+    } else if (bScore > 21) {
+        // Boss bust
+        bjBossHP -= damage;
+        bjFlash(true);
+        resultMsg = `✨ Felifep ESTOUROU (${bScore})! -${damage} HP do Felifep!`;
+        bjSetSpeech(bjRandSpeech(bjSpeechPlayerWin));
+    } else if (pScore > bScore) {
+        bjBossHP -= damage;
+        bjFlash(true);
+        resultMsg = `⚔️ Voce venceu (${pScore} vs ${bScore})! -${damage} HP do Felifep!`;
+        bjSetSpeech(bjRandSpeech(bjSpeechPlayerWin));
+    } else if (bScore > pScore) {
+        bjPlayerHP -= damage;
+        bjFlash(false);
+        resultMsg = `💀 Felifep venceu (${bScore} vs ${pScore})! -${damage} HP seus!`;
+        bjSetSpeech(bjRandSpeech(bjSpeechBossWin));
+    } else {
+        resultMsg = `🤝 Empate (${pScore} vs ${bScore})! Sem dano.`;
+        bjSetSpeech("Um empate... aceito, mas com reservas.");
+    }
+
+    bjBossHP   = Math.max(0, bjBossHP);
+    bjPlayerHP = Math.max(0, bjPlayerHP);
+    bjUpdateHP();
+
+    bjRoundResultText.textContent = resultMsg;
+    bjRoundResult.style.display   = 'block';
+
+    // Check end game
+    if (bjBossHP <= 0) {
+        setTimeout(bjShowWin, 1200);
+        return;
+    }
+    if (bjPlayerHP <= 0) {
+        setTimeout(bjShowLose, 1200);
+        return;
+    }
+}
+
+// ---- Powers ----
+function bjActivatePowerAnim(btn) {
+    btn.classList.add('activating');
+    setTimeout(() => btn.classList.remove('activating'), 550);
+}
+
+// Power 1: Olho da Verdade
+btnBjPower1.addEventListener('click', () => {
+    if (!bjPlayerTurn || bjPower1Uses <= 0) return;
+    bjPower1Uses--;
+    bjBossCardRevealed = true;
+    bjActivatePowerAnim(btnBjPower1);
+    bjRedrawBossCards(false); // will auto-reveal because bjBossCardRevealed = true
+    bjSetSpeech("Voce ousou espionar minha mao? Insolencia!");
+    bjUpdatePowerUI();
+    playSound('rank_up_med');
+});
+
+// Power 2: Decreto de Etiqueta (cancels bust - activate after bust is detected via player clicking it)
+btnBjPower2.addEventListener('click', () => {
+    if (!bjPlayerTurn || bjPower2Uses <= 0) return;
+    const score = bjScore(bjPlayerHand);
+    if (score <= 21) {
+        bjSetSpeech("Este poder so cancela um estouro, senhor.");
+        return;
+    }
+    // Remove last card
+    bjPower2Uses--;
+    bjPlayerHand.pop();
+    bjActivatePowerAnim(btnBjPower2);
+    bjRedrawPlayerCards();
+    bjSetSpeech("O Decreto de Etiqueta... salvo desta vez.");
+    bjUpdatePowerUI();
+    playSound('rank_up_med');
+});
+
+// Power 3: Balanca Divina — swap last card
+btnBjPower3.addEventListener('click', () => {
+    if (!bjPlayerTurn || bjPower3Uses <= 0 || bjPlayerHand.length < 1) return;
+    bjPower3Uses--;
+    bjPlayerHand.pop();
+    bjPlayerHand.push(bjDraw());
+    bjActivatePowerAnim(btnBjPower3);
+    bjRedrawPlayerCards();
+    bjSetSpeech("A Balanca oscila... nova carta, nova chance.");
+    bjUpdatePowerUI();
+    playSound('rank_up_med');
+    // Check bust
+    if (bjScore(bjPlayerHand) > 21 && bjPower2Uses > 0) {
+        btnBjPower2.disabled = false;
+    }
+});
+
+// ---- Hit ----
+btnBjHit.addEventListener('click', () => {
+    if (!bjGameActive || !bjPlayerTurn) return;
+    const card = bjDraw();
+    bjPlayerHand.push(card);
+    bjRedrawPlayerCards();
+    bjSetSpeech(bjRandSpeech(bjSpeechPlayerHit));
+    const score = bjScore(bjPlayerHand);
+    // Enable decree button if busted
+    if (score > 21) {
+        btnBjPower2.disabled = bjPower2Uses <= 0;
+    }
+    bjUpdatePowerUI();
+    playSound('click');
+});
+
+// ---- Stand ----
+btnBjStand.addEventListener('click', () => {
+    if (!bjGameActive || !bjPlayerTurn) return;
+    bjPlayerTurn = false;
+    bjSetControls(false);
+    playSound('click');
+    // Check if player busted first
+    if (bjScore(bjPlayerHand) > 21) {
+        setTimeout(() => bjResolveRound(false), 300);
+        return;
+    }
+    bjBossPlay();
+});
+
+// ---- Next Round ----
+btnBjNextRound.addEventListener('click', () => {
+    bjRoundResult.style.display = 'none';
+    bjStartRound();
+    playSound('click');
+});
+
+// ---- Win / Lose Screens ----
+function bjShowWin() {
+    bjGameActive = false;
+    bjSetSpeech(bjRandSpeech(bjSpeechWin));
+    bjRoundResult.style.display = 'none';
+    bjWinScreen.classList.add('active');
+    bjSpawnFireworks();
+}
+
+function bjShowLose() {
+    bjGameActive = false;
+    bjRoundResult.style.display = 'none';
+    bjLoseScreen.classList.add('active');
+}
+
+function bjSpawnFireworks() {
+    const colors = ['#f8d862','#c084fc','#22c55e','#f97316','#ec4899','#06b6d4','#ef4444'];
+    for (let burst = 0; burst < 12; burst++) {
+        const cx = Math.random() * 100;
+        const cy = Math.random() * 60;
+        setTimeout(() => {
+            for (let i = 0; i < 12; i++) {
+                const spark = document.createElement('div');
+                spark.className = 'bj-fw-spark';
+                const angle = (i / 12) * 360;
+                const dist  = 40 + Math.random() * 60;
+                const tx    = Math.cos(angle * Math.PI / 180) * dist + 'px';
+                const ty    = Math.sin(angle * Math.PI / 180) * dist + 'px';
+                spark.style.cssText = `left:${cx}%;top:${cy}%;background:${colors[i % colors.length]};--tx:${tx};--ty:${ty};--delay:${Math.random() * 0.3}s`;
+                bjFireworks.appendChild(spark);
+                setTimeout(() => spark.remove(), 1200);
+            }
+        }, burst * 200);
+    }
+}
+
+btnBjWinOk.addEventListener('click', () => {
+    bjWinScreen.classList.remove('active');
+    blackjackOverlay.classList.remove('active');
+    bjFireworks.innerHTML = '';
+    playSound('rank_up_high');
+    localStorage.setItem('mandamau_journey_fase5_completed', 'true');
+    openJourney();
+});
+
+btnBjRestart.addEventListener('click', () => {
+    bjLoseScreen.classList.remove('active');
+    playSound('click');
+    bjInitGame();
+});
+
+btnBjQuit.addEventListener('click', () => {
+    bjGameActive = false;
+    blackjackOverlay.classList.remove('active');
+    bjWinScreen.classList.remove('active');
+    bjLoseScreen.classList.remove('active');
+    bjTutorialModal.classList.remove('active');
+    bjRoundResult.style.display = 'none';
+    bjFireworks.innerHTML = '';
+    playSound('click');
+});
+
+// ---- Tutorial ----
+btnCloseBjTutorial.addEventListener('click', () => {
+    bjTutorialModal.classList.remove('active');
+    bjTutorialOpen = false;
+    playSound('click');
+    bjStartRound();
+});
+
+// ---- Init ----
+function bjInitGame() {
+    bjDeck      = bjShuffle(bjBuildDeck());
+    bjPlayerHP  = BJ_MAX_HP;
+    bjBossHP    = BJ_MAX_HP;
+    bjRound     = 0;
+    bjPower1Uses= 1;
+    bjPower2Uses= 1;
+    bjPower3Uses= 2;
+    bjGameActive = true;
+    bjPlayerTurn = false;
+    bjJudgmentBadge.classList.remove('active');
+    bjUpdateHP();
+    bjUpdatePowerUI();
+    bjBossCards.innerHTML   = '';
+    bjPlayerCards.innerHTML = '';
+    bjBossScore.textContent   = '?';
+    bjPlayerScore.textContent = '0';
+    bjRoundResult.style.display = 'none';
+    bjSetSpeech("Sua falta de etiqueta me diverte. Compre uma carta!");
+    bjSetControls(false);
+}
+
+function openBlackjack() {
+    blackjackOverlay.classList.add('active');
+    bjInitGame();
+    bjTutorialOpen = true;
+    bjTutorialModal.classList.add('active');
+}
+
+// ---- Journey map: GGOPA node click ----
+document.getElementById('node-ggopa').addEventListener('click', () => {
+    const fase4Done = localStorage.getItem('mandamau_journey_fase4_completed') === 'true';
+    if (fase4Done) {
+        playSound('click');
+        journeyPlayerToken.style.left = '90%';
+        journeyPlayerToken.style.top  = '20%';
+        setTimeout(() => {
+            currentBossEncounter = 'felifep';
+            setupBossEncounterUI();
+            journeyEncounterOverlay.classList.add('active');
+        }, 1000);
+    }
+});
+
+// (felifep case handled in setupBossEncounterUI and btnAcceptChallenge above)
