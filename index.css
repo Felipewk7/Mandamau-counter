@@ -4118,3 +4118,63 @@ body::before {
     border-color: rgba(255,255,255,0.35);
     color: rgba(255,255,255,0.7);
 }
+
+/* ================================================================
+   KLEBER PCD OFFER MODAL
+   ================================================================ */
+.kleber-pcd-card {
+    max-width: 420px;
+    padding: 0;
+    overflow: hidden;
+    background: rgba(10, 10, 18, 0.98);
+    border: 1px solid rgba(239,68,68,0.3);
+    box-shadow: 0 0 40px rgba(239,68,68,0.15);
+}
+
+.kleber-pcd-portrait-wrap {
+    width: 100%;
+    height: 140px;
+    overflow: hidden;
+    position: relative;
+    background: #0a0010;
+}
+
+.kleber-pcd-portrait {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center top;
+    filter: saturate(0.6) brightness(0.75);
+    mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 60%, rgba(0,0,0,0));
+    -webkit-mask-image: linear-gradient(to bottom, rgba(0,0,0,1) 60%, rgba(0,0,0,0));
+}
+
+.kleber-pcd-bubble {
+    padding: 20px 24px 4px;
+}
+
+.kleber-pcd-speaker {
+    font-size: 0.65rem;
+    font-weight: 900;
+    color: #ef4444;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    display: block;
+    margin-bottom: 8px;
+}
+
+.kleber-pcd-text {
+    font-size: 0.95rem;
+    color: #cbd5e1;
+    line-height: 1.65;
+    margin: 0;
+}
+
+.kleber-pcd-text strong { color: #f87171; }
+.kleber-pcd-text em    { color: #94a3b8; font-style: italic; }
+
+.kleber-pcd-actions {
+    display: flex;
+    gap: 10px;
+    padding: 20px 24px 16px;
+}

@@ -2037,6 +2037,8 @@ const armTargetZone = document.querySelector('.arm-target-zone');
 let armWrestlingState = 0;
 let armWrestlingInterval = null;
 let isArmGameActive = false;
+let kleberPCDMode = false;          // true when player accepted PCD easy mode
+let kleberLossStreak = parseInt(localStorage.getItem('kleber_loss_streak') || '0');
 let isTutorialOpen = false;
 let isUpsideDown = false;
 let hasJumpscareTriggered = false;
@@ -2110,14 +2112,14 @@ function getArmSVG(state) {
 }
 
 function randomizeTargetZone() {
-    // Randomize width between 12% and 18% (slightly more generous)
-    const targetWidth = Math.floor(Math.random() * 7) + 12;
-    // Randomize left keeping it within bounds
-    const maxLeft = 98 - targetWidth;
-    const targetLeft = Math.floor(Math.random() * (maxLeft - 5)) + 5;
-    
-    armTargetZone.style.width = `${targetWidth}%`;
-    armTargetZone.style.left = `${targetLeft}%`;
+    // In PCD mode, target zone is 12% wider
+    const baseWidth = kleberPCDMode
+        ? Math.random() * 10 + 28   // 28–38% wide
+        : Math.random() * 10 + 16;  // 16–26% wide
+    const maxLeft = 96 - baseWidth;
+    const left = Math.random() * maxLeft + 2;
+    armTargetZone.style.left  = `${left}%`;
+    armTargetZone.style.width = `${baseWidth}%`;
 }
 
 function randomizeButtonPosition() {
@@ -2320,14 +2322,14 @@ function startArmWrestlingGame() {
     
     armWrestlingInterval = setInterval(() => {
         if (isArmGameActive && !isTutorialOpen) {
-            armWrestlingState -= 1; // Kleber pulls back
+            armWrestlingState -= 1; // Kleber puxa
             updateArmWrestlingUI();
-            
+
             if (armWrestlingState <= -10) {
                 endArmWrestlingGame(false);
             }
         }
-    }, 1000);
+    }, kleberPCDMode ? 2000 : 1000); // PCD mode: Kleber puxa mais devagar
     
     if (armAnimationId) cancelAnimationFrame(armAnimationId);
     armAnimationId = requestAnimationFrame(animatePointer);
@@ -2362,7 +2364,11 @@ function endArmWrestlingGame(isVictory) {
     
     if (isVictory) {
         playSound('rank_up');
-        alert("VITÓRIA! Você derrotou Kleber em uma intensa queda de braço! O caminho da sua jornada avança!");
+        // Reset loss streak on win
+        kleberLossStreak = 0;
+        kleberPCDMode = false;
+        localStorage.setItem('kleber_loss_streak', '0');
+        alert('VITÓRIA! Você derrotou Kleber em uma intensa queda de braço! O caminho da sua jornada avança!');
         
         localStorage.setItem('mandamau_journey_fase1_completed', 'true');
         
@@ -2394,11 +2400,52 @@ function endArmWrestlingGame(isVictory) {
         }, 800);
         
     } else {
-        playSound('reset');
-        alert("DERROTA! Kleber usou a força dos seus mil dentes e te derrotou. O jogo reiniciou, continue tentando!");
-        startArmWrestlingGame();
+        // ---- DERROTA ----
+        kleberLossStreak++;
+        localStorage.setItem('kleber_loss_streak', kleberLossStreak);
+
+        if (kleberLossStreak >= 25 && !kleberPCDMode) {
+            // Mostra proposta PCD
+            showKleberPCDOffer();
+        } else {
+            playSound('reset');
+            startArmWrestlingGame();
+        }
     }
 }
+
+// ---- PCD Offer Modal ----
+function showKleberPCDOffer() {
+    isArmGameActive = false;
+    const modal = document.getElementById('kleber-pcd-modal');
+    if (modal) modal.classList.add('active');
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const btnAcceptPCD = document.getElementById('btn-kleber-pcd-accept');
+    const btnDeclinePCD = document.getElementById('btn-kleber-pcd-decline');
+    const pcdModal = document.getElementById('kleber-pcd-modal');
+
+    if (btnAcceptPCD) {
+        btnAcceptPCD.addEventListener('click', () => {
+            kleberPCDMode = true;
+            kleberLossStreak = 0;
+            localStorage.setItem('kleber_loss_streak', '0');
+            pcdModal.classList.remove('active');
+            playSound('rank_up_med');
+            startArmWrestlingGame();
+        });
+    }
+    if (btnDeclinePCD) {
+        btnDeclinePCD.addEventListener('click', () => {
+            kleberLossStreak = 0;
+            localStorage.setItem('kleber_loss_streak', '0');
+            pcdModal.classList.remove('active');
+            playSound('click');
+            startArmWrestlingGame();
+        });
+    }
+});
 
 // Event Listeners for Arm Wrestling minigame
 btnArmAction.addEventListener('click', () => {
