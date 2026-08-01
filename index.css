@@ -4860,4 +4860,129 @@ body::before {
     cursor: not-allowed;
 }
 
+/* Cosmetic Unlock Victory Modal */
+.cosmetic-unlock-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(5, 5, 12, 0.92);
+    backdrop-filter: blur(12px);
+    z-index: 100001;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    animation: fadeInModal 0.3s ease;
+}
+
+.cosmetic-unlock-modal.active {
+    display: flex;
+}
+
+.cosmetic-unlock-card {
+    width: 100%;
+    max-width: 420px;
+    background: #0d0d18;
+    border: 2px solid #f59e0b;
+    border-radius: 20px;
+    padding: 24px;
+    box-shadow: 0 20px 60px rgba(245, 158, 11, 0.35), 0 0 40px rgba(0, 0, 0, 0.9);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.cosmetic-unlock-badge {
+    font-size: 0.75rem;
+    font-weight: 900;
+    color: #f59e0b;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    background: rgba(245, 158, 11, 0.15);
+    border: 1px solid rgba(245, 158, 11, 0.4);
+    padding: 6px 16px;
+    border-radius: 20px;
+    margin-bottom: 16px;
+}
+
+.cosmetic-unlock-img-wrap {
+    width: 170px;
+    height: 200px;
+    border: 3px solid #f59e0b;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 16px;
+    box-shadow: 0 10px 25px rgba(0,0,0,0.8), 0 0 20px rgba(245,158,11,0.4);
+    background: #000;
+}
+
+.cosmetic-unlock-img-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.cosmetic-unlock-name {
+    font-size: 1.3rem;
+    font-weight: 800;
+    color: #ffffff;
+    margin: 0 0 6px 0;
+}
+
+.cosmetic-unlock-desc {
+    font-size: 0.82rem;
+    color: #94a3b8;
+    margin: 0 0 20px 0;
+    line-height: 1.45;
+}
+
+.cosmetic-unlock-actions {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+}
+
+.btn-cosmetic-unlock-close {
+    flex: 1;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    color: #cbd5e1;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    padding: 10px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.btn-cosmetic-unlock-close:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: #ffffff;
+}
+
+.btn-cosmetic-unlock-open-menu {
+    flex: 2;
+    background: linear-gradient(135deg, #f59e0b, #ec4899);
+    border: none;
+    color: #ffffff;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 800;
+    padding: 10px;
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
+    transition: all 0.2s ease;
+}
+
+.btn-cosmetic-unlock-open-menu:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(245, 158, 11, 0.6);
+}
+
+
 

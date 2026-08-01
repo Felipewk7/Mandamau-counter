@@ -295,6 +295,25 @@ function getUnlockedCosmetics() {
     }
 }
 
+function showCosmeticUnlockModal(cosmetic) {
+    const modal = document.getElementById('cosmetic-unlock-modal');
+    const img = document.getElementById('cosmetic-unlock-img');
+    const name = document.getElementById('cosmetic-unlock-name');
+    const desc = document.getElementById('cosmetic-unlock-desc');
+    
+    if (!modal) return;
+    
+    if (img) {
+        img.src = cosmetic.img;
+        delete img.dataset.fallbackTried;
+    }
+    if (name) name.textContent = cosmetic.name;
+    if (desc) desc.textContent = `Você venceu ${cosmetic.bossName} e desbloqueou o ${cosmetic.name}! Acesse o menu "Decoração" para posicioná-lo no fundo do site.`;
+    
+    try { playSound('rank_up_god'); } catch(e) {}
+    modal.classList.add('active');
+}
+
 function unlockCosmetic(bossId) {
     const cosmetic = BOSS_COSMETICS.find(c => c.bossId === bossId);
     if (!cosmetic) return;
@@ -312,7 +331,13 @@ function unlockCosmetic(bossId) {
     });
     
     renderDecorationsModal();
+    
+    // Mostra popup comemorativo do novo quadro desbloqueado
+    setTimeout(() => {
+        showCosmeticUnlockModal(cosmetic);
+    }, 600);
 }
+
 
 function getPlacedDecorations() {
     try {
@@ -538,9 +563,29 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
+    const modalUnlock = document.getElementById('cosmetic-unlock-modal');
+    const btnUnlockClose = document.getElementById('btn-cosmetic-unlock-close');
+    const btnUnlockOpenMenu = document.getElementById('btn-cosmetic-unlock-open-menu');
+
+    if (btnUnlockClose && modalUnlock) {
+        btnUnlockClose.addEventListener('click', () => {
+            modalUnlock.classList.remove('active');
+            playSound('click');
+        });
+    }
+    if (btnUnlockOpenMenu && modalUnlock && modalDec) {
+        btnUnlockOpenMenu.addEventListener('click', () => {
+            modalUnlock.classList.remove('active');
+            renderDecorationsModal();
+            modalDec.classList.add('active');
+            playSound('click');
+        });
+    }
+    
     // Initial render of placed background decorations
     renderPlacedDecorations();
 });
+
 // ================================================================
 
 // DMC Ranks Configuration
