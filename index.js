@@ -2259,6 +2259,7 @@ let armWrestlingInterval = null;
 let isArmGameActive = false;
 let kleberPCDMode = false;          // true when player accepted PCD easy mode
 let kleberLossStreak = parseInt(localStorage.getItem('kleber_loss_streak') || '0');
+let kleberMatchTimer = null;        // 2-minute in-match timer for PCD offer
 let isTutorialOpen = false;
 let isUpsideDown = false;
 let hasJumpscareTriggered = false;
@@ -2539,6 +2540,16 @@ function startArmWrestlingGame() {
     updateArmWrestlingUI();
     
     if (armWrestlingInterval) clearInterval(armWrestlingInterval);
+    if (kleberMatchTimer) clearTimeout(kleberMatchTimer);
+    
+    // Timer de 2 minutos (120000ms): se o jogador ficar vivo 2min na mesma partida sem passar, a proposta PCD aparece no meio da partida
+    if (!kleberPCDMode) {
+        kleberMatchTimer = setTimeout(() => {
+            if (isArmGameActive && !isTutorialOpen && !kleberPCDMode) {
+                showKleberPCDOffer();
+            }
+        }, 120000);
+    }
     
     armWrestlingInterval = setInterval(() => {
         if (isArmGameActive && !isTutorialOpen) {
@@ -2561,6 +2572,10 @@ function cleanupArmWrestlingEffects() {
     if (armAnimationId) {
         cancelAnimationFrame(armAnimationId);
         armAnimationId = null;
+    }
+    if (kleberMatchTimer) {
+        clearTimeout(kleberMatchTimer);
+        kleberMatchTimer = null;
     }
     fadeOutTheme();
     armWrestlingCard.classList.remove('arm-shake');
@@ -2625,8 +2640,8 @@ function endArmWrestlingGame(isVictory) {
         kleberLossStreak++;
         localStorage.setItem('kleber_loss_streak', kleberLossStreak);
 
-        if (kleberLossStreak >= 25 && !kleberPCDMode) {
-            // Mostra proposta PCD
+        if (kleberLossStreak >= 15 && !kleberPCDMode) {
+            // Mostra proposta PCD (após 15 derrotas seguidas)
             showKleberPCDOffer();
         } else {
             playSound('reset');
@@ -2638,6 +2653,15 @@ function endArmWrestlingGame(isVictory) {
 // ---- PCD Offer Modal ----
 function showKleberPCDOffer() {
     isArmGameActive = false;
+    if (armWrestlingInterval) clearInterval(armWrestlingInterval);
+    if (armAnimationId) {
+        cancelAnimationFrame(armAnimationId);
+        armAnimationId = null;
+    }
+    if (kleberMatchTimer) {
+        clearTimeout(kleberMatchTimer);
+        kleberMatchTimer = null;
+    }
     const modal = document.getElementById('kleber-pcd-modal');
     if (modal) modal.classList.add('active');
 }
