@@ -335,17 +335,27 @@ function togglePlacedDecoration(cosmeticId) {
         // Remover do fundo
         placed.splice(existingIndex, 1);
     } else {
-        // Colocar no fundo em posição default
+        // Colocar no fundo em posições estrategicas nas laterais (sem cobrir o contador central)
+        const winW = window.innerWidth;
+        const cardW = 440;
+        const frameW = 180;
+        
+        const leftX1 = Math.max(15, Math.floor((winW / 2) - (cardW / 2) - frameW - 25));
+        const leftX2 = Math.max(15, Math.floor((winW / 2) - (cardW / 2) - frameW - 55));
+        const rightX1 = Math.min(winW - frameW - 15, Math.floor((winW / 2) + (cardW / 2) + 25));
+        const rightX2 = Math.min(winW - frameW - 15, Math.floor((winW / 2) + (cardW / 2) + 55));
+
         const defaultPositions = [
-            { x: 30, y: 120 },
-            { x: window.innerWidth - 210, y: 120 },
-            { x: 30, y: 380 },
-            { x: window.innerWidth - 210, y: 380 },
-            { x: Math.floor(window.innerWidth / 2) - 80, y: 60 }
+            { x: leftX1, y: 110 },
+            { x: rightX1, y: 110 },
+            { x: leftX2 > 0 ? leftX2 : 20, y: 360 },
+            { x: rightX2, y: 360 },
+            { x: Math.max(15, leftX1 - 15), y: 230 }
         ];
         const pos = defaultPositions[placed.length % defaultPositions.length];
         placed.push({ id: cosmeticId, x: Math.max(10, pos.x), y: Math.max(10, pos.y) });
     }
+
     
     savePlacedDecorations(placed);
     renderPlacedDecorations();
