@@ -227,7 +227,7 @@ const BOSS_COSMETICS = [
         bossName: 'Kleber (Fase 1)',
         name: 'Quadro do Kleber',
         title: 'O Palhaço dos Mil Dentes',
-        img: 'img/cosmetic_kleber.jpg',
+        img: 'img/cosmetic_kleber.png',
         desc: 'Quadro barroco exclusivo conquistado ao derrotar Kleber na Queda de Braço.'
     },
     {
@@ -236,7 +236,7 @@ const BOSS_COSMETICS = [
         bossName: 'Gwen (Fase 2)',
         name: 'Quadro da Gwen',
         title: 'A Mestre dos Músculos e Cálculos',
-        img: 'img/cosmetic_gwen.jpg',
+        img: 'img/cosmetic_gwen.png',
         desc: 'Quadro místico exclusivo conquistado ao vencer Gwen no Quiz.'
     },
     {
@@ -245,7 +245,7 @@ const BOSS_COSMETICS = [
         bossName: 'Sam (Fase 3)',
         name: 'Quadro do Sam',
         title: 'O Gordão do Esmaga',
-        img: 'img/cosmetic_sam.jpg',
+        img: 'img/cosmetic_sam.png',
         desc: 'Quadro retro cyber conquistado ao derrotar Sam no Esmaga Teclas.'
     },
     {
@@ -254,7 +254,7 @@ const BOSS_COSMETICS = [
         bossName: 'Cláudio (Fase 4)',
         name: 'Quadro do Cláudio',
         title: 'O Cubo Gey da Memória',
-        img: 'img/cosmetic_claudio.jpg',
+        img: 'img/cosmetic_claudio.png',
         desc: 'Quadro neon futurista conquistado ao derrotar Cláudio no Genius.'
     },
     {
@@ -263,10 +263,21 @@ const BOSS_COSMETICS = [
         name: 'Quadro do Felifep',
         bossName: 'Felifep (Fase 5)',
         title: 'Deus da Etiqueta e da Verdade',
-        img: 'img/cosmetic_felifep.jpg',
+        img: 'img/cosmetic_felifep.png',
         desc: 'Quadro majestoso divino conquistado ao derrotar Felifep no Blackjack.'
     }
 ];
+
+function handleCosmeticImgError(imgEl) {
+    if (!imgEl || imgEl.dataset.fallbackTried) return;
+    imgEl.dataset.fallbackTried = "true";
+    const src = imgEl.src;
+    if (src.endsWith('.jpg')) {
+        imgEl.src = src.replace(/\.jpg$/, '.png');
+    } else if (src.endsWith('.png')) {
+        imgEl.src = src.replace(/\.png$/, '.jpg');
+    }
+}
 
 function getUnlockedCosmetics() {
     try {
@@ -363,7 +374,7 @@ function renderPlacedDecorations() {
                 <span class="placed-frame-drag-label">🖐️ ${cosmetic.name}</span>
                 <button class="btn-remove-placed-frame" title="Remover" data-id="${cosmetic.id}">&times;</button>
             </div>
-            <img src="${cosmetic.img}" alt="${cosmetic.name}" class="placed-frame-img">
+            <img src="${cosmetic.img}" alt="${cosmetic.name}" class="placed-frame-img" onerror="handleCosmeticImgError(this)">
             <div class="placed-frame-caption">${cosmetic.title}</div>
         `;
         
@@ -467,7 +478,7 @@ function renderDecorationsModal() {
         return `
             <div class="decoration-item-card ${isUnlocked ? 'unlocked' : 'locked'}">
                 <div class="decoration-item-preview-wrap">
-                    <img src="${cosmetic.img}" alt="${cosmetic.name}" class="decoration-item-img">
+                    <img src="${cosmetic.img}" alt="${cosmetic.name}" class="decoration-item-img" onerror="handleCosmeticImgError(this)">
                 </div>
                 <div class="decoration-item-body">
                     <span class="decoration-item-boss">${cosmetic.bossName}</span>

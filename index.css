@@ -4573,8 +4573,9 @@ body::before {
 .bg-placed-frame {
     pointer-events: auto;
     position: absolute;
-    width: 165px;
-    height: 215px;
+    width: 180px;
+    max-width: 220px;
+    height: auto;
     background: #0d0d16;
     border: 4px solid #f59e0b;
     border-radius: 12px;
@@ -4637,10 +4638,13 @@ body::before {
 
 .placed-frame-img {
     width: 100%;
-    height: 145px;
-    object-fit: cover;
+    height: auto;
+    max-height: 260px;
+    object-fit: contain;
+    background: #080810;
     display: block;
 }
+
 
 .placed-frame-caption {
     padding: 4px 6px;
