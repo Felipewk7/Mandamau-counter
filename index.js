@@ -216,6 +216,312 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 // ================================================================
 
+
+// ================================================================
+// COSMETICS & DECORATION SYSTEM (QUADROS DOS BOSSES)
+// ================================================================
+const BOSS_COSMETICS = [
+    {
+        id: 'frame_kleber',
+        bossId: 'kleber',
+        bossName: 'Kleber (Fase 1)',
+        name: 'Quadro do Kleber',
+        title: 'O Palhaço dos Mil Dentes',
+        img: 'img/cosmetic_kleber.jpg',
+        desc: 'Quadro barroco exclusivo conquistado ao derrotar Kleber na Queda de Braço.'
+    },
+    {
+        id: 'frame_gwen',
+        bossId: 'gwen',
+        bossName: 'Gwen (Fase 2)',
+        name: 'Quadro da Gwen',
+        title: 'A Mestre dos Músculos e Cálculos',
+        img: 'img/cosmetic_gwen.jpg',
+        desc: 'Quadro místico exclusivo conquistado ao vencer Gwen no Quiz.'
+    },
+    {
+        id: 'frame_sam',
+        bossId: 'sam',
+        bossName: 'Sam (Fase 3)',
+        name: 'Quadro do Sam',
+        title: 'O Gordão do Esmaga',
+        img: 'img/cosmetic_sam.jpg',
+        desc: 'Quadro retro cyber conquistado ao derrotar Sam no Esmaga Teclas.'
+    },
+    {
+        id: 'frame_claudio',
+        bossId: 'claudio',
+        bossName: 'Cláudio (Fase 4)',
+        name: 'Quadro do Cláudio',
+        title: 'O Cubo Gey da Memória',
+        img: 'img/cosmetic_claudio.jpg',
+        desc: 'Quadro neon futurista conquistado ao derrotar Cláudio no Genius.'
+    },
+    {
+        id: 'frame_felifep',
+        bossId: 'felifep',
+        name: 'Quadro do Felifep',
+        bossName: 'Felifep (Fase 5)',
+        title: 'Deus da Etiqueta e da Verdade',
+        img: 'img/cosmetic_felifep.jpg',
+        desc: 'Quadro majestoso divino conquistado ao derrotar Felifep no Blackjack.'
+    }
+];
+
+function getUnlockedCosmetics() {
+    try {
+        const data = localStorage.getItem('mandamau_cosmetics');
+        let unlocked = data ? JSON.parse(data) : [];
+        // Auto unlock based on completed journey phases
+        if (localStorage.getItem('mandamau_journey_fase1_completed') === 'true' && !unlocked.includes('frame_kleber')) unlocked.push('frame_kleber');
+        if (localStorage.getItem('mandamau_journey_fase2_completed') === 'true' && !unlocked.includes('frame_gwen')) unlocked.push('frame_gwen');
+        if (localStorage.getItem('mandamau_journey_fase3_completed') === 'true' && !unlocked.includes('frame_sam')) unlocked.push('frame_sam');
+        if (localStorage.getItem('mandamau_journey_fase4_completed') === 'true' && !unlocked.includes('frame_claudio')) unlocked.push('frame_claudio');
+        if (localStorage.getItem('mandamau_journey_fase5_completed') === 'true' && !unlocked.includes('frame_felifep')) unlocked.push('frame_felifep');
+        return unlocked;
+    } catch(e) {
+        return [];
+    }
+}
+
+function unlockCosmetic(bossId) {
+    const cosmetic = BOSS_COSMETICS.find(c => c.bossId === bossId);
+    if (!cosmetic) return;
+    
+    const unlocked = getUnlockedCosmetics();
+    if (unlocked.includes(cosmetic.id)) return; // Já desbloqueado
+    
+    unlocked.push(cosmetic.id);
+    localStorage.setItem('mandamau_cosmetics', JSON.stringify(unlocked));
+    
+    showAchievementToast({
+        icon: '🖼️',
+        title: 'NOVO QUADRO ADQUIRIDO!',
+        desc: cosmetic.name + ' foi adicionado à sua Galeria de Decoração!'
+    });
+    
+    renderDecorationsModal();
+}
+
+function getPlacedDecorations() {
+    try {
+        const data = localStorage.getItem('mandamau_placed_decorations');
+        return data ? JSON.parse(data) : [];
+    } catch(e) {
+        return [];
+    }
+}
+
+function savePlacedDecorations(placedArray) {
+    localStorage.setItem('mandamau_placed_decorations', JSON.stringify(placedArray));
+}
+
+function togglePlacedDecoration(cosmeticId) {
+    let placed = getPlacedDecorations();
+    const existingIndex = placed.findIndex(p => p.id === cosmeticId);
+    
+    if (existingIndex >= 0) {
+        // Remover do fundo
+        placed.splice(existingIndex, 1);
+    } else {
+        // Colocar no fundo em posição default
+        const defaultPositions = [
+            { x: 30, y: 120 },
+            { x: window.innerWidth - 210, y: 120 },
+            { x: 30, y: 380 },
+            { x: window.innerWidth - 210, y: 380 },
+            { x: Math.floor(window.innerWidth / 2) - 80, y: 60 }
+        ];
+        const pos = defaultPositions[placed.length % defaultPositions.length];
+        placed.push({ id: cosmeticId, x: Math.max(10, pos.x), y: Math.max(10, pos.y) });
+    }
+    
+    savePlacedDecorations(placed);
+    renderPlacedDecorations();
+    renderDecorationsModal();
+}
+
+function renderPlacedDecorations() {
+    const layer = document.getElementById('bg-decorations-layer');
+    if (!layer) return;
+    
+    const placed = getPlacedDecorations();
+    layer.innerHTML = '';
+    
+    placed.forEach(pItem => {
+        const cosmetic = BOSS_COSMETICS.find(c => c.id === pItem.id);
+        if (!cosmetic) return;
+        
+        const frameEl = document.createElement('div');
+        frameEl.className = 'bg-placed-frame';
+        frameEl.id = 'placed-' + cosmetic.id;
+        frameEl.style.left = pItem.x + 'px';
+        frameEl.style.top = pItem.y + 'px';
+        
+        frameEl.innerHTML = `
+            <div class="placed-frame-bar">
+                <span class="placed-frame-drag-label">🖐️ ${cosmetic.name}</span>
+                <button class="btn-remove-placed-frame" title="Remover" data-id="${cosmetic.id}">&times;</button>
+            </div>
+            <img src="${cosmetic.img}" alt="${cosmetic.name}" class="placed-frame-img">
+            <div class="placed-frame-caption">${cosmetic.title}</div>
+        `;
+        
+        // Remove button event
+        const removeBtn = frameEl.querySelector('.btn-remove-placed-frame');
+        removeBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            togglePlacedDecoration(cosmetic.id);
+            playSound('click');
+        });
+        
+        // Make Draggable
+        makeFrameDraggable(frameEl, cosmetic.id);
+        
+        layer.appendChild(frameEl);
+    });
+}
+
+function makeFrameDraggable(element, cosmeticId) {
+    let isDragging = false;
+    let startX, startY, initialLeft, initialTop;
+    
+    const onStart = (e) => {
+        if (e.target.classList.contains('btn-remove-placed-frame')) return;
+        isDragging = true;
+        element.classList.add('dragging');
+        
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        
+        startX = clientX;
+        startY = clientY;
+        initialLeft = element.offsetLeft;
+        initialTop = element.offsetTop;
+        
+        document.addEventListener('mousemove', onMove);
+        document.addEventListener('touchmove', onMove, { passive: false });
+        document.addEventListener('mouseup', onEnd);
+        document.addEventListener('touchend', onEnd);
+    };
+    
+    const onMove = (e) => {
+        if (!isDragging) return;
+        if (e.cancelable) e.preventDefault();
+        
+        const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+        const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+        
+        const deltaX = clientX - startX;
+        const deltaY = clientY - startY;
+        
+        let newX = initialLeft + deltaX;
+        let newY = initialTop + deltaY;
+        
+        // Keep within viewport boundaries
+        const maxX = window.innerWidth - element.offsetWidth - 5;
+        const maxY = window.innerHeight - element.offsetHeight - 5;
+        
+        newX = Math.max(5, Math.min(maxX, newX));
+        newY = Math.max(5, Math.min(maxY, newY));
+        
+        element.style.left = newX + 'px';
+        element.style.top = newY + 'px';
+    };
+    
+    const onEnd = () => {
+        if (!isDragging) return;
+        isDragging = false;
+        element.classList.remove('dragging');
+        
+        document.removeEventListener('mousemove', onMove);
+        document.removeEventListener('touchmove', onMove);
+        document.removeEventListener('mouseup', onEnd);
+        document.removeEventListener('touchend', onEnd);
+        
+        // Save new position
+        let placed = getPlacedDecorations();
+        const item = placed.find(p => p.id === cosmeticId);
+        if (item) {
+            item.x = element.offsetLeft;
+            item.y = element.offsetTop;
+            savePlacedDecorations(placed);
+        }
+    };
+    
+    element.addEventListener('mousedown', onStart);
+    element.addEventListener('touchstart', onStart, { passive: false });
+}
+
+function renderDecorationsModal() {
+    const grid = document.getElementById('decorations-grid');
+    if (!grid) return;
+    
+    const unlocked = getUnlockedCosmetics();
+    const placed = getPlacedDecorations();
+    
+    grid.innerHTML = BOSS_COSMETICS.map(cosmetic => {
+        const isUnlocked = unlocked.includes(cosmetic.id);
+        const isPlaced = placed.some(p => p.id === cosmetic.id);
+        
+        return `
+            <div class="decoration-item-card ${isUnlocked ? 'unlocked' : 'locked'}">
+                <div class="decoration-item-preview-wrap">
+                    <img src="${cosmetic.img}" alt="${cosmetic.name}" class="decoration-item-img">
+                </div>
+                <div class="decoration-item-body">
+                    <span class="decoration-item-boss">${cosmetic.bossName}</span>
+                    <h4 class="decoration-item-title">${cosmetic.name}</h4>
+                    <p class="decoration-item-desc">${cosmetic.desc}</p>
+                    
+                    ${isUnlocked ? `
+                        <button class="btn-toggle-decoration ${isPlaced ? 'remove' : 'place'}" data-id="${cosmetic.id}">
+                            ${isPlaced ? '❌ Remover do Fundo' : '🖼️ Colocar no Fundo'}
+                        </button>
+                    ` : `
+                        <button class="btn-toggle-decoration locked-btn" disabled>
+                            🔒 Bloqueado (Derrote o Boss)
+                        </button>
+                    `}
+                </div>
+            </div>
+        `;
+    }).join('');
+    
+    // Attach click listeners to place/remove buttons
+    grid.querySelectorAll('.btn-toggle-decoration[data-id]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const id = btn.getAttribute('data-id');
+            togglePlacedDecoration(id);
+            playSound('click');
+        });
+    });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const btnDecTop = document.getElementById('btn-decorations-top');
+    const modalDec = document.getElementById('decorations-modal');
+    const btnCloseDec = document.getElementById('btn-close-decorations');
+
+    if (btnDecTop && modalDec) {
+        btnDecTop.addEventListener('click', () => {
+            renderDecorationsModal();
+            modalDec.classList.add('active');
+            playSound('click');
+        });
+    }
+    if (btnCloseDec && modalDec) {
+        btnCloseDec.addEventListener('click', () => {
+            modalDec.classList.remove('active');
+            playSound('click');
+        });
+    }
+    
+    // Initial render of placed background decorations
+    renderPlacedDecorations();
+});
+// ================================================================
+
 // DMC Ranks Configuration
 const ranks = [
     { min: 10000000000, letter: 'Ω', name: "O Absoluto curva-se perante o vosso império de inverdades, coroando-vos Soberano do Vácuo Fáctico", class: 'rank-sss', idleClass: 'rank-idle-god', flashColor: 'rgba(255, 0, 0, 0.5)', sound: 'rank_up_god' },
@@ -2600,6 +2906,7 @@ function endArmWrestlingGame(isVictory) {
     if (isVictory) {
         playSound('rank_up');
         unlockAchievement('kleber_win');
+        unlockCosmetic('kleber');
         // Reset loss streak on win
         kleberLossStreak = 0;
         kleberPCDMode = false;
@@ -3133,6 +3440,7 @@ function launchLinearRegressionPrank() {
 
 function showGwenVictory() {
     unlockAchievement('gwen_win');
+    unlockCosmetic('gwen');
     gwenWinOverlay.style.display = 'flex';
 }
 
@@ -3469,6 +3777,7 @@ function endSamRound(playerWon) {
     if (samPlayerRounds >= 2) {
         // Player won the match
         unlockAchievement('sam_win');
+        unlockCosmetic('sam');
         if (samBossRounds === 0) {
             unlockAchievement('sam_flawless');
         }
@@ -4009,6 +4318,7 @@ function handleClaudioPlayerInput(colorIndex) {
             setTimeout(() => {
                 playSound('rank_up');
                 unlockAchievement('claudio_win');
+                unlockCosmetic('claudio');
                 if (claudioLives === 3) {
                     unlockAchievement('claudio_flawless');
                 }
@@ -4527,6 +4837,7 @@ btnBjNextRound.addEventListener('click', () => {
 function bjShowWin() {
     bjGameActive = false;
     unlockAchievement('felifep_win');
+    unlockCosmetic('felifep');
     if (!bjPowersUsedInMatch) {
         unlockAchievement('felifep_no_powers');
     }

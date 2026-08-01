@@ -17,6 +17,9 @@
 
     <!-- Ambient interactive canvas background -->
     <canvas id="bg-canvas"></canvas>
+    
+    <!-- Background Floating Decorations Layer (placed frames go here) -->
+    <div id="bg-decorations-layer" class="bg-decorations-layer"></div>
 
     <div class="container">
         <div class="card">
@@ -30,6 +33,9 @@
                     <button class="theme-btn theme-btn-gold" title="Golden Demiurge" data-theme="gold"></button>
                 </div>
                 <div style="display: flex; gap: 10px; align-items: center;">
+                    <button id="btn-decorations-top" class="btn-decorations-top" title="Quadros de Decoração">
+                        🖼️ Decoração
+                    </button>
                     <button id="btn-music" class="btn-sound" title="Alternar música">
                         <svg viewBox="0 0 24 24" id="music-icon-on"><path d="M12 3v10.55c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4V7h6V3h-8z"/></svg>
                         <svg viewBox="0 0 24 24" id="music-icon-off" style="display:none;"><path d="M4.27 3L3 4.27l9 9v1.28c-.59-.34-1.27-.55-2-.55-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4v-1.73l6 6 1.27-1.27L4.27 3zM14 7h4V3h-6v3.18l2 2V7z"/></svg>
@@ -990,6 +996,22 @@
                 </div>
             </div>
             <div id="achievements-grid" class="achievements-grid">
+                <!-- Rendered dynamically by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Decoração Gallery Modal -->
+    <div id="decorations-modal" class="decorations-modal">
+        <div class="decorations-card">
+            <button id="btn-close-decorations" class="btn-close-decorations" title="Fechar">&times;</button>
+            <div class="decorations-card-header">
+                <div class="decorations-title-group">
+                    <h2 class="decorations-title">🖼️ QUADROS E DECORAÇÕES</h2>
+                    <p class="decorations-subtitle">Derrote os bosses na Jornada para conquistar quadros ornamentados e posicioná-los no fundo do site!</p>
+                </div>
+            </div>
+            <div id="decorations-grid" class="decorations-grid">
                 <!-- Rendered dynamically by JS -->
             </div>
         </div>
