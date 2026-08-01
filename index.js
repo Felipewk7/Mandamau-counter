@@ -1821,7 +1821,7 @@ function setupBossEncounterUI() {
     const bubblePara = document.querySelector('.encounter-dialog-bubble p');
     
     if (currentBossEncounter === 'kleber') {
-        portrait.src = "kleber_clown.jpg";
+        portrait.src = "img/kleber_clown.jpg";
         portrait.alt = "Kleber O palhaço dos mil dentes";
         nameText.textContent = "Kleber";
         titleText.textContent = "O palhaço dos mil dentes";
@@ -1836,8 +1836,8 @@ function setupBossEncounterUI() {
         bubblePara.textContent = "Eai porra, vc é bom em matematica ? Não ? que pena vai ter que ser pra passar Hahahaha!!!";
     } else if (currentBossEncounter === 'sam') {
         portrait.onerror = function() {
-            if (!this.src.endsWith('kleber_clown.jpg')) {
-                this.onerror = function() { this.src = 'kleber_clown.jpg'; this.onerror = null; };
+            if (!this.src.endsWith('img/kleber_clown.jpg')) {
+                this.onerror = function() { this.src = 'img/kleber_clown.jpg'; this.onerror = null; };
                 this.src = 'img/sam.jpg';
             }
         };
@@ -1851,14 +1851,14 @@ function setupBossEncounterUI() {
     } else if (currentBossEncounter === 'claudio') {
         portrait.src = 'img/claudio.png';
         portrait.alt = 'Cláudio O Cubo Gey';
-        portrait.onerror = function() { this.src = 'kleber_clown.jpg'; };
+        portrait.onerror = function() { this.src = 'img/kleber_clown.jpg'; };
         nameText.textContent = 'Cláudio';
         titleText.textContent = 'O Cubo Gey';
         authorText.textContent = 'Cláudio';
         bubblePara.textContent = 'Eu sou um cubo gey, me vença se for capaz!';
     } else if (currentBossEncounter === 'felifep') {
 
-        portrait.onerror = function() { if (!this.src.endsWith('kleber_clown.jpg')) this.src = 'kleber_clown.jpg'; };
+        portrait.onerror = function() { if (!this.src.endsWith('img/kleber_clown.jpg')) this.src = 'img/kleber_clown.jpg'; };
         portrait.src = '';
         portrait.src = 'img/felifep.png';
         portrait.alt = 'Felifep';
