@@ -1,6 +1,3 @@
-
-// ================================================================
-// INDEPENDENT DECORATION BUTTON CONTROLLER (UNLINKED FROM MAP)
 // ================================================================
 (function initStandaloneDecorationButton() {
     function bindDec() {
@@ -6228,3 +6225,33 @@ if (dbgLaunchWarwick) {
 }
 
 
+
+
+// ================================================================
+// DELEGATED DECORATION & NAVIGATION EVENT LISTENER
+// ================================================================
+document.addEventListener('click', (e) => {
+    // 🖼️ Top Bar Decoration Button
+    const btnDec = e.target.closest('#btn-decorations-top');
+    if (btnDec) {
+        e.preventDefault();
+        const modalDec = document.getElementById('decorations-modal');
+        if (modalDec) {
+            if (typeof renderDecorationsModal === 'function') renderDecorationsModal();
+            modalDec.classList.add('active');
+        }
+        try { playSound('click'); } catch(err) {}
+        return;
+    }
+
+    const btnCloseDec = e.target.closest('#btn-close-decorations');
+    if (btnCloseDec) {
+        e.preventDefault();
+        const modalDec = document.getElementById('decorations-modal');
+        if (modalDec) {
+            modalDec.classList.remove('active');
+        }
+        try { playSound('click'); } catch(err) {}
+        return;
+    }
+});
