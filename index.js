@@ -88,12 +88,11 @@ function updateWarwickUI() {
 }
 
 function openWarwickGame() {
-    // 1. Force close Volibear overlay so they never run simultaneously
-    const volibearOverlay = document.getElementById('volibear-storm-overlay') || volibearStormOverlay;
-    if (volibearOverlay) volibearOverlay.classList.remove('active');
-
+    // 1. Force close Volibear game completely
+    closeVolibearGame();
+    
     // 2. Open Warwick stealth overlay
-    const overlay = document.getElementById('warwick-stealth-overlay') || warwickStealthOverlay;
+    const overlay = document.getElementById('warwick-stealth-overlay');
     if (!overlay) return;
     overlay.classList.add('active');
     
@@ -106,31 +105,6 @@ function openWarwickGame() {
     if (loseOv) loseOv.style.display = 'none';
     if (jumpOv) jumpOv.style.display = 'none';
     if (tutModal) tutModal.style.display = 'flex';
-
-    // 3. Dynamically bind tutorial and quit buttons
-    const btnCloseTut = document.getElementById('btn-close-warwick-tutorial') || btnCloseWarwickTut;
-    if (btnCloseTut) {
-        btnCloseTut.onclick = () => {
-            try { playSound('click'); } catch(e) {}
-            startWarwickGame();
-        };
-    }
-
-    const btnQuit = document.getElementById('btn-warwick-quit') || btnWarwickQuit;
-    if (btnQuit) {
-        btnQuit.onclick = () => {
-            closeWarwickGame();
-            try { playSound('click'); } catch(e) {}
-        };
-    }
-
-    const btnRestart = document.getElementById('btn-warwick-restart') || btnWarwickRestart;
-    if (btnRestart) {
-        btnRestart.onclick = () => {
-            try { playSound('click'); } catch(e) {}
-            startWarwickGame();
-        };
-    }
     
     warwickGameActive = false;
     playTheme('fase6');
@@ -438,11 +412,10 @@ function updateVolibearRoundUI() {
 }
 
 function openVolibearGame() {
-    // Force close Warwick overlay so they never run simultaneously
-    const warwickOverlay = document.getElementById('warwick-stealth-overlay') || warwickStealthOverlay;
-    if (warwickOverlay) warwickOverlay.classList.remove('active');
+    // Force close Warwick game completely
+    closeWarwickGame();
 
-    const overlay = document.getElementById('volibear-storm-overlay') || volibearStormOverlay;
+    const overlay = document.getElementById('volibear-storm-overlay');
     if (!overlay) return;
     overlay.classList.add('active');
     
@@ -455,30 +428,6 @@ function openVolibearGame() {
     if (loseOv) loseOv.style.display = 'none';
     if (tutModal) tutModal.style.display = 'flex';
     if (roundBanner) roundBanner.style.display = 'none';
-
-    const btnCloseTut = document.getElementById('btn-close-volibear-tutorial') || btnCloseVolibearTut;
-    if (btnCloseTut) {
-        btnCloseTut.onclick = () => {
-            try { playSound('click'); } catch(e) {}
-            startVolibearGame();
-        };
-    }
-
-    const btnQuit = document.getElementById('btn-volibear-quit') || btnVolibearQuit;
-    if (btnQuit) {
-        btnQuit.onclick = () => {
-            closeVolibearGame();
-            try { playSound('click'); } catch(e) {}
-        };
-    }
-
-    const btnRestart = document.getElementById('btn-volibear-restart') || btnVolibearRestart;
-    if (btnRestart) {
-        btnRestart.onclick = () => {
-            try { playSound('click'); } catch(e) {}
-            startVolibearGame();
-        };
-    }
     
     volibearGameActive = false;
     playTheme('fase6');
@@ -6269,3 +6218,108 @@ if (dbgLaunchWarwick) {
 }
 
 
+
+
+// ================================================================
+// DELEGATED EVENT LISTENERS (BULLETPROOF MODAL & BUTTON CONTROL)
+// ================================================================
+document.addEventListener('click', (e) => {
+    // 🖼️ Decoration Top Button & Close
+    if (e.target.closest('#btn-decorations-top')) {
+        e.preventDefault();
+        const modalDec = document.getElementById('decorations-modal');
+        if (modalDec) {
+            renderDecorationsModal();
+            modalDec.classList.add('active');
+            try { playSound('click'); } catch(err) {}
+        }
+    }
+    if (e.target.closest('#btn-close-decorations')) {
+        e.preventDefault();
+        const modalDec = document.getElementById('decorations-modal');
+        if (modalDec) {
+            modalDec.classList.remove('active');
+            try { playSound('click'); } catch(err) {}
+        }
+    }
+
+    // 🐺 Warwick Buttons
+    if (e.target.closest('#btn-close-warwick-tutorial')) {
+        e.preventDefault();
+        try { playSound('click'); } catch(err) {}
+        startWarwickGame();
+    }
+    if (e.target.closest('#btn-warwick-quit')) {
+        e.preventDefault();
+        closeWarwickGame();
+        try { playSound('click'); } catch(err) {}
+    }
+    if (e.target.closest('#btn-warwick-restart')) {
+        e.preventDefault();
+        try { playSound('click'); } catch(err) {}
+        startWarwickGame();
+    }
+    if (e.target.closest('#btn-warwick-win-ok')) {
+        e.preventDefault();
+        closeWarwickGame();
+        try { playSound('rank_up_high'); } catch(err) {}
+        openJourney();
+        setTimeout(() => {
+            switchMapChapter(2);
+            const nodeF8 = document.getElementById('node-fase8');
+            const lineF8 = document.querySelector('.line-fase8');
+            if (nodeF8) {
+                nodeF8.className = 'map-node node-active';
+                nodeF8.title = 'Fase 8 - Disponível';
+                const iconSpan = nodeF8.querySelector('.node-icon');
+                if (iconSpan) iconSpan.textContent = '🗣️';
+            }
+            if (lineF8) lineF8.classList.add('line-active');
+            const token = document.getElementById('journey-player-token');
+            if (token) {
+                token.style.left = '55%';
+                token.style.top = '40%';
+            }
+        }, 600);
+    }
+
+    // ⚡ Volibear Buttons
+    if (e.target.closest('#btn-close-volibear-tutorial')) {
+        e.preventDefault();
+        try { playSound('click'); } catch(err) {}
+        startVolibearGame();
+    }
+    if (e.target.closest('#btn-volibear-quit')) {
+        e.preventDefault();
+        closeVolibearGame();
+        try { playSound('click'); } catch(err) {}
+    }
+    if (e.target.closest('#btn-volibear-restart')) {
+        e.preventDefault();
+        try { playSound('click'); } catch(err) {}
+        startVolibearGame();
+    }
+    if (e.target.closest('#btn-volibear-win-ok')) {
+        e.preventDefault();
+        closeVolibearGame();
+        try { playSound('rank_up_high'); } catch(err) {}
+        openJourney();
+        setTimeout(() => {
+            switchMapChapter(2);
+            const nodeF7 = document.getElementById('node-fase7');
+            const lineF7 = document.querySelector('.line-fase7');
+            if (nodeF7) {
+                nodeF7.className = 'map-node node-active';
+                nodeF7.title = 'Fase 7 - Warwick (Desbloqueado!)';
+                const iconSpan = nodeF7.querySelector('.node-icon');
+                if (iconSpan) iconSpan.textContent = '🐺';
+            }
+            if (lineF7) lineF7.classList.add('line-active');
+            const token = document.getElementById('journey-player-token');
+            if (token) {
+                token.style.left = '40%';
+                token.style.top = '50%';
+            }
+        }, 600);
+    }
+});
