@@ -1,68 +1,14 @@
-// ================================================================
-// LEVEL 6 — VOLIBEAR STORM (5-ROUND BULLET HELL ENGINE)
-// ================================================================
-const volibearStormOverlay = document.getElementById('volibear-storm-overlay');
-const volibearArena        = document.getElementById('volibear-arena');
-const volibearPlayerToken  = document.getElementById('volibear-player-token');
-const volibearRoundNum     = document.getElementById('volibear-round-num');
-const volibearTimerNum     = document.getElementById('volibear-timer-num');
-const volibearLivesHearts  = document.getElementById('volibear-lives-hearts');
-const volibearSpeechBubble = document.getElementById('volibear-speech-bubble');
-const volibearWinOverlay   = document.getElementById('volibear-win-overlay');
-const volibearLoseOverlay  = document.getElementById('volibear-lose-overlay');
-const volibearTutorialModal= document.getElementById('volibear-tutorial-modal');
-const volibearRoundBanner  = document.getElementById('volibear-round-banner');
-const volibearBannerTitle  = document.getElementById('volibear-banner-title');
-const volibearBannerSub    = document.getElementById('volibear-banner-sub');
-const btnCloseVolibearTut  = document.getElementById('btn-close-volibear-tutorial');
-const btnVolibearQuit      = document.getElementById('btn-volibear-quit');
-const btnVolibearWinOk     = document.getElementById('btn-volibear-win-ok');
-const btnVolibearRestart   = document.getElementById('btn-volibear-restart');
+    
+    const winOv = document.getElementById('volibear-win-overlay');
+    const loseOv = document.getElementById('volibear-lose-overlay');
+    const tutModal = document.getElementById('volibear-tutorial-modal');
+    const roundBanner = document.getElementById('volibear-round-banner');
 
-
-// ================================================================
-
-const VOLIBEAR_ROUND_SPEECHES = {
-    1: ["A TEMPESTADE NÃO TEM PIEDADE!", "SINTA O PODER DOS RAIOS!", "o boga do bako é meu"],
-    2: ["ESPIRAL DUPLA INVERTIDA! NÃO HÁ PARA ONDE FUGIR!", "GIRE NO RITMO DA MORTE!", "O VÓRTEX VAI TE ENGOLIR!"],
-    3: ["MATRIZ DE TROVÕES DESTRUTIVA! ACHE O QUADRADO DA SALVAÇÃO!", "GRADE DE LASERS ABSURDA!", "DESVIE DA MATRIZ ELÉTRICA!"],
-    4: ["EU FECHO O SEU CERCO! O BOGA É MEU!", "RAIOS PERSEGUIDORES EM VOCÊ!", "Sinta meu trovão te caçar!"],
-    5: ["APOCALIPSE ELÉTRICO! NINGUÉM ESCAPA DA MINHA FÚRIA!", "CAOS TOTAL! DESVIE SE FOR CAPAZ!", "O MUNDO VAI SUBMERGIR EM TROVÕES!"]
-};
-
-let volibearGameActive = false;
-let volibearRound = 1;
-let volibearTimeLeft = 15;
-let volibearLives = 3;
-let volibearPlayerPos = { x: 225, y: 150 };
-let volibearKeys = {};
-let volibearTimerInterval = null;
-let volibearSpawnTimeout = null;
-let volibearAnimFrame = null;
-let volibearSpeechInterval = null;
-let volibearSpiralAngle = 0;
-let volibearGridStep = 0;
-
-function updateVolibearLivesUI() {
-    if (!volibearLivesHearts) return;
-    let hearts = '';
-    for (let i = 0; i < 3; i++) {
-        hearts += i < volibearLives ? '❤️' : '🖤';
-    }
-    volibearLivesHearts.textContent = hearts;
-}
-
-function updateVolibearRoundUI() {
-    if (volibearRoundNum) volibearRoundNum.textContent = `${volibearRound} / 5`;
-}
-
-function openVolibearGame() {
-    if (!volibearStormOverlay) return;
-    volibearStormOverlay.classList.add('active');
-    if (volibearWinOverlay) volibearWinOverlay.style.display = 'none';
-    if (volibearLoseOverlay) volibearLoseOverlay.style.display = 'none';
-    if (volibearTutorialModal) volibearTutorialModal.style.display = 'flex';
-    if (volibearRoundBanner) volibearRoundBanner.style.display = 'none';
+    if (winOv) winOv.style.display = 'none';
+    if (loseOv) loseOv.style.display = 'none';
+    if (tutModal) tutModal.style.display = 'flex';
+    if (roundBanner) roundBanner.style.display = 'none';
+    
     volibearGameActive = false;
     playTheme('fase6');
 }
@@ -412,57 +358,3 @@ document.addEventListener('DOMContentLoaded', () => {
             startVolibearGame();
         });
     }
-
-    if (btnVolibearQuit) {
-        btnVolibearQuit.addEventListener('click', () => {
-            closeVolibearGame();
-            try { playSound('click'); } catch(e) {}
-        });
-    }
-
-    if (btnVolibearRestart) {
-        btnVolibearRestart.addEventListener('click', () => {
-            try { playSound('click'); } catch(e) {}
-            startVolibearGame();
-        });
-    }
-
-    if (btnVolibearWinOk) {
-        btnVolibearWinOk.addEventListener('click', () => {
-            closeVolibearGame();
-            try { playSound('rank_up_high'); } catch(e) {}
-            
-            // Open journey and navigate DIRECTLY to Chapter 2 with Fase 7 unlocked
-            openJourney();
-            setTimeout(() => {
-                // CRITICAL: go to Chapter 2 map (Volibear is Chapter 2!)
-                switchMapChapter(2);
-                
-                const nodeF7 = document.getElementById('node-fase7');
-                const lineF7 = document.querySelector('.line-fase7');
-                if (nodeF7) {
-                    nodeF7.className = 'map-node node-active';
-                    nodeF7.title = 'Fase 7 - Warwick (Desbloqueado!)';
-                    const iconSpan = nodeF7.querySelector('.node-icon');
-                    if (iconSpan) iconSpan.textContent = '🐺';
-                }
-                if (lineF7) lineF7.classList.add('line-active');
-                
-                const token = document.getElementById('journey-player-token');
-                if (token) {
-                    token.style.left = '40%';
-                    token.style.top = '50%';
-                }
-            }, 600);
-        });
-    }
-});
-// ================================================================
-
-const THEMES = {
-    fase1: 'audio/fase1_kleber.mp3',
-    fase2: 'audio/fase2_gwen.mp3',
-    fase3: 'audio/fase3_sam.mp3',
-    fase4: 'audio/fase4_claudio.mp3',
-    fase5: 'audio/fase5_felifep.mp3',
-};

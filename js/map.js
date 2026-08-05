@@ -1,3 +1,67 @@
+                const cell = document.querySelector(`.duel-cell[data-index="${i}"]`);
+                cell.textContent = 'O';
+                cell.className = 'duel-cell o-played';
+            });
+            
+            triggerBakoWin(playerWinnerPattern, "Achei que ia ganhar? Eu joguei ali no mesmo microssegundo. Mais um ponto pro Bako!");
+        }, 550);
+        return;
+    }
+
+    isDuelActive = false;
+    setTimeout(() => {
+        if (duelBoard.filter(s => s === null).length > 0) {
+            isDuelActive = true;
+            bakoPlay();
+        }
+    }, 450);
+}
+
+// Duel Event listeners setup
+duelCells.forEach(cell => {
+    cell.addEventListener('click', () => {
+        const idx = parseInt(cell.getAttribute('data-index'));
+        playerPlay(idx);
+    });
+});
+
+btnDuelReset.addEventListener('click', () => {
+    bakoScoreCount += 100;
+    initDuel();
+    triggerBakoCheatEffects("Reiniciou? Adicionei +100 vitórias para mim por conta do tempo que gastei esperando você.");
+    playSound('reset');
+});
+
+// Initialize Duel at startup
+initDuel();
+
+// Smartphone Chat system
+const btnPhoneTrigger = document.getElementById('btn-phone-trigger');
+const smartphoneContainer = document.getElementById('smartphone-container');
+const btnClosePhone = document.getElementById('btn-close-phone');
+const chatMessagesContainer = document.getElementById('chat-messages-container');
+const chatTypingIndicator = document.getElementById('chat-typing-indicator');
+const chatOptionsPanel = document.getElementById('chat-options-panel');
+const btnJourneyTrigger = document.getElementById('btn-journey-trigger');
+
+// Persisted State
+const askedQuestions = JSON.parse(localStorage.getItem('mandamau_asked_questions')) || { patinhos: false, terrorista: false, peixes: false };
+let chatCompleted = localStorage.getItem('mandamau_chat_completed') === 'true';
+
+btnPhoneTrigger.addEventListener('click', () => {
+    smartphoneContainer.classList.toggle('active');
+    // Hide notification badge when opened
+    const badge = btnPhoneTrigger.querySelector('.phone-badge');
+    if (badge) badge.style.display = 'none';
+    playSound('click');
+});
+
+btnClosePhone.addEventListener('click', () => {
+    smartphoneContainer.classList.remove('active');
+    playSound('click');
+});
+
+
 // ================================================================
 // CHAPTER 2 MAP & NAVIGATION SYSTEM
 // ================================================================
@@ -184,6 +248,8 @@ function setupBossEncounterUI() {
 
 btnAcceptChallenge.addEventListener('click', () => {
     journeyEncounterOverlay.classList.remove('active');
+    // CRITICAL: close journey overlay so it doesn't block clicks after game ends
+    journeyOverlay.classList.remove('active');
     playSound('click');
     
     if (currentBossEncounter === 'kleber') {
@@ -402,340 +468,66 @@ function renderChatOptions() {
         chatOptionsPanel.appendChild(titleSpan);
         return;
     }
-    
-    const allInitialAsked = askedQuestions.patinhos && askedQuestions.terrorista && askedQuestions.peixes;
-    
-    if (allInitialAsked) {
-        const titleSpan = document.createElement('span');
-        titleSpan.className = 'options-title';
-        titleSpan.textContent = 'Pergunta Secreta Desbloqueada:';
-        chatOptionsPanel.appendChild(titleSpan);
-        
-        const btn = document.createElement('button');
-        btn.className = 'chat-opt-btn';
-        btn.style.borderColor = 'rgba(234, 179, 8, 0.5)';
-        btn.style.background = 'rgba(234, 179, 8, 0.05)';
-        btn.innerHTML = '❓ Bako ta tudo bem ?';
-        btn.addEventListener('click', () => {
-            triggerSecretConversation();
-        });
-        chatOptionsPanel.appendChild(btn);
-    } else {
-        const titleSpan = document.createElement('span');
-        titleSpan.className = 'options-title';
-        titleSpan.textContent = 'Selecione uma pergunta para enviar:';
-        chatOptionsPanel.appendChild(titleSpan);
-        
-        if (!askedQuestions.patinhos) {
-            const btn = document.createElement('button');
-            btn.className = 'chat-opt-btn';
-            btn.textContent = '🦆 Bako pq vc fez aquilo com os patinhos?';
-            btn.addEventListener('click', () => triggerConversation('patinhos'));
-            chatOptionsPanel.appendChild(btn);
-        }
-        if (!askedQuestions.terrorista) {
-            const btn = document.createElement('button');
-            btn.className = 'chat-opt-btn';
-            btn.textContent = '💣 bako vc é um terrorista?';
-            btn.addEventListener('click', () => triggerConversation('terrorista'));
-            chatOptionsPanel.appendChild(btn);
-        }
-        if (!askedQuestions.peixes) {
-            const btn = document.createElement('button');
-            btn.className = 'chat-opt-btn';
-            btn.textContent = '🐟 Bako pq vc gosta de mijar em peixes?';
-            btn.addEventListener('click', () => triggerConversation('peixes'));
-            chatOptionsPanel.appendChild(btn);
-        }
-    }
-}
-
-function triggerConversation(key) {
-    const chat = bakoChats[key];
-    if (!chat) return;
-    
-    // Disable options panel during dialogue
-    chatOptionsPanel.style.pointerEvents = 'none';
-    chatOptionsPanel.style.opacity = '0.4';
-    
-    // 1. Send Player Question
-    appendChatMessage(chat.question, true, 'Você');
-    
-    // 2. Typing indicator delay
-    setTimeout(() => {
-        chatTypingIndicator.style.display = 'flex';
-        chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
-        
-        // 3. Send Bako Answer
-        setTimeout(() => {
-            chatTypingIndicator.style.display = 'none';
-            appendChatMessage(chat.bakoAnswer, false, 'Bako');
-            playSound('rank_up_low');
-            
-            // 4. Send Player Reply
-            setTimeout(() => {
-                appendChatMessage(chat.playerReply, true, 'Você');
-                
-                // 5. Finalize this question and enable remaining options
-                setTimeout(() => {
-                    askedQuestions[key] = true;
-                    localStorage.setItem('mandamau_asked_questions', JSON.stringify(askedQuestions));
-                    
-                    chatOptionsPanel.style.pointerEvents = 'all';
-                    chatOptionsPanel.style.opacity = '1';
-                    renderChatOptions();
-                }, 2000);
-                
-            }, 1200);
-            
-        }, 1500);
-        
-    }, 800);
-}
-
-function triggerSecretConversation() {
-    chatOptionsPanel.style.pointerEvents = 'none';
-    chatOptionsPanel.style.opacity = '0.4';
-    
-    // 1. Player Question: Bako ta tudo bem ?
-    appendChatMessage("Bako ta tudo bem ?", true, 'Você');
-    
-    // 2. Typing indicator -> Bako Answer
-    setTimeout(() => {
-        chatTypingIndicator.style.display = 'flex';
-        chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
-        
-        setTimeout(() => {
-            chatTypingIndicator.style.display = 'none';
-            appendChatMessage("na real não , eu fui amaldiçoado pra sempre mentir , mas tem um jeito de me curar , vc precisa apenas pegar o remedio supremo", false, 'Bako');
-            playSound('rank_up_low');
-            
-            // 3. Player: onde consigo isso ?
-            setTimeout(() => {
-                appendChatMessage("onde consigo isso ?", true, 'Você');
-                
-                // 4. Typing indicator -> Bako: va ate a cede do GGOPA , depois que passar dos desafios vai conseguir
-                setTimeout(() => {
-                    chatTypingIndicator.style.display = 'flex';
-                    chatMessagesContainer.scrollTop = chatMessagesContainer.scrollHeight;
-                    
-                    setTimeout(() => {
-                        chatTypingIndicator.style.display = 'none';
-                        appendChatMessage("va ate a cede do GGOPA , depois que passar dos desafios vai conseguir", false, 'Bako');
-                        playSound('rank_up_low');
-                        
-                        // 5. Player: ok , vamos tentar
-                        setTimeout(() => {
-                            appendChatMessage("ok , vamos tentar", true, 'Você');
-                            
-                            // 6. Complete and Unlock Map Icon (persisted)
-                            setTimeout(() => {
-                                chatCompleted = true;
-                                localStorage.setItem('mandamau_chat_completed', 'true');
-                                
-                                renderChatOptions();
-                                btnJourneyTrigger.classList.add('active');
-                            }, 2500);
-                            
-                        }, 1200);
-                        
-                    }, 1500);
-                    
-                }, 800);
-                
-            }, 1200);
-            
-        }, 2000);
-        
-    }, 800);
-}
-
-function initPhoneChat() {
-    if (chatCompleted) {
-        btnJourneyTrigger.classList.add('active');
-        chatMessagesContainer.innerHTML = `
-            <div class="msg-bubble bako-msg">
-                <span class="msg-author">Bako</span>
-                <p>Obrigado pela ajuda! Vá até a sede da GGOPA para conseguir o remédio supremo e quebrar a minha maldição!</p>
-            </div>
-        `;
-    } else {
-        btnJourneyTrigger.classList.remove('active');
-        chatMessagesContainer.innerHTML = `
-            <div class="msg-bubble bako-msg">
-                <span class="msg-author">Bako</span>
-                <p>Diga lá, o que você quer me perguntar? Sem mentiras, hein! 😉</p>
-            </div>
-        `;
-    }
-    renderChatOptions();
-    initJourneyMapState();
-}
-
-// Start Phone system
-initPhoneChat();
-
-// Queda de Braço Minigame System
-function initJourneyMapState() {
-    const journeyFase1Completed = localStorage.getItem('mandamau_journey_fase1_completed') === 'true';
-    if (journeyFase1Completed) {
-        const nodeFase2 = document.getElementById('node-fase2');
-        const pathLineFase2 = document.querySelector('.line-fase2');
-        if (nodeFase2) {
-            nodeFase2.className = 'map-node node-active';
-            nodeFase2.title = 'Fase 2 - Disponível';
-            const iconSpan = nodeFase2.querySelector('.node-icon');
-            if (iconSpan) iconSpan.textContent = '⚔️';
-        }
-        if (pathLineFase2) {
-            pathLineFase2.classList.add('line-active');
-        }
-    }
-    
-    const journeyFase2Completed = localStorage.getItem('mandamau_journey_fase2_completed') === 'true';
-    if (journeyFase2Completed) {
-        const nodeFase3 = document.getElementById('node-fase3');
-        const pathLineFase3 = document.querySelector('.line-fase3');
-        if (nodeFase3) {
-            nodeFase3.className = 'map-node node-active';
-            nodeFase3.title = 'Fase 3 - Disponível';
-            const iconSpan = nodeFase3.querySelector('.node-icon');
-            if (iconSpan) iconSpan.textContent = '⚔️';
-        }
-        if (pathLineFase3) {
-            pathLineFase3.classList.add('line-active');
-        }
-    }
-    
-    const journeyFase3Completed = localStorage.getItem('mandamau_journey_fase3_completed') === 'true';
-    if (journeyFase3Completed) {
-        const nodeFase4 = document.getElementById('node-fase4');
-        const pathLineFase4 = document.querySelector('.line-fase4');
-        if (nodeFase4) {
-            nodeFase4.className = 'map-node node-active';
-            nodeFase4.title = 'Fase 4 - Disponível';
-            const iconSpan = nodeFase4.querySelector('.node-icon');
-            if (iconSpan) iconSpan.textContent = '⚔️';
-        }
-        if (pathLineFase4) {
-            pathLineFase4.classList.add('line-active');
-        }
+            const isF3Done = localStorage.getItem('mandamau_journey_fase3_completed') === 'true';
+            if (isF3Done) {
+                try { playSound('click'); } catch(err) {}
+                currentBossEncounter = 'claudio';
+                setupBossEncounterUI();
+                if (journeyEncounterOverlay) journeyEncounterOverlay.classList.add('active');
+            } else {
+                try { playSound('click'); } catch(err) {}
+                showAchievementToast({ icon: '🔒', title: 'FASE BLOQUEADA', desc: 'Derrote Sam na Fase 3 primeiro!' });
+            }
+        };
     }
 
-    const journeyFase4Completed = localStorage.getItem('mandamau_journey_fase4_completed') === 'true';
-    if (journeyFase4Completed) {
-        const nodeGgopa = document.getElementById('node-ggopa');
-        const pathLineFase5 = document.querySelector('.line-fase5');
-        if (nodeGgopa) {
-            nodeGgopa.className = 'map-node node-active';
-            nodeGgopa.title = 'Fase 5 - Sede do GGOPA';
-            const iconSpan = nodeGgopa.querySelector('.node-icon');
-            if (iconSpan) iconSpan.textContent = '🏗️';
-        }
-        if (pathLineFase5) {
-            pathLineFase5.classList.add('line-active');
-        }
+    const nodeGgopa = document.getElementById('node-ggopa');
+    if (nodeGgopa) {
+        nodeGgopa.onclick = () => {
+            const isF4Done = localStorage.getItem('mandamau_journey_fase4_completed') === 'true';
+            if (isF4Done) {
+                try { playSound('click'); } catch(err) {}
+                currentBossEncounter = 'felifep';
+                setupBossEncounterUI();
+                if (journeyEncounterOverlay) journeyEncounterOverlay.classList.add('active');
+            } else {
+                try { playSound('click'); } catch(err) {}
+                showAchievementToast({ icon: '🔒', title: 'FASE BLOQUEADA', desc: 'Derrote Cláudio na Fase 4 primeiro!' });
+            }
+        };
     }
 
-    const journeyFase5Completed = localStorage.getItem('mandamau_journey_fase5_completed') === 'true';
-    if (journeyFase5Completed) {
-        const nodeFase6 = document.getElementById('node-fase6');
-        const lineFase6 = document.querySelector('.line-fase6');
-        if (nodeFase6) {
-            nodeFase6.className = 'map-node node-active';
-            nodeFase6.title = 'Fase 6 - Volibear';
-            const iconSpan = nodeFase6.querySelector('.node-icon');
-            if (iconSpan) iconSpan.textContent = '⚡';
-        }
-        if (lineFase6) lineFase6.classList.add('line-active');
-    }
-
-    const journeyFase6Completed = localStorage.getItem('mandamau_journey_fase6_completed') === 'true';
-    const nodeFase7 = document.getElementById('node-fase7');
-    const lineFase7 = document.querySelector('.line-fase7');
-    if (journeyFase6Completed) {
-        if (nodeFase7) {
-            nodeFase7.className = 'map-node node-active';
-            nodeFase7.title = 'Fase 7 - Warwick';
-            const iconSpan = nodeFase7.querySelector('.node-icon');
-            if (iconSpan) iconSpan.textContent = '🐺';
-        }
-        if (lineFase7) lineFase7.classList.add('line-active');
-    } else {
-        if (nodeFase7) {
-            nodeFase7.className = 'map-node node-locked';
-            nodeFase7.title = 'Fase 7 - Bloqueada (Derrote Volibear primeiro)';
-            const iconSpan = nodeFase7.querySelector('.node-icon');
-            if (iconSpan) iconSpan.textContent = '🔒';
-        }
-        if (lineFase7) lineFase7.classList.remove('line-active');
-    }
-
-    const journeyFase7Completed = localStorage.getItem('mandamau_journey_fase7_completed') === 'true';
-    if (journeyFase7Completed) {
-        const nodeFase8 = document.getElementById('node-fase8');
-        const lineFase8 = document.querySelector('.line-fase8');
-        if (nodeFase8) {
-            nodeFase8.className = 'map-node node-active';
-            nodeFase8.title = 'Fase 8 - Disponível';
-            const iconSpan = nodeFase8.querySelector('.node-icon');
-            if (iconSpan) iconSpan.textContent = '🗣️';
-        }
-        if (lineFase8) lineFase8.classList.add('line-active');
-    }
-}
-
-// Add the click listener for Fase 1 Node
-document.getElementById('node-fase1').addEventListener('click', () => {
-    playSound('click');
-    
-    // Walk to Fase 1 node (25%, 62%)
-    journeyPlayerToken.style.left = '25%';
-    journeyPlayerToken.style.top = '62%';
-    
-    setTimeout(() => {
-        playSound('rank_up_med');
-        currentBossEncounter = 'kleber';
-        setupBossEncounterUI();
-        journeyEncounterOverlay.classList.add('active');
-    }, 1500);
-});
-
-// Add the click listener for Fase 2 Node
-document.getElementById('node-fase2').addEventListener('click', () => {
-    const journeyFase1Completed = localStorage.getItem('mandamau_journey_fase1_completed') === 'true';
-    if (journeyFase1Completed) {
-        playSound('click');
-        
-        // Walk from Fase 1 node (25%, 62%) to Fase 2 node (40%, 50%)
-        journeyPlayerToken.style.left = '40%';
-        journeyPlayerToken.style.top = '50%';
-        
-        setTimeout(() => {
-            const nodeFase2Element = document.getElementById('node-fase2');
-            const pathLineFase2Element = document.querySelector('.line-fase2');
-            if (nodeFase2Element) nodeFase2Element.classList.add('node-active');
-            if (pathLineFase2Element) pathLineFase2Element.classList.add('line-active');
-            
-            playSound('rank_up_med');
-            currentBossEncounter = 'gwen';
+    // CHAPTER 2 NODES
+    const node6 = document.getElementById('node-fase6');
+    if (node6) {
+        node6.onclick = () => {
+            try { playSound('click'); } catch(err) {}
+            currentBossEncounter = 'volibear';
             setupBossEncounterUI();
-            journeyEncounterOverlay.classList.add('active');
-        }, 1500);
+            if (journeyEncounterOverlay) journeyEncounterOverlay.classList.add('active');
+        };
     }
-});
 
-// ---- Journey map: GGOPA node click ----
-document.getElementById('node-ggopa').addEventListener('click', () => {
-    const fase4Done = localStorage.getItem('mandamau_journey_fase4_completed') === 'true';
-    if (fase4Done) {
-        playSound('click');
-        journeyPlayerToken.style.left = '90%';
-        journeyPlayerToken.style.top  = '20%';
-        setTimeout(() => {
-            currentBossEncounter = 'felifep';
-            setupBossEncounterUI();
-            journeyEncounterOverlay.classList.add('active');
-        }, 1000);
+    const node7 = document.getElementById('node-fase7');
+    if (node7) {
+        node7.onclick = () => {
+            const isF6Done = localStorage.getItem('mandamau_journey_fase6_completed') === 'true';
+            if (isF6Done) {
+                try { playSound('click'); } catch(err) {}
+                currentBossEncounter = 'warwick';
+                setupBossEncounterUI();
+                if (journeyEncounterOverlay) journeyEncounterOverlay.classList.add('active');
+            } else {
+                try { playSound('click'); } catch(err) {}
+                showAchievementToast({ icon: '🔒', title: 'FASE BLOQUEADA', desc: 'Derrote Volibear na Fase 6 primeiro!' });
+            }
+        };
     }
-});
+}
+
+// Call setup automatically on DOM ready & load
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    setupCentralizedMapListeners();
+} else {
+    document.addEventListener('DOMContentLoaded', setupCentralizedMapListeners);
+}

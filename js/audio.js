@@ -82,16 +82,33 @@ function fadeOutTheme(duration) {
     const decrement = startVol / steps;
     let step = 0;
     const fade = setInterval(function() {
-        step++;
-        gameThemeAudio.volume = Math.max(0, startVol - decrement * step);
-        if (step >= steps) {
-            clearInterval(fade);
-            stopTheme();
-            gameThemeAudio.volume = 0.25;
-            resumeBgMusic(); // Retoma a musica de fundo ao sair da fase
-        }
-    }, interval);
-}
+const tabDuel = document.getElementById('tab-duel');
+const contentCounter = document.getElementById('content-counter');
+const contentStats = document.getElementById('content-stats');
+const contentDuel = document.getElementById('content-duel');
+
+// Sub-Tab Elements
+const subtabStatsGeneral = document.getElementById('subtab-stats-general');
+const subtabStats2 = document.getElementById('subtab-stats-2');
+const subcontentStatsGeneral = document.getElementById('subcontent-stats-general');
+const subcontentStats2 = document.getElementById('subcontent-stats-2');
+
+// Duel Elements
+const duelCells = document.querySelectorAll('.duel-cell');
+const bakoSpeech = document.getElementById('bako-speech');
+const btnDuelReset = document.getElementById('btn-duel-reset');
+const duelScorePlayer = document.getElementById('duel-score-player');
+const duelScoreBako = document.getElementById('duel-score-bako');
+
+// Theme, Sound, and Music controls elements
+const themeBtns = document.querySelectorAll('.theme-btn');
+const btnSound = document.getElementById('btn-sound');
+const soundIconOn = document.getElementById('sound-icon-on');
+const soundIconOff = document.getElementById('sound-icon-off');
+const btnMusic = document.getElementById('btn-music');
+const musicIconOn = document.getElementById('music-icon-on');
+const musicIconOff = document.getElementById('music-icon-off');
+
 // Audio System (Web Audio Synth)
 let audioCtx = null;
 let isMuted = localStorage.getItem('mandamau_muted') === 'true';
@@ -441,30 +458,3 @@ function updateMusicUI() {
         if (audioCtx && audioCtx.state === 'running') {
             startMusic();
         }
-    } else {
-        musicIconOn.style.display = 'none';
-        musicIconOff.style.display = 'block';
-        btnMusic.style.opacity = '0.5';
-        stopMusic();
-    }
-}
-
-btnSound.addEventListener('click', () => {
-    isMuted = !isMuted;
-    localStorage.setItem('mandamau_muted', isMuted);
-    updateSoundUI();
-    if (!isMuted) {
-        playSound('click');
-    }
-});
-
-btnMusic.addEventListener('click', () => {
-    isMusicEnabled = !isMusicEnabled;
-    localStorage.setItem('mandamau_music', isMusicEnabled);
-    updateMusicUI();
-    if (isMusicEnabled) {
-        initAudio();
-    }
-});
-
-// Theme Manager

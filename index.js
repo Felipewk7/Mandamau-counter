@@ -6221,3 +6221,163 @@ if (dbgLaunchWarwick) {
 
 
 
+
+
+// ================================================================
+// CENTRALIZED MAP NODE & BUTTON CONTROLLER
+// ================================================================
+function setupCentralizedMapListeners() {
+    console.log("Initializing Centralized Map Node Listeners...");
+    
+    // Top Bar Decoration Button
+    const btnDecTop = document.getElementById('btn-decorations-top');
+    const modalDec = document.getElementById('decorations-modal');
+    const btnCloseDec = document.getElementById('btn-close-decorations');
+    
+    if (btnDecTop) {
+        btnDecTop.onclick = (e) => {
+            if (e) e.preventDefault();
+            renderDecorationsModal();
+            if (modalDec) modalDec.classList.add('active');
+            try { playSound('click'); } catch(err) {}
+        };
+    }
+    if (btnCloseDec) {
+        btnCloseDec.onclick = (e) => {
+            if (e) e.preventDefault();
+            if (modalDec) modalDec.classList.remove('active');
+            try { playSound('click'); } catch(err) {}
+        };
+    }
+
+    // Journey Trigger & Close Buttons
+    const btnJourneyTrigger = document.getElementById('btn-journey-trigger');
+    const journeyOverlay = document.getElementById('journey-overlay');
+    const btnCloseJourneyView = document.getElementById('btn-close-journey-view');
+    const journeyEncounterOverlay = document.getElementById('journey-encounter-overlay');
+
+    if (btnJourneyTrigger) {
+        btnJourneyTrigger.onclick = (e) => {
+            if (e) e.preventDefault();
+            try { playSound('click'); } catch(err) {}
+            openJourney();
+        };
+    }
+
+    if (btnCloseJourneyView) {
+        btnCloseJourneyView.onclick = (e) => {
+            if (e) e.preventDefault();
+            try { playSound('click'); } catch(err) {}
+            if (journeyOverlay) journeyOverlay.classList.remove('active');
+        };
+    }
+
+    // CHAPTER 1 NODES
+    const node1 = document.getElementById('node-fase1');
+    if (node1) {
+        node1.onclick = () => {
+            try { playSound('click'); } catch(err) {}
+            currentBossEncounter = 'kleber';
+            setupBossEncounterUI();
+            if (journeyEncounterOverlay) journeyEncounterOverlay.classList.add('active');
+        };
+    }
+
+    const node2 = document.getElementById('node-fase2');
+    if (node2) {
+        node2.onclick = () => {
+            const isF1Done = localStorage.getItem('mandamau_journey_fase1_completed') === 'true';
+            if (isF1Done) {
+                try { playSound('click'); } catch(err) {}
+                currentBossEncounter = 'gwen';
+                setupBossEncounterUI();
+                if (journeyEncounterOverlay) journeyEncounterOverlay.classList.add('active');
+            } else {
+                try { playSound('click'); } catch(err) {}
+                showAchievementToast({ icon: '🔒', title: 'FASE BLOQUEADA', desc: 'Derrote Kleber na Fase 1 primeiro!' });
+            }
+        };
+    }
+
+    const node3 = document.getElementById('node-fase3');
+    if (node3) {
+        node3.onclick = () => {
+            const isF2Done = localStorage.getItem('mandamau_journey_fase2_completed') === 'true';
+            if (isF2Done) {
+                try { playSound('click'); } catch(err) {}
+                currentBossEncounter = 'sam';
+                setupBossEncounterUI();
+                if (journeyEncounterOverlay) journeyEncounterOverlay.classList.add('active');
+            } else {
+                try { playSound('click'); } catch(err) {}
+                showAchievementToast({ icon: '🔒', title: 'FASE BLOQUEADA', desc: 'Derrote Gwen na Fase 2 primeiro!' });
+            }
+        };
+    }
+
+    const node4 = document.getElementById('node-fase4');
+    if (node4) {
+        node4.onclick = () => {
+            const isF3Done = localStorage.getItem('mandamau_journey_fase3_completed') === 'true';
+            if (isF3Done) {
+                try { playSound('click'); } catch(err) {}
+                currentBossEncounter = 'claudio';
+                setupBossEncounterUI();
+                if (journeyEncounterOverlay) journeyEncounterOverlay.classList.add('active');
+            } else {
+                try { playSound('click'); } catch(err) {}
+                showAchievementToast({ icon: '🔒', title: 'FASE BLOQUEADA', desc: 'Derrote Sam na Fase 3 primeiro!' });
+            }
+        };
+    }
+
+    const nodeGgopa = document.getElementById('node-ggopa');
+    if (nodeGgopa) {
+        nodeGgopa.onclick = () => {
+            const isF4Done = localStorage.getItem('mandamau_journey_fase4_completed') === 'true';
+            if (isF4Done) {
+                try { playSound('click'); } catch(err) {}
+                currentBossEncounter = 'felifep';
+                setupBossEncounterUI();
+                if (journeyEncounterOverlay) journeyEncounterOverlay.classList.add('active');
+            } else {
+                try { playSound('click'); } catch(err) {}
+                showAchievementToast({ icon: '🔒', title: 'FASE BLOQUEADA', desc: 'Derrote Cláudio na Fase 4 primeiro!' });
+            }
+        };
+    }
+
+    // CHAPTER 2 NODES
+    const node6 = document.getElementById('node-fase6');
+    if (node6) {
+        node6.onclick = () => {
+            try { playSound('click'); } catch(err) {}
+            currentBossEncounter = 'volibear';
+            setupBossEncounterUI();
+            if (journeyEncounterOverlay) journeyEncounterOverlay.classList.add('active');
+        };
+    }
+
+    const node7 = document.getElementById('node-fase7');
+    if (node7) {
+        node7.onclick = () => {
+            const isF6Done = localStorage.getItem('mandamau_journey_fase6_completed') === 'true';
+            if (isF6Done) {
+                try { playSound('click'); } catch(err) {}
+                currentBossEncounter = 'warwick';
+                setupBossEncounterUI();
+                if (journeyEncounterOverlay) journeyEncounterOverlay.classList.add('active');
+            } else {
+                try { playSound('click'); } catch(err) {}
+                showAchievementToast({ icon: '🔒', title: 'FASE BLOQUEADA', desc: 'Derrote Volibear na Fase 6 primeiro!' });
+            }
+        };
+    }
+}
+
+// Call setup automatically on DOM ready & load
+if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    setupCentralizedMapListeners();
+} else {
+    document.addEventListener('DOMContentLoaded', setupCentralizedMapListeners);
+}
