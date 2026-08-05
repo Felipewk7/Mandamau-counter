@@ -1341,23 +1341,23 @@ function renderDecorationsModal() {
     });
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+function initAppUIListeners() {
     const btnDecTop = document.getElementById('btn-decorations-top');
     const modalDec = document.getElementById('decorations-modal');
     const btnCloseDec = document.getElementById('btn-close-decorations');
 
     if (btnDecTop && modalDec) {
-        btnDecTop.addEventListener('click', () => {
+        btnDecTop.onclick = () => {
             renderDecorationsModal();
             modalDec.classList.add('active');
             playSound('click');
-        });
+        };
     }
     if (btnCloseDec && modalDec) {
-        btnCloseDec.addEventListener('click', () => {
+        btnCloseDec.onclick = () => {
             modalDec.classList.remove('active');
             playSound('click');
-        });
+        };
     }
     
     const modalUnlock = document.getElementById('cosmetic-unlock-modal');
@@ -1365,39 +1365,38 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnUnlockOpenMenu = document.getElementById('btn-cosmetic-unlock-open-menu');
 
     if (btnUnlockClose && modalUnlock) {
-        btnUnlockClose.addEventListener('click', () => {
+        btnUnlockClose.onclick = () => {
             modalUnlock.classList.remove('active');
             playSound('click');
-        });
+        };
     }
     if (btnUnlockOpenMenu && modalUnlock && modalDec) {
-        btnUnlockOpenMenu.addEventListener('click', () => {
+        btnUnlockOpenMenu.onclick = () => {
             modalUnlock.classList.remove('active');
             renderDecorationsModal();
             modalDec.classList.add('active');
             playSound('click');
-        });
+        };
     }
-    
     
     const btnNavPrev = document.getElementById('btn-map-nav-prev');
     const btnNavNext = document.getElementById('btn-map-nav-next');
     if (btnNavNext) {
-        btnNavNext.addEventListener('click', () => {
+        btnNavNext.onclick = () => {
             switchMapChapter(2);
             playSound('click');
-        });
+        };
     }
     if (btnNavPrev) {
-        btnNavPrev.addEventListener('click', () => {
+        btnNavPrev.onclick = () => {
             switchMapChapter(1);
             playSound('click');
-        });
+        };
     }
     
     const nodeFase6 = document.getElementById('node-fase6');
     if (nodeFase6) {
-        nodeFase6.addEventListener('click', () => {
+        nodeFase6.onclick = () => {
             try { playSound('click'); } catch(e) {}
             if (journeyPlayerToken) {
                 journeyPlayerToken.style.left = '25%';
@@ -1407,12 +1406,12 @@ document.addEventListener('DOMContentLoaded', () => {
             setupBossEncounterUI();
             const overlay = document.getElementById('journey-encounter-overlay') || journeyEncounterOverlay;
             if (overlay) overlay.classList.add('active');
-        });
+        };
     }
 
     const nodeFase7 = document.getElementById('node-fase7');
     if (nodeFase7) {
-        nodeFase7.addEventListener('click', () => {
+        nodeFase7.onclick = () => {
             const isFase6Done = localStorage.getItem('mandamau_journey_fase6_completed') === 'true';
             if (isFase6Done) {
                 try { playSound('click'); } catch(e) {}
@@ -1432,12 +1431,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     desc: 'Derrote Volibear na Fase 6 primeiro para desbloquear a Fase 7!'
                 });
             }
-        });
+        };
     }
 
     // Initial render of placed background decorations
     renderPlacedDecorations();
-});
+}
+
+initAppUIListeners();
+if (document.readyState !== 'complete') {
+    document.addEventListener('DOMContentLoaded', initAppUIListeners);
+}
 
 // ================================================================
 
