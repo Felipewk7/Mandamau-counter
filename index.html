@@ -1035,9 +1035,13 @@
 
                 <!-- Survival Top Status Bar -->
                 <div class="volibear-status-bar">
+                    <div class="volibear-round-wrap">
+                        <span class="volibear-round-label">Rodada:</span>
+                        <span id="volibear-round-num" class="volibear-round-num">1 / 5</span>
+                    </div>
                     <div class="volibear-timer-wrap">
-                        <span class="volibear-timer-label">Sobreviva por:</span>
-                        <span id="volibear-timer-num" class="volibear-timer-num">20s</span>
+                        <span class="volibear-timer-label">Tempo:</span>
+                        <span id="volibear-timer-num" class="volibear-timer-num">15s</span>
                     </div>
                     <div class="volibear-lives-wrap">
                         <span class="volibear-lives-label">Vidas:</span>
@@ -1047,6 +1051,12 @@
 
                 <!-- Battle Arena -->
                 <div id="volibear-arena" class="volibear-arena">
+                    <!-- Round Banner Overlay -->
+                    <div id="volibear-round-banner" class="volibear-round-banner" style="display:none;">
+                        <h3 id="volibear-banner-title">⚡ RODADA 1 ⚡</h3>
+                        <p id="volibear-banner-sub">A TEMPESTADE COMEÇOU!</p>
+                    </div>
+
                     <!-- Dynamic Lightning Warning & Strikes appended here -->
                     <div id="volibear-player-token" class="volibear-player-token">
                         <span class="volibear-player-icon">⚡</span>
@@ -1054,6 +1064,7 @@
                 </div>
 
                 <p class="volibear-controls-hint">Use <strong>WASD</strong> ou as <strong>Setas do Teclado</strong> para esquivar das marcas vermelhas de trovão!</p>
+
             </div>
 
             <!-- Volibear Victory Overlay -->

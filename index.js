@@ -6,33 +6,39 @@ const bgMusicAudio   = document.getElementById('bg-music');
 let currentThemeFile = '';
 
 
+
 // ================================================================
-// LEVEL 6 — VOLIBEAR STORM GAME ENGINE
+// LEVEL 6 — VOLIBEAR STORM (5-ROUND BULLET HELL ENGINE)
 // ================================================================
 const volibearStormOverlay = document.getElementById('volibear-storm-overlay');
 const volibearArena        = document.getElementById('volibear-arena');
 const volibearPlayerToken  = document.getElementById('volibear-player-token');
+const volibearRoundNum     = document.getElementById('volibear-round-num');
 const volibearTimerNum     = document.getElementById('volibear-timer-num');
 const volibearLivesHearts  = document.getElementById('volibear-lives-hearts');
 const volibearSpeechBubble = document.getElementById('volibear-speech-bubble');
 const volibearWinOverlay   = document.getElementById('volibear-win-overlay');
 const volibearLoseOverlay  = document.getElementById('volibear-lose-overlay');
 const volibearTutorialModal= document.getElementById('volibear-tutorial-modal');
+const volibearRoundBanner  = document.getElementById('volibear-round-banner');
+const volibearBannerTitle  = document.getElementById('volibear-banner-title');
+const volibearBannerSub    = document.getElementById('volibear-banner-sub');
 const btnCloseVolibearTut  = document.getElementById('btn-close-volibear-tutorial');
 const btnVolibearQuit      = document.getElementById('btn-volibear-quit');
 const btnVolibearWinOk     = document.getElementById('btn-volibear-win-ok');
 const btnVolibearRestart   = document.getElementById('btn-volibear-restart');
 
-const VOLIBEAR_SPEECHES = [
-    "A TEMPESTADE NÃO TEM PIEDADE!",
-    "SINTA O PODER DOS RAIOS!",
-    "o boga do bako é meu",
-    "Nenhum mortal se esquiva do meu trovão!",
-    "Renda-se à fúria dos céus!"
-];
+const VOLIBEAR_ROUND_SPEECHES = {
+    1: ["A TEMPESTADE NÃO TEM PIEDADE!", "SINTA O PODER DOS RAIOS!", "o boga do bako é meu"],
+    2: ["SIRENE DE CORRENTES ELÉTRICAS! GIRE E CORRA!", "A ESPIRAL VAI TE ESMAGAR!", "Não há para onde fugir!"],
+    3: ["MURALHAS DE TROVÃO! TENTE ATRAVESSAR!", "CORTES ELÉTRICOS EM GRADE!", "Nenhum mortal escapa!"],
+    4: ["EU FECHO O SEU CERCO! O BOGA É MEU!", "RAIOS PERSEGUIDORES EM VOCÊ!", "Sinta meu trovão te caçar!"],
+    5: ["APOCALIPSE ELÉTRICO! NINGUÉM ESCAPA DA MINHA FÚRIA!", "CAOS TOTAL! DESVIE SE FOR CAPAZ!", "O MUNDO VAI SUBMERGIR EM TROVÕES!"]
+};
 
 let volibearGameActive = false;
-let volibearTimeLeft = 20;
+let volibearRound = 1;
+let volibearTimeLeft = 15;
 let volibearLives = 3;
 let volibearPlayerPos = { x: 225, y: 150 };
 let volibearKeys = {};
@@ -40,6 +46,8 @@ let volibearTimerInterval = null;
 let volibearSpawnTimeout = null;
 let volibearAnimFrame = null;
 let volibearSpeechInterval = null;
+let volibearSpiralAngle = 0;
+let volibearGridStep = 0;
 
 function updateVolibearLivesUI() {
     if (!volibearLivesHearts) return;
@@ -50,12 +58,17 @@ function updateVolibearLivesUI() {
     volibearLivesHearts.textContent = hearts;
 }
 
+function updateVolibearRoundUI() {
+    if (volibearRoundNum) volibearRoundNum.textContent = `${volibearRound} / 5`;
+}
+
 function openVolibearGame() {
     if (!volibearStormOverlay) return;
     volibearStormOverlay.classList.add('active');
     if (volibearWinOverlay) volibearWinOverlay.style.display = 'none';
     if (volibearLoseOverlay) volibearLoseOverlay.style.display = 'none';
     if (volibearTutorialModal) volibearTutorialModal.style.display = 'flex';
+    if (volibearRoundBanner) volibearRoundBanner.style.display = 'none';
     volibearGameActive = false;
     playTheme('fase6');
 }
@@ -65,19 +78,19 @@ function startVolibearGame() {
     if (volibearWinOverlay) volibearWinOverlay.style.display = 'none';
     if (volibearLoseOverlay) volibearLoseOverlay.style.display = 'none';
     
-    volibearTimeLeft = 20;
+    volibearRound = 1;
     volibearLives = 3;
-    volibearGameActive = true;
+    startVolibearRound(1);
+}
+
+function startVolibearRound(roundNum) {
+    volibearRound = roundNum;
+    volibearTimeLeft = 15;
+    volibearGameActive = false; // pause briefly during banner
     
-    // Center player in arena
-    const rect = volibearArena.getBoundingClientRect();
-    const arenaW = rect.width || 480;
-    const arenaH = rect.height || 300;
-    volibearPlayerPos = { x: arenaW / 2, y: arenaH / 2 };
-    
-    updateVolibearPlayerPosition();
+    updateVolibearRoundUI();
     updateVolibearLivesUI();
-    if (volibearTimerNum) volibearTimerNum.textContent = '20s';
+    if (volibearTimerNum) volibearTimerNum.textContent = '15s';
     
     // Clear previous intervals/timeouts
     if (volibearTimerInterval) clearInterval(volibearTimerInterval);
@@ -85,35 +98,82 @@ function startVolibearGame() {
     if (volibearSpeechInterval) clearInterval(volibearSpeechInterval);
     if (volibearAnimFrame) cancelAnimationFrame(volibearAnimFrame);
     
-    // Remove lingering strikes/danger zones
     if (volibearArena) {
         volibearArena.querySelectorAll('.volibear-danger-zone, .volibear-lightning-strike').forEach(el => el.remove());
     }
     
-    // Timer countdown (20s to 0s)
-    volibearTimerInterval = setInterval(() => {
-        if (!volibearGameActive) return;
-        volibearTimeLeft--;
-        if (volibearTimerNum) volibearTimerNum.textContent = `${volibearTimeLeft}s`;
+    // Show Round Banner
+    if (volibearRoundBanner) {
+        volibearBannerTitle.textContent = `⚡ RODADA ${volibearRound} / 5 ⚡`;
+        const subTitles = {
+            1: "Tempestade Aleatória de Aquecimento!",
+            2: "Ataque da Espiral de Trovões!",
+            3: "Muralhas de Raios Horizontais e Verticais!",
+            4: "Cerco Fechado e Raios Perseguidores!",
+            5: "🔥 APOCALIPSE ELÉTRICO FINAL! 🔥"
+        };
+        volibearBannerSub.textContent = subTitles[volibearRound] || "Prepare-se!";
+        volibearRoundBanner.style.display = 'flex';
+    }
+    
+    // Speech update
+    const roundSpeeches = VOLIBEAR_ROUND_SPEECHES[volibearRound] || VOLIBEAR_ROUND_SPEECHES[1];
+    if (volibearSpeechBubble) {
+        volibearSpeechBubble.textContent = roundSpeeches[0];
+    }
+    
+    // Start active round after banner
+    setTimeout(() => {
+        if (volibearRoundBanner) volibearRoundBanner.style.display = 'none';
+        volibearGameActive = true;
         
-        if (volibearTimeLeft <= 0) {
-            volibearTimeLeft = 0;
-            clearInterval(volibearTimerInterval);
-            endVolibearGame(true);
-        }
-    }, 1000);
+        // Center player
+        const rect = volibearArena.getBoundingClientRect();
+        const arenaW = rect.width || 480;
+        const arenaH = rect.height || 300;
+        volibearPlayerPos = { x: arenaW / 2, y: arenaH / 2 };
+        updateVolibearPlayerPosition();
+        
+        // Timer countdown (15s to 0s)
+        volibearTimerInterval = setInterval(() => {
+            if (!volibearGameActive) return;
+            volibearTimeLeft--;
+            if (volibearTimerNum) volibearTimerNum.textContent = `${volibearTimeLeft}s`;
+            
+            if (volibearTimeLeft <= 0) {
+                volibearTimeLeft = 0;
+                clearInterval(volibearTimerInterval);
+                handleVolibearRoundComplete();
+            }
+        }, 1000);
+        
+        // Speech rotation
+        volibearSpeechInterval = setInterval(() => {
+            if (!volibearGameActive) return;
+            volibearSpeechBubble.textContent = roundSpeeches[Math.floor(Math.random() * roundSpeeches.length)];
+        }, 3000);
+        
+        scheduleNextLightning();
+        runVolibearGameLoop();
+    }, 1800);
+}
+
+function handleVolibearRoundComplete() {
+    volibearGameActive = false;
+    if (volibearTimerInterval) clearInterval(volibearTimerInterval);
+    if (volibearSpawnTimeout) clearTimeout(volibearSpawnTimeout);
+    if (volibearSpeechInterval) clearInterval(volibearSpeechInterval);
+    if (volibearAnimFrame) cancelAnimationFrame(volibearAnimFrame);
     
-    // Speech bubble rotation
-    volibearSpeechInterval = setInterval(() => {
-        if (!volibearGameActive) return;
-        if (volibearSpeechBubble) {
-            volibearSpeechBubble.textContent = VOLIBEAR_SPEECHES[Math.floor(Math.random() * VOLIBEAR_SPEECHES.length)];
-        }
-    }, 3500);
-    
-    // Start Game Loop & Lightning Spawner
-    scheduleNextLightning();
-    runVolibearGameLoop();
+    if (volibearRound < 5) {
+        // Reward +1 HP (max 3)
+        if (volibearLives < 3) volibearLives++;
+        try { playSound('rank_up_med'); } catch(e) {}
+        startVolibearRound(volibearRound + 1);
+    } else {
+        // Round 5 Complete -> Final Victory!
+        endVolibearGame(true);
+    }
 }
 
 function updateVolibearPlayerPosition() {
@@ -128,7 +188,7 @@ function runVolibearGameLoop() {
     const rect = volibearArena.getBoundingClientRect();
     const arenaW = rect.width || 480;
     const arenaH = rect.height || 300;
-    const speed = 4.2; // px per frame
+    const speed = 4.4; // px per frame
     
     if (volibearKeys['KeyW'] || volibearKeys['ArrowUp'])    volibearPlayerPos.y -= speed;
     if (volibearKeys['KeyS'] || volibearKeys['ArrowDown'])  volibearPlayerPos.y += speed;
@@ -148,35 +208,87 @@ function runVolibearGameLoop() {
 function scheduleNextLightning() {
     if (!volibearGameActive) return;
     
-    // Progressively faster spawn rate: 750ms at start -> 280ms near end
-    const progressRatio = (20 - volibearTimeLeft) / 20; // 0 to 1
-    const minDelay = 280;
-    const maxDelay = 750;
-    const delay = Math.max(minDelay, maxDelay - (progressRatio * (maxDelay - minDelay)));
+    const rect = volibearArena.getBoundingClientRect();
+    const arenaW = rect.width || 480;
+    const arenaH = rect.height || 300;
     
-    // Final 5 seconds: bullet hell mode (spawn 2 strikes)
-    const strikeCount = volibearTimeLeft <= 5 ? (Math.random() > 0.4 ? 2 : 1) : 1;
+    let delay = 650;
     
-    for (let i = 0; i < strikeCount; i++) {
-        spawnLightningZone();
+    switch (volibearRound) {
+        case 1:
+            // Round 1: Escalating Random Strikes
+            delay = Math.max(300, 650 - ((15 - volibearTimeLeft) * 22));
+            spawnStrikeAt(Math.random() * (arenaW - 60) + 30, Math.random() * (arenaH - 60) + 30);
+            break;
+            
+        case 2:
+            // Round 2: Rotating Spiral Pattern
+            delay = 320;
+            volibearSpiralAngle += 0.45;
+            const r = 30 + ((volibearTimeLeft * 12) % 110);
+            const sx = (arenaW / 2) + Math.cos(volibearSpiralAngle) * r;
+            const sy = (arenaH / 2) + Math.sin(volibearSpiralAngle) * r;
+            spawnStrikeAt(sx, sy);
+            break;
+            
+        case 3:
+            // Round 3: Grid Wall Sweeps
+            delay = 450;
+            volibearGridStep++;
+            if (volibearGridStep % 2 === 0) {
+                // Horizontal wall with safe gap
+                const wallY = Math.random() * (arenaH - 60) + 30;
+                for (let x = 30; x < arenaW; x += 65) {
+                    if (Math.abs(x - volibearPlayerPos.x) > 55) { // Leave gap near player or random
+                        spawnStrikeAt(x, wallY);
+                    }
+                }
+            } else {
+                // Vertical wall with safe gap
+                const wallX = Math.random() * (arenaW - 60) + 30;
+                for (let y = 30; y < arenaH; y += 60) {
+                    if (Math.abs(y - volibearPlayerPos.y) > 55) {
+                        spawnStrikeAt(wallX, y);
+                    }
+                }
+            }
+            break;
+            
+        case 4:
+            // Round 4: Locked Ring + Targeted Player Pursuit
+            delay = 380;
+            // 1 Targeted strike directly on player position!
+            spawnStrikeAt(volibearPlayerPos.x + (Math.random() * 30 - 15), volibearPlayerPos.y + (Math.random() * 30 - 15));
+            // Perimeter ring strike
+            const ang = Math.random() * Math.PI * 2;
+            spawnStrikeAt((arenaW / 2) + Math.cos(ang) * 120, (arenaH / 2) + Math.sin(ang) * 100);
+            break;
+            
+        case 5:
+            // Round 5: APOCALIPSE ELÉTRICO (Chaos Bullet Hell)
+            delay = 240; // Extremely fast!
+            // Multi-strike spawn
+            spawnStrikeAt(volibearPlayerPos.x + (Math.random() * 50 - 25), volibearPlayerPos.y + (Math.random() * 50 - 25));
+            spawnStrikeAt(Math.random() * (arenaW - 60) + 30, Math.random() * (arenaH - 60) + 30);
+            break;
     }
     
     volibearSpawnTimeout = setTimeout(scheduleNextLightning, delay);
 }
 
-function spawnLightningZone() {
+function spawnStrikeAt(x, y) {
     if (!volibearGameActive || !volibearArena) return;
     
     const rect = volibearArena.getBoundingClientRect();
     const arenaW = rect.width || 480;
     const arenaH = rect.height || 300;
-    const strikeRadius = 34; // px
+    const strikeRadius = 32; // px
     
-    // Random position in arena
-    const rx = Math.floor(Math.random() * (arenaW - strikeRadius * 2)) + strikeRadius;
-    const ry = Math.floor(Math.random() * (arenaH - strikeRadius * 2)) + strikeRadius;
+    // Clamp coordinates to arena
+    const rx = Math.max(strikeRadius, Math.min(arenaW - strikeRadius, x));
+    const ry = Math.max(strikeRadius, Math.min(arenaH - strikeRadius, y));
     
-    // Create warning danger zone circle
+    // Warning danger zone
     const dangerZone = document.createElement('div');
     dangerZone.className = 'volibear-danger-zone';
     dangerZone.style.width = `${strikeRadius * 2}px`;
@@ -186,12 +298,14 @@ function spawnLightningZone() {
     
     volibearArena.appendChild(dangerZone);
     
-    // After 0.7s (700ms) warning delay, lightning strikes!
+    // Warning delay (faster in higher rounds: 0.65s to 0.5s)
+    const warningDelay = Math.max(480, 680 - (volibearRound * 35));
+    
     setTimeout(() => {
         if (dangerZone.parentNode) dangerZone.remove();
         if (!volibearGameActive) return;
         
-        // Spawn lightning strike flash effect
+        // Spawn lightning impact flash
         const strike = document.createElement('div');
         strike.className = 'volibear-lightning-strike';
         strike.style.width = `${strikeRadius * 2.2}px`;
@@ -199,19 +313,17 @@ function spawnLightningZone() {
         strike.style.left = `${rx}px`;
         strike.style.top = `${ry}px`;
         volibearArena.appendChild(strike);
-        setTimeout(() => strike.remove(), 350);
+        setTimeout(() => strike.remove(), 320);
         
         try { playSound('click'); } catch(e) {}
         
-        // Check collision with player
+        // Collision detection
         const dist = Math.hypot(volibearPlayerPos.x - rx, volibearPlayerPos.y - ry);
         if (dist <= strikeRadius) {
-            // Player hit!
             volibearLives--;
             updateVolibearLivesUI();
             try { playSound('bako_cheat'); } catch(e) {}
             
-            // Screen Shake
             const card = document.querySelector('.volibear-card');
             if (card) {
                 card.classList.add('volibear-shake');
@@ -222,7 +334,7 @@ function spawnLightningZone() {
                 endVolibearGame(false);
             }
         }
-    }, 700);
+    }, warningDelay);
 }
 
 function endVolibearGame(isVictory) {

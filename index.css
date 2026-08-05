@@ -5371,6 +5371,59 @@ body::before {
     border-radius: 20px;
 }
 
+/* Volibear Round UI */
+.volibear-round-wrap {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.volibear-round-label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #94a3b8;
+}
+
+.volibear-round-num {
+    font-size: 1.15rem;
+    font-weight: 900;
+    color: #f59e0b;
+    text-shadow: 0 0 10px rgba(245, 158, 11, 0.6);
+}
+
+/* Round Banner Overlay inside Arena */
+.volibear-round-banner {
+    position: absolute;
+    inset: 0;
+    background: rgba(3, 5, 18, 0.88);
+    backdrop-filter: blur(4px);
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    gap: 6px;
+    animation: fadeInModal 0.25s ease;
+}
+
+.volibear-round-banner h3 {
+    font-size: 1.6rem;
+    font-weight: 900;
+    color: #00f0ff;
+    margin: 0;
+    letter-spacing: 0.05em;
+    text-shadow: 0 0 15px rgba(0, 240, 255, 0.8);
+}
+
+.volibear-round-banner p {
+    font-size: 0.88rem;
+    font-weight: 700;
+    color: #f8d862;
+    margin: 0;
+}
+
+
 
 
 
