@@ -88,12 +88,20 @@ function updateWarwickUI() {
 }
 
 function openWarwickGame() {
-    if (!warwickStealthOverlay) return;
-    warwickStealthOverlay.classList.add('active');
-    if (warwickWinOverlay) warwickWinOverlay.style.display = 'none';
-    if (warwickLoseOverlay) warwickLoseOverlay.style.display = 'none';
-    if (warwickJumpscare) warwickJumpscare.style.display = 'none';
-    if (warwickTutorialModal) warwickTutorialModal.style.display = 'flex';
+    const overlay = document.getElementById('warwick-stealth-overlay') || warwickStealthOverlay;
+    if (!overlay) return;
+    overlay.classList.add('active');
+    
+    const winOv = document.getElementById('warwick-win-overlay');
+    const loseOv = document.getElementById('warwick-lose-overlay');
+    const jumpOv = document.getElementById('warwick-jumpscare-overlay');
+    const tutModal = document.getElementById('warwick-tutorial-modal');
+    
+    if (winOv) winOv.style.display = 'none';
+    if (loseOv) loseOv.style.display = 'none';
+    if (jumpOv) jumpOv.style.display = 'none';
+    if (tutModal) tutModal.style.display = 'flex';
+    
     warwickGameActive = false;
     playTheme('fase6');
 }
@@ -3257,9 +3265,15 @@ function openJourney() {
     if (warwickStealthOverlay) warwickStealthOverlay.classList.remove('active');
     if (volibearStormOverlay) volibearStormOverlay.classList.remove('active');
     
-    // Always open on Chapter 1 map. User navigates to Chapter 2 via the arrow.
-    currentMapChapter = 1;
-    switchMapChapter(1);
+    // If Chapter 1 (Fase 5) is completed, open directly on Chapter 2 map!
+    const isCap1Completed = localStorage.getItem('mandamau_journey_fase5_completed') === 'true';
+    if (isCap1Completed) {
+        currentMapChapter = 2;
+        switchMapChapter(2);
+    } else {
+        currentMapChapter = 1;
+        switchMapChapter(1);
+    }
     journeyEncounterOverlay.classList.remove('active');
     pathLineFase1.classList.remove('line-active');
     nodeFase1.classList.remove('node-active');
@@ -6157,6 +6171,8 @@ if (dbgLaunchVolibear) {
 const dbgLaunchWarwick = document.getElementById('dbg-launch-warwick');
 if (dbgLaunchWarwick) {
     dbgLaunchWarwick.addEventListener('click', () => {
+        localStorage.setItem('mandamau_journey_fase6_completed', 'true');
+        currentBossEncounter = 'warwick';
         if (debugPanel) debugPanel.style.display = 'none';
         if (journeyOverlay) journeyOverlay.classList.remove('active');
         openWarwickGame();
