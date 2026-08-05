@@ -1385,14 +1385,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const nodeFase6 = document.getElementById('node-fase6');
     if (nodeFase6) {
         nodeFase6.addEventListener('click', () => {
-            // Only open encounter if the node is active (not locked)
-            if (!nodeFase6.classList.contains('node-active')) return;
             try { playSound('click'); } catch(e) {}
             currentBossEncounter = 'volibear';
             setupBossEncounterUI();
-            journeyEncounterOverlay.classList.add('active');
+            if (journeyEncounterOverlay) journeyEncounterOverlay.classList.add('active');
         });
     }
+
 
     
     const nodeFase7 = document.getElementById('node-fase7');
