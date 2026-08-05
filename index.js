@@ -250,6 +250,8 @@ function closeVolibearGame() {
     if (volibearAnimFrame) cancelAnimationFrame(volibearAnimFrame);
     fadeOutTheme();
     if (volibearStormOverlay) volibearStormOverlay.classList.remove('active');
+    if (journeyEncounterOverlay) journeyEncounterOverlay.classList.remove('active');
+    currentBossEncounter = null;
 }
 
 // Key listeners for player WASD / Arrow movement
@@ -2584,8 +2586,13 @@ function setupBossEncounterUI() {
         authorText.textContent = "Kleber";
         bubblePara.textContent = "pra passar de mim terá que me vencer numa queda de braço krl";
     } else if (currentBossEncounter === 'volibear') {
-        journeyEncounterOverlay.classList.remove('active');
-        openVolibearGame();
+        portrait.onerror = function() { this.src = 'img/kleber_clown.jpg'; };
+        portrait.src = "img/volibear.png";
+        portrait.alt = "Volibear O Urso da Tempestade";
+        nameText.textContent = "Volibear";
+        titleText.textContent = "O Urso da Tempestade — Capítulo 2: Fase 6";
+        authorText.textContent = "Volibear";
+        bubblePara.textContent = "Para chegar no meu mestre terá que passar por mim, que o boga do bako é só meu!";
     } else if (currentBossEncounter === 'gwen') {
         portrait.src = "img/gwen.jpg";
         portrait.alt = "Gwen";
