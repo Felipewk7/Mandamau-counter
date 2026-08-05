@@ -6670,3 +6670,161 @@ if (document.readyState !== 'complete') {
     document.addEventListener('DOMContentLoaded', initMasterAppController);
     window.addEventListener('load', initMasterAppController);
 }
+
+
+// ================================================================
+// MASTER CENTRALIZED GAME & MAP FLOW CONTROLLER
+// ================================================================
+function startBossEncounterGame(bossId) {
+    const journeyOverlay = document.getElementById('journey-overlay');
+    const encounterOverlay = document.getElementById('journey-encounter-overlay');
+
+    // Hide journey map and dialogue overlays cleanly
+    if (encounterOverlay) encounterOverlay.classList.remove('active');
+    if (journeyOverlay) journeyOverlay.classList.remove('active');
+
+    // Close any active themes and games
+    try { stopTheme(); } catch(e) {}
+
+    if (bossId === 'kleber') {
+        const armOv = document.getElementById('arm-wrestling-overlay');
+        const armTut = document.getElementById('arm-tutorial-modal');
+        // Ensure card content tab is active so embedded minigame is 100% visible
+        const tabCounter = document.getElementById('tab-counter');
+        const contentCounter = document.getElementById('content-counter');
+        if (tabCounter) tabCounter.click();
+        
+        if (armOv) armOv.classList.add('active');
+        if (armTut) armTut.classList.add('active');
+        isTutorialOpen = true;
+        isArmGameActive = false;
+        armWrestlingState = 0;
+        updateArmWrestlingUI();
+        playTheme('fase1');
+    } 
+    else if (bossId === 'gwen') {
+        const gwenOv = document.getElementById('gwen-quiz-overlay');
+        const gwenTut = document.getElementById('gwen-tutorial-modal');
+        const tabCounter = document.getElementById('tab-counter');
+        if (tabCounter) tabCounter.click();
+
+        if (gwenOv) gwenOv.classList.add('active');
+        if (gwenTut) gwenTut.classList.add('active');
+        isGwenTutorialOpen = true;
+        gwenActive = false;
+        gwenScore = 0;
+        gwenLives = 3;
+        updateGwenUI();
+        playTheme('fase2');
+    } 
+    else if (bossId === 'sam') {
+        const samOv = document.getElementById('sam-smash-overlay');
+        const samTut = document.getElementById('sam-tutorial-modal');
+        const tabCounter = document.getElementById('tab-counter');
+        if (tabCounter) tabCounter.click();
+
+        if (samOv) samOv.classList.add('active');
+        if (samTut) samTut.classList.add('active');
+        isSamTutorialOpen = true;
+        samGameActive = false;
+        samTugProgress = 50;
+        samTimeLeft = 15;
+        updateSamTugUI();
+        playTheme('fase3');
+    } 
+    else if (bossId === 'claudio') {
+        const cOv = document.getElementById('claudio-genius-overlay');
+        const cTut = document.getElementById('claudio-tutorial-modal');
+        const tabCounter = document.getElementById('tab-counter');
+        if (tabCounter) tabCounter.click();
+
+        if (cOv) cOv.classList.add('active');
+        if (cTut) cTut.classList.add('active');
+        isClaudioTutorialOpen = true;
+        claudioGameActive = false;
+        resetClaudioGame();
+        playTheme('fase4');
+    } 
+    else if (bossId === 'felifep') {
+        openBlackjack();
+    } 
+    else if (bossId === 'volibear') {
+        openVolibearGame();
+    } 
+    else if (bossId === 'warwick') {
+        openWarwickGame();
+    }
+}
+
+// Master Delegated Click Handler for all buttons
+document.addEventListener('click', (e) => {
+    // 🖼️ Top Bar Decoration Button
+    const btnDecTop = e.target.closest('#btn-decorations-top');
+    if (btnDecTop) {
+        e.preventDefault();
+        const modal = document.getElementById('decorations-modal');
+        if (modal) {
+            renderDecorationsModal();
+            modal.classList.add('active');
+        }
+        try { playSound('click'); } catch(err) {}
+        return;
+    }
+
+    const btnCloseDec = e.target.closest('#btn-close-decorations');
+    if (btnCloseDec) {
+        e.preventDefault();
+        const modal = document.getElementById('decorations-modal');
+        if (modal) modal.classList.remove('active');
+        try { playSound('click'); } catch(err) {}
+        return;
+    }
+
+    // 🗺️ Journey Trigger Button
+    const btnJourney = e.target.closest('#btn-journey-trigger');
+    if (btnJourney) {
+        e.preventDefault();
+        try { playSound('click'); } catch(err) {}
+        openJourney();
+        return;
+    }
+
+    const btnCloseJourney = e.target.closest('#btn-close-journey-view');
+    if (btnCloseJourney) {
+        e.preventDefault();
+        try { playSound('click'); } catch(err) {}
+        const jOv = document.getElementById('journey-overlay');
+        if (jOv) jOv.classList.remove('active');
+        return;
+    }
+
+    // 🗺️ Map Chapter Navigation
+    const btnNavPrev = e.target.closest('#btn-map-nav-prev');
+    if (btnNavPrev) {
+        e.preventDefault();
+        switchMapChapter(1);
+        try { playSound('click'); } catch(err) {}
+        return;
+    }
+
+    const btnNavNext = e.target.closest('#btn-map-nav-next');
+    if (btnNavNext) {
+        e.preventDefault();
+        switchMapChapter(2);
+        try { playSound('click'); } catch(err) {}
+        return;
+    }
+
+    // ⚔️ Accept Challenge Button
+    const btnAccept = e.target.closest('#btn-accept-challenge');
+    if (btnAccept) {
+        e.preventDefault();
+        startBossEncounterGame(currentBossEncounter);
+        return;
+    }
+});
+
+// Initial startup render of background decorations
+try {
+    renderPlacedDecorations();
+} catch(e) {}
