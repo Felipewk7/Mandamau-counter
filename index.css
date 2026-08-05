@@ -5440,6 +5440,438 @@ body::before {
     object-fit: cover;
 }
 
+/* ================================================================
+   LEVEL 7 — WARWICK STEALTH (CHAPTER 2 FASE 7)
+   ================================================================ */
+.warwick-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(12, 7, 20, 0.96);
+    backdrop-filter: blur(12px);
+    z-index: 10000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+}
+
+.warwick-overlay.active {
+    display: flex;
+}
+
+.warwick-card {
+    position: relative;
+    width: 100%;
+    max-width: 520px;
+    background: #0f0a1c;
+    border: 2px solid #ef4444;
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 0 35px rgba(239, 68, 68, 0.35), 0 20px 50px rgba(0, 0, 0, 0.9);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+/* Red Hunt Mode Flash on Card */
+.warwick-card.hunt-mode-active {
+    background: #250914;
+    border-color: #f87171;
+    box-shadow: 0 0 55px rgba(239, 68, 68, 0.7), 0 0 100px rgba(220, 38, 38, 0.4);
+    animation: blood-card-pulse 0.4s infinite alternate;
+}
+
+@keyframes blood-card-pulse {
+    0% { border-color: #ef4444; box-shadow: 0 0 40px rgba(239, 68, 68, 0.6); }
+    100% { border-color: #ff2222; box-shadow: 0 0 70px rgba(255, 34, 34, 0.9); }
+}
+
+.warwick-boss-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    position: relative;
+}
+
+.warwick-portrait-wrap {
+    width: 68px;
+    height: 68px;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 2px solid #ef4444;
+    box-shadow: 0 0 15px rgba(239, 68, 68, 0.5);
+    flex-shrink: 0;
+    background: #000;
+}
+
+.warwick-portrait {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.warwick-boss-info {
+    flex: 1;
+    overflow: hidden;
+}
+
+.warwick-nameplate {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 4px;
+}
+
+.warwick-name {
+    font-size: 1.2rem;
+    font-weight: 900;
+    color: #ffffff;
+    letter-spacing: 0.05em;
+    text-shadow: 0 0 10px rgba(239, 68, 68, 0.6);
+}
+
+.warwick-title {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #ef4444;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.warwick-speech-bubble {
+    background: rgba(239, 68, 68, 0.12);
+    border: 1px solid rgba(239, 68, 68, 0.35);
+    border-radius: 10px;
+    padding: 6px 10px;
+    font-size: 0.78rem;
+    font-weight: 800;
+    color: #fee2e2;
+    line-height: 1.3;
+}
+
+.warwick-quit-btn {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: #94a3b8;
+    font-size: 1.1rem;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.warwick-quit-btn:hover {
+    background: rgba(239, 68, 68, 0.3);
+    color: #ef4444;
+}
+
+/* Progress Sections */
+.warwick-progress-section {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.warwick-progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.warwick-progress-label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #cbd5e1;
+}
+
+.warwick-progress-val {
+    font-size: 0.95rem;
+    font-weight: 900;
+    color: #ffffff;
+    font-family: monospace;
+}
+
+.warwick-bar-bg {
+    width: 100%;
+    height: 14px;
+    background: rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
+.warwick-bar-fill {
+    height: 100%;
+    border-radius: 10px;
+    transition: width 0.1s linear;
+}
+
+.distance-fill {
+    background: linear-gradient(90deg, #22c55e, #10b981);
+    box-shadow: 0 0 10px rgba(34, 197, 94, 0.6);
+}
+
+.oxygen-fill {
+    background: linear-gradient(90deg, #0284c7, #38bdf8);
+    box-shadow: 0 0 10px rgba(56, 189, 248, 0.6);
+}
+
+.oxygen-fill.low-oxygen {
+    background: linear-gradient(90deg, #dc2626, #ef4444);
+    box-shadow: 0 0 12px rgba(239, 68, 68, 0.8);
+    animation: warning-pulse 0.3s infinite alternate;
+}
+
+/* Scene Track */
+.warwick-scene {
+    position: relative;
+    width: 100%;
+    height: 140px;
+    background: radial-gradient(circle at center, #1a0f2e, #05020a);
+    border: 2px solid rgba(239, 68, 68, 0.3);
+    border-radius: 14px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+}
+
+.warwick-blood-alert {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    background: rgba(220, 38, 38, 0.9);
+    border: 2px solid #ffffff;
+    border-radius: 20px;
+    padding: 6px 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 0 25px #ef4444;
+    z-index: 20;
+    animation: blood-alert-pulse 0.3s infinite alternate;
+}
+
+@keyframes blood-alert-pulse {
+    0% { transform: translateX(-50%) scale(0.98); background: rgba(220, 38, 38, 0.85); }
+    100% { transform: translateX(-50%) scale(1.03); background: rgba(255, 0, 0, 1); }
+}
+
+#warwick-alert-text {
+    font-size: 0.78rem;
+    font-weight: 900;
+    color: #ffffff;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    text-align: center;
+}
+
+.warwick-scene-character-wrap {
+    position: relative;
+    width: 85%;
+    height: 50px;
+    margin-top: 25px;
+    display: flex;
+    align-items: center;
+}
+
+.warwick-player-sprite {
+    position: absolute;
+    left: 0%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transition: left 0.1s linear;
+}
+
+.sprite-icon {
+    font-size: 1.8rem;
+}
+
+.sprite-label {
+    font-size: 0.65rem;
+    font-weight: 800;
+    color: #38bdf8;
+    margin-top: -2px;
+}
+
+.warwick-exit-portal {
+    position: absolute;
+    right: 0%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.portal-icon {
+    font-size: 2rem;
+}
+
+.portal-label {
+    font-size: 0.65rem;
+    font-weight: 800;
+    color: #22c55e;
+    margin-top: -2px;
+}
+
+/* Control Buttons */
+.warwick-controls-panel {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+}
+
+.btn-warwick-action {
+    flex: 1;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 800;
+    padding: 12px;
+    border-radius: 12px;
+    cursor: pointer;
+    border: none;
+    transition: all 0.15s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    user-select: none;
+    -webkit-user-select: none;
+}
+
+.btn-walk {
+    background: linear-gradient(135deg, #16a34a, #15803d);
+    color: #ffffff;
+    box-shadow: 0 4px 15px rgba(22, 163, 74, 0.4);
+}
+
+.btn-walk:active, .btn-walk.active-holding {
+    transform: translateY(2px);
+    background: linear-gradient(135deg, #22c55e, #16a34a);
+    box-shadow: 0 0 20px rgba(34, 197, 94, 0.8);
+}
+
+.btn-breath {
+    background: linear-gradient(135deg, #0284c7, #0369a1);
+    color: #ffffff;
+    box-shadow: 0 4px 15px rgba(2, 132, 199, 0.4);
+}
+
+.btn-breath:active, .btn-breath.active-holding {
+    transform: translateY(2px);
+    background: linear-gradient(135deg, #38bdf8, #0284c7);
+    box-shadow: 0 0 20px rgba(56, 189, 248, 0.8);
+}
+
+/* Jumpscare Fullscreen Overlay */
+.warwick-jumpscare-overlay {
+    position: fixed;
+    inset: 0;
+    background: #000;
+    z-index: 999999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+.warwick-jumpscare-img {
+    width: 100vw;
+    height: 100vh;
+    object-fit: cover;
+    animation: warwick-intense-shake 0.1s linear infinite;
+}
+
+.warwick-jumpscare-flash {
+    position: absolute;
+    inset: 0;
+    background: rgba(255, 0, 0, 0.45);
+    animation: warning-pulse 0.08s infinite alternate;
+    pointer-events: none;
+}
+
+@keyframes warwick-intense-shake {
+    0% { transform: scale(1.15) translate(0, 0) rotate(0deg); }
+    20% { transform: scale(1.2) translate(-12px, 12px) rotate(-3deg); }
+    40% { transform: scale(1.15) translate(12px, -12px) rotate(3deg); }
+    60% { transform: scale(1.22) translate(-12px, -6px) rotate(-2deg); }
+    80% { transform: scale(1.18) translate(12px, 6px) rotate(2deg); }
+    100% { transform: scale(1.15) translate(0, 0) rotate(0deg); }
+}
+
+.warwick-end-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(12, 7, 20, 0.92);
+    backdrop-filter: blur(8px);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    border-radius: 20px;
+}
+
+.warwick-end-card {
+    width: 100%;
+    max-width: 380px;
+    background: #140b24;
+    border-radius: 16px;
+    padding: 24px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.warwick-victory-portrait-wrap {
+    width: 88px;
+    height: 88px;
+    border-radius: 18px;
+    overflow: hidden;
+    border: 3px solid #ef4444;
+    box-shadow: 0 0 25px rgba(239, 68, 68, 0.7);
+    background: #000;
+    margin-bottom: 6px;
+}
+
+.warwick-victory-portrait {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.warwick-tutorial-modal {
+    position: absolute;
+    inset: 0;
+    background: rgba(12, 7, 20, 0.94);
+    backdrop-filter: blur(8px);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    border-radius: 20px;
+}
+
+
 
 
 

@@ -449,6 +449,8 @@
                 <button id="dbg-reset-all" class="debug-action-btn debug-danger" style="width: 100%; margin-top: 10px;">💀 Resetar Tudo</button>
                 <button id="dbg-launch-bj" class="debug-action-btn" style="width:100%; margin-top:6px; background:linear-gradient(135deg,#7c3aed,#c026d3); color:#fff;">⚔️ Abrir Blackjack (Fase 5)</button>
                 <button id="dbg-launch-volibear" class="debug-action-btn" style="width:100%; margin-top:6px; background:linear-gradient(135deg,#00f0ff,#0284c7); color:#000; font-weight:800;">⚡ Abrir Volibear (Fase 6)</button>
+                <button id="dbg-launch-warwick" class="debug-action-btn" style="width:100%; margin-top:6px; background:linear-gradient(135deg,#dc2626,#991b1b); color:#fff; font-weight:800;">🐺 Abrir Warwick (Fase 7)</button>
+
 
             </div>
         </div>
@@ -1110,10 +1112,134 @@
                         <li>❤️ <strong>Recuperação:</strong> Você tem 3 vidas. Cada rodada vencida recupera +1 Vida!</li>
                     </ul>
                     <button id="btn-close-volibear-tutorial" class="btn btn-sum" style="width:100%; font-size:1rem; padding:10px;">⚡ Entrar na Tempestade!</button>
-                </div>
             </div>
 
         </div>
+
+        <!-- =============================================
+             LEVEL 7 — WARWICK STEALTH (CHAPTER 2 FASE 7)
+             ============================================= -->
+        <div id="warwick-stealth-overlay" class="warwick-overlay">
+            <div id="warwick-card" class="warwick-card">
+                <!-- Warwick Header -->
+                <div class="warwick-boss-header">
+                    <div class="warwick-portrait-wrap">
+                        <img id="warwick-img" src="img/warwick.png" alt="Warwick" class="warwick-portrait" onerror="this.src='img/kleber_clown.jpg'">
+                    </div>
+                    <div class="warwick-boss-info">
+                        <div class="warwick-nameplate">
+                            <span class="warwick-name">Warwick</span>
+                            <span class="warwick-title">O Caçador da Noite</span>
+                        </div>
+                        <div id="warwick-speech-bubble" class="warwick-speech-bubble">
+                            Sinto cheiro de medo no ar...
+                        </div>
+                    </div>
+                    <button id="btn-warwick-quit" class="warwick-quit-btn" title="Sair">✕</button>
+                </div>
+
+                <!-- Distance Progress Bar (Top) -->
+                <div class="warwick-progress-section">
+                    <div class="warwick-progress-header">
+                        <span class="warwick-progress-label">🏃 Distância até a saída:</span>
+                        <span id="warwick-distance-text" class="warwick-progress-val">0%</span>
+                    </div>
+                    <div class="warwick-bar-bg">
+                        <div id="warwick-distance-fill" class="warwick-bar-fill distance-fill" style="width: 0%;"></div>
+                    </div>
+                </div>
+
+                <!-- Main Stealth Scene / Blood Sense Alert Banner -->
+                <div id="warwick-scene" class="warwick-scene">
+                    <div id="warwick-blood-alert" class="warwick-blood-alert" style="display:none;">
+                        <span class="alert-pulse-icon">🚨</span>
+                        <span id="warwick-alert-text">SENSO DE SANGUE ATIVADO! PRENDA A RESPIRAÇÃO!</span>
+                    </div>
+                    
+                    <div class="warwick-scene-character-wrap">
+                        <div id="warwick-player-sprite" class="warwick-player-sprite">
+                            <span class="sprite-icon">🚶</span>
+                            <span class="sprite-label">Você</span>
+                        </div>
+                        <div class="warwick-exit-portal">
+                            <span class="portal-icon">🚪</span>
+                            <span class="portal-label">Saída</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Oxygen / Breath Bar (Bottom) -->
+                <div class="warwick-progress-section">
+                    <div class="warwick-progress-header">
+                        <span class="warwick-progress-label">🫁 Fôlego / Oxigênio:</span>
+                        <span id="warwick-oxygen-text" class="warwick-progress-val">100%</span>
+                    </div>
+                    <div class="warwick-bar-bg">
+                        <div id="warwick-oxygen-fill" class="warwick-bar-fill oxygen-fill" style="width: 100%;"></div>
+                    </div>
+                </div>
+
+                <!-- Interactive Control Buttons -->
+                <div class="warwick-controls-panel">
+                    <button id="btn-warwick-walk" class="btn-warwick-action btn-walk">
+                        🚶 CAMINHAR (Manter W / Seta Cima)
+                    </button>
+                    <button id="btn-warwick-breath" class="btn-warwick-action btn-breath">
+                        🫁 PRENDER RESPIRAÇÃO (Manter Espaço)
+                    </button>
+                </div>
+            </div>
+
+            <!-- Warwick Jumpscare Fullscreen Overlay -->
+            <div id="warwick-jumpscare-overlay" class="warwick-jumpscare-overlay" style="display:none;">
+                <img src="img/warwick.png" alt="Warwick Jumpscare" class="warwick-jumpscare-img" onerror="this.src='img/kleber_clown.jpg'">
+                <div class="warwick-jumpscare-flash"></div>
+            </div>
+
+            <!-- Victory Overlay -->
+            <div id="warwick-win-overlay" class="warwick-end-overlay" style="display:none;">
+                <div class="warwick-end-card win-card">
+                    <div class="warwick-victory-portrait-wrap">
+                        <img src="img/warwick.png" alt="Warwick" class="warwick-victory-portrait" onerror="this.src='img/kleber_clown.jpg'">
+                    </div>
+                    <h2 class="warwick-end-title">VITÓRIA FURTIVA!</h2>
+                    <div class="warwick-victory-speech">
+                        <span style="color:#ef4444; font-weight:800; font-size:0.85rem;">Warwick:</span>
+                        <p style="color:#f8d862; font-style:italic; font-weight:800; font-size:1.05rem; margin:4px 0 10px 0;">"qual foi , eu só queria cheirar a bunda do bako"</p>
+                    </div>
+                    <p class="warwick-end-desc">Você escapou das garras de Warwick sem fazer nenhum barulho!</p>
+                    <button id="btn-warwick-win-ok" class="btn btn-sum">Avançar para Fase 8 ▶</button>
+                </div>
+            </div>
+
+            <!-- Game Over Overlay -->
+            <div id="warwick-lose-overlay" class="warwick-end-overlay" style="display:none;">
+                <div class="warwick-end-card lose-card">
+                    <div class="warwick-end-icon">💀</div>
+                    <h2 class="warwick-end-title">GAME OVER</h2>
+                    <p class="warwick-end-desc">Você foi pego e devorado por Warwick!</p>
+                    <button id="btn-warwick-restart" class="btn btn-sum">🔄 Tentar Novamente</button>
+                </div>
+            </div>
+
+            <!-- Tutorial Modal -->
+            <div id="warwick-tutorial-modal" class="warwick-tutorial-modal">
+                <div class="tutorial-card" style="max-width:480px; text-align:left;">
+                    <h3 style="color:#ef4444; font-size:1.35rem; margin-bottom:10px; text-align:center;">🐺 Desafio de Stealth: Warwick</h3>
+                    <p style="color:#e0f2fe; font-size:0.85rem; line-height:1.45; margin-bottom:10px;">
+                        Chegue até a saída (100%) sem ser devorado por Warwick!
+                    </p>
+                    <ul style="color:#cbd5e1; font-size:0.8rem; line-height:1.45; padding-left:18px; margin-bottom:12px;">
+                        <li>🚶 <strong>Caminhar:</strong> Mantenha pressionado <strong>W</strong> / <strong>Seta Cima</strong> ou o botão <strong>CAMINHAR</strong> para avançar.</li>
+                        <li>🚨 <strong>Senso de Sangue:</strong> Quando a tela piscar em VERMELHO, Warwick entrou em Modo Caça!</li>
+                        <li>🫁 <strong>Prender Respiração:</strong> No Modo Caça, <strong>PARAR DE CAMINHAR</strong> e <strong>MANTER ESPAÇO</strong> pressionado!</li>
+                        <li>💀 <strong>Cuidado:</strong> Se você se mexer no vermelho ou o fôlego zerar, sofrerá um Jumpscare fulminante!</li>
+                    </ul>
+                    <button id="btn-close-warwick-tutorial" class="btn btn-sum" style="width:100%; font-size:1rem; padding:10px;">🐺 Iniciar Infiltração!</button>
+                </div>
+            </div>
+        </div>
+
 
 
         <!-- Jumpscare Overlay -->
