@@ -3082,11 +3082,6 @@ function setupBossEncounterUI() {
         titleText.textContent = "O Caçador da Noite — Capítulo 2: Fase 7";
         authorText.textContent = "Warwick";
         bubblePara.textContent = "sinto cheiro de cu virgem , é o seu ?";
-    } else if (currentBossEncounter === 'warwick') {
-        cleanupArmWrestlingEffects();
-        closeGwenQuiz();
-        closeSamGame();
-        openWarwickGame();
     } else if (currentBossEncounter === 'volibear') {
         portrait.onerror = function() { this.src = 'img/kleber_clown.jpg'; };
         portrait.src = "img/volibear.png";
@@ -3209,6 +3204,11 @@ btnAcceptChallenge.addEventListener('click', () => {
         closeGwenQuiz();
         closeSamGame();
         openVolibearGame();
+    } else if (currentBossEncounter === 'warwick') {
+        cleanupArmWrestlingEffects();
+        closeGwenQuiz();
+        closeSamGame();
+        openWarwickGame();
     }
 });
 
