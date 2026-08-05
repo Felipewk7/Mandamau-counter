@@ -1399,23 +1399,31 @@ document.addEventListener('DOMContentLoaded', () => {
     if (nodeFase6) {
         nodeFase6.addEventListener('click', () => {
             try { playSound('click'); } catch(e) {}
+            if (journeyPlayerToken) {
+                journeyPlayerToken.style.left = '25%';
+                journeyPlayerToken.style.top = '62%';
+            }
             currentBossEncounter = 'volibear';
             setupBossEncounterUI();
-            if (journeyEncounterOverlay) journeyEncounterOverlay.classList.add('active');
+            const overlay = document.getElementById('journey-encounter-overlay') || journeyEncounterOverlay;
+            if (overlay) overlay.classList.add('active');
         });
     }
 
-
-    
     const nodeFase7 = document.getElementById('node-fase7');
     if (nodeFase7) {
         nodeFase7.addEventListener('click', () => {
             const isFase6Done = localStorage.getItem('mandamau_journey_fase6_completed') === 'true';
             if (isFase6Done) {
                 try { playSound('click'); } catch(e) {}
+                if (journeyPlayerToken) {
+                    journeyPlayerToken.style.left = '40%';
+                    journeyPlayerToken.style.top = '50%';
+                }
                 currentBossEncounter = 'warwick';
                 setupBossEncounterUI();
-                if (journeyEncounterOverlay) journeyEncounterOverlay.classList.add('active');
+                const overlay = document.getElementById('journey-encounter-overlay') || journeyEncounterOverlay;
+                if (overlay) overlay.classList.add('active');
             } else {
                 try { playSound('click'); } catch(e) {}
                 showAchievementToast({
@@ -6051,7 +6059,10 @@ btnBjCh2Close.addEventListener('click', () => {
     bjChapter2.classList.remove('active');
     playSound('rank_up_high');
     localStorage.setItem('mandamau_journey_fase5_completed', 'true');
-    currentMapChapter = 1; // Stay on Chapter 1 — player uses the arrow to go to Chapter 2
+    // Ensure Chapter 2 starts cleanly at Volibear (Fase 6)
+    localStorage.removeItem('mandamau_journey_fase6_completed');
+    localStorage.removeItem('mandamau_journey_fase7_completed');
+    currentMapChapter = 2;
     openJourney();
 });
 
