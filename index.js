@@ -1,3 +1,36 @@
+
+// ================================================================
+// INDEPENDENT DECORATION BUTTON CONTROLLER (UNLINKED FROM MAP)
+// ================================================================
+(function initStandaloneDecorationButton() {
+    function bindDec() {
+        const btn = document.getElementById('btn-decorations-top');
+        const modal = document.getElementById('decorations-modal');
+        const closeBtn = document.getElementById('btn-close-decorations');
+        
+        if (btn && modal) {
+            btn.onclick = function(e) {
+                if (e) e.preventDefault();
+                try { if (typeof renderDecorationsModal === 'function') renderDecorationsModal(); } catch(err) {}
+                modal.classList.add('active');
+                try { playSound('click'); } catch(err) {}
+            };
+        }
+        if (closeBtn && modal) {
+            closeBtn.onclick = function(e) {
+                if (e) e.preventDefault();
+                modal.classList.remove('active');
+                try { playSound('click'); } catch(err) {}
+            };
+        }
+    }
+    bindDec();
+    if (document.readyState !== 'complete') {
+        document.addEventListener('DOMContentLoaded', bindDec);
+        window.addEventListener('load', bindDec);
+    }
+})();
+
 // ================================================================
 // THEME MUSIC SYSTEM
 // ================================================================
@@ -3041,29 +3074,31 @@ function switchMapChapter(chapterNum) {
         if (mapCap1) { mapCap1.style.display = 'none'; mapCap1.classList.remove('active'); }
         if (mapCap2) { mapCap2.style.display = 'block'; mapCap2.classList.add('active'); }
         if (titleEl) titleEl.textContent = 'Capítulo 2: O Caos Deselegante';
-        if (subtitleEl) subtitleEl.textContent = 'O Deus da Mentira foi libertado! Enfrente as novas ameaças e restabeleça a ordem!';
+        if (subtitleEl) subtitleEl.textContent = 'Enfrente as ameaças do Capítulo 2 e avance rumo ao Confronto Final!';
         
         if (btnNavPrev) btnNavPrev.style.display = 'inline-flex';
         if (btnNavNext) btnNavNext.style.display = 'none';
 
         const isFase6Completed = localStorage.getItem('mandamau_journey_fase6_completed') === 'true';
 
+        // NODE FASE 6 (VOLIBEAR - POSITION: LEFT 25%, TOP 62%)
         const nodeFase6 = document.getElementById('node-fase6');
         const lineFase6 = document.querySelector('.line-fase6');
         if (nodeFase6) {
             nodeFase6.className = 'map-node node-active';
-            nodeFase6.title = 'Fase 6 - O Urso da Tempestade (Volibear)';
+            nodeFase6.title = 'Fase 6 - Volibear (O Urso da Tempestade)';
             const iconSpan = nodeFase6.querySelector('.node-icon');
             if (iconSpan) iconSpan.textContent = '⚡';
         }
         if (lineFase6) lineFase6.classList.add('line-active');
 
+        // NODE FASE 7 (WARWICK - POSITION: LEFT 65%, TOP 40% - TOTALLY SEPARATE)
         const nodeFase7 = document.getElementById('node-fase7');
         const lineFase7 = document.querySelector('.line-fase7');
         if (isFase6Completed) {
             if (nodeFase7) {
                 nodeFase7.className = 'map-node node-active';
-                nodeFase7.title = 'Fase 7 - Warwick';
+                nodeFase7.title = 'Fase 7 - Warwick (O Caçador Furtivo)';
                 const iconSpan = nodeFase7.querySelector('.node-icon');
                 if (iconSpan) iconSpan.textContent = '🐺';
             }
@@ -3078,18 +3113,16 @@ function switchMapChapter(chapterNum) {
             if (lineFase7) lineFase7.classList.remove('line-active');
         }
 
+        // PLAYER TOKEN POSITIONING
         if (journeyPlayerToken) {
             if (isFase6Completed) {
-                journeyPlayerToken.style.left = '40%';
-                journeyPlayerToken.style.top = '50%';
+                journeyPlayerToken.style.left = '65%';
+                journeyPlayerToken.style.top = '40%';
             } else {
                 journeyPlayerToken.style.left = '25%';
                 journeyPlayerToken.style.top = '62%';
             }
         }
-    } else {
-
-        if (mapCap2) { mapCap2.style.display = 'none'; mapCap2.classList.remove('active'); }
         if (mapCap1) { mapCap1.style.display = 'block'; mapCap1.classList.add('active'); }
         if (titleEl) titleEl.textContent = 'A Jornada pelo Remédio Supremo (Capítulo 1)';
         if (subtitleEl) subtitleEl.textContent = 'Desbrave o caminho até a sede do GGOPA para curar a maldição do Bako';
