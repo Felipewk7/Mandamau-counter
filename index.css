@@ -4984,5 +4984,59 @@ body::before {
     box-shadow: 0 6px 20px rgba(245, 158, 11, 0.6);
 }
 
+/* Navigation Arrows for Map Chapters */
+.btn-map-nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 50;
+    background: linear-gradient(135deg, rgba(245, 158, 11, 0.95), rgba(236, 72, 153, 0.95));
+    border: 2px solid #ffffff;
+    color: #ffffff;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 800;
+    padding: 10px 16px;
+    border-radius: 25px;
+    cursor: pointer;
+    box-shadow: 0 0 25px rgba(245, 158, 11, 0.6), 0 4px 15px rgba(0, 0, 0, 0.5);
+    transition: all 0.25s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    animation: pulse-nav-arrow 1.6s infinite alternate;
+}
+
+.btn-map-nav.nav-next {
+    right: 14px;
+}
+
+.btn-map-nav.nav-prev {
+    left: 14px;
+}
+
+.btn-map-nav:hover {
+    transform: translateY(-50%) scale(1.08);
+    box-shadow: 0 0 35px rgba(245, 158, 11, 0.8), 0 6px 20px rgba(0, 0, 0, 0.6);
+}
+
+@keyframes pulse-nav-arrow {
+    0% { transform: translateY(-50%) scale(1); box-shadow: 0 0 15px rgba(245, 158, 11, 0.5); }
+    100% { transform: translateY(-50%) scale(1.05); box-shadow: 0 0 30px rgba(245, 158, 11, 0.9); }
+}
+
+/* Chapter Map View Container */
+.map-chapter-view {
+    position: absolute;
+    inset: 0;
+    transition: opacity 0.4s ease;
+}
+
+.map-chapter-view:not(.active) {
+    pointer-events: none;
+    opacity: 0;
+}
+
+
 
 

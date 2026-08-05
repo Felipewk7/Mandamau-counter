@@ -311,8 +311,8 @@
     <div id="journey-overlay" class="journey-overlay">
         <div class="journey-box">
             <button id="btn-close-journey-view" class="btn-close-journey-view" title="Fechar Jornada">&times;</button>
-            <h2 class="journey-title">A Jornada pelo Remédio Supremo</h2>
-            <p class="journey-subtitle">Desbrave o caminho até a sede do GGOPA para curar a maldição do Bako</p>
+            <h2 id="journey-title" class="journey-title">A Jornada pelo Remédio Supremo (Capítulo 1)</h2>
+            <p id="journey-subtitle" class="journey-subtitle">Desbrave o caminho até a sede do GGOPA para curar a maldição do Bako</p>
             <div class="journey-top-actions">
                 <button id="btn-open-achievements-map" class="btn-achievements-map" title="Ver Conquistas">
                     🏆 Conquistas <span id="map-achievements-badge" class="achievements-badge-pill">0/10</span>
@@ -320,46 +320,100 @@
             </div>
             
             <div id="journey-map-container" class="journey-map-container">
-                <!-- SVG connecting paths -->
-                <svg class="journey-map-svg">
-                    <line x1="10%" y1="75%" x2="25%" y2="62%" class="map-path-line line-fase1" />
-                    <line x1="25%" y1="62%" x2="40%" y2="50%" class="map-path-line line-fase2" />
-                    <line x1="40%" y1="50%" x2="55%" y2="40%" class="map-path-line line-fase3" />
-                    <line x1="55%" y1="40%" x2="72%" y2="30%" class="map-path-line line-fase4" />
-                    <line x1="72%" y1="30%" x2="90%" y2="20%" class="map-path-line line-fase5" />
-                </svg>
-                
-                <!-- Map Nodes -->
-                <div id="node-start" class="map-node node-active" style="left: 10%; top: 75%;" title="Início">
-                    <span class="node-icon">🏁</span>
-                    <span class="node-label">Início</span>
-                </div>
-                
-                <div id="node-fase1" class="map-node" style="left: 25%; top: 62%;" title="Fase 1 - O Palhaço Kleber">
-                    <span class="node-icon">🤡</span>
-                    <span class="node-label">Fase 1</span>
-                </div>
-                
-                <div id="node-fase2" class="map-node node-locked" style="left: 40%; top: 50%;" title="Fase 2 - Quiz da Gwen">
-                    <span class="node-icon">🔒</span>
-                    <span class="node-label">Fase 2</span>
-                </div>
-                
-                <div id="node-fase3" class="map-node node-locked" style="left: 55%; top: 40%;" title="Fase 3">
-                    <span class="node-icon">🔒</span>
-                    <span class="node-label">Fase 3</span>
+                <!-- Navigation Arrows between Chapters -->
+                <button id="btn-map-nav-prev" class="btn-map-nav nav-prev" style="display: none;" title="Voltar para o Capítulo 1">
+                    ⬅️ Capitulo 1
+                </button>
+                <button id="btn-map-nav-next" class="btn-map-nav nav-next" style="display: none;" title="Ir para o Capítulo 2">
+                    Capítulo 2 ➡️
+                </button>
+
+                <!-- MAP CHAPTER 1 -->
+                <div id="map-chapter-1" class="map-chapter-view active">
+                    <!-- SVG connecting paths -->
+                    <svg class="journey-map-svg">
+                        <line x1="10%" y1="75%" x2="25%" y2="62%" class="map-path-line line-fase1" />
+                        <line x1="25%" y1="62%" x2="40%" y2="50%" class="map-path-line line-fase2" />
+                        <line x1="40%" y1="50%" x2="55%" y2="40%" class="map-path-line line-fase3" />
+                        <line x1="55%" y1="40%" x2="72%" y2="30%" class="map-path-line line-fase4" />
+                        <line x1="72%" y1="30%" x2="90%" y2="20%" class="map-path-line line-fase5" />
+                    </svg>
+                    
+                    <!-- Map Nodes -->
+                    <div id="node-start" class="map-node node-active" style="left: 10%; top: 75%;" title="Início">
+                        <span class="node-icon">🏁</span>
+                        <span class="node-label">Início</span>
+                    </div>
+                    
+                    <div id="node-fase1" class="map-node" style="left: 25%; top: 62%;" title="Fase 1 - O Palhaço Kleber">
+                        <span class="node-icon">🤡</span>
+                        <span class="node-label">Fase 1</span>
+                    </div>
+                    
+                    <div id="node-fase2" class="map-node node-locked" style="left: 40%; top: 50%;" title="Fase 2 - Quiz da Gwen">
+                        <span class="node-icon">🔒</span>
+                        <span class="node-label">Fase 2</span>
+                    </div>
+                    
+                    <div id="node-fase3" class="map-node node-locked" style="left: 55%; top: 40%;" title="Fase 3">
+                        <span class="node-icon">🔒</span>
+                        <span class="node-label">Fase 3</span>
+                    </div>
+
+                    <div id="node-fase4" class="map-node node-locked" style="left: 72%; top: 30%;" title="Fase 4 - Bloqueada">
+                        <span class="node-icon">🔒</span>
+                        <span class="node-label">Fase 4</span>
+                    </div>
+
+                    <div id="node-ggopa" class="map-node node-locked" style="left: 90%; top: 20%;" title="Fase 5 - Fim (Sede do GGOPA)">
+                        <span class="node-icon">🏛️</span>
+                        <span class="node-label">Fase 5 (Fim)</span>
+                    </div>
                 </div>
 
-                <div id="node-fase4" class="map-node node-locked" style="left: 72%; top: 30%;" title="Fase 4 - Bloqueada">
-                    <span class="node-icon">🔒</span>
-                    <span class="node-label">Fase 4</span>
+                <!-- MAP CHAPTER 2 -->
+                <div id="map-chapter-2" class="map-chapter-view" style="display: none;">
+                    <!-- SVG connecting paths -->
+                    <svg class="journey-map-svg">
+                        <line x1="10%" y1="75%" x2="25%" y2="62%" class="map-path-line line-fase6" />
+                        <line x1="25%" y1="62%" x2="40%" y2="50%" class="map-path-line line-fase7" />
+                        <line x1="40%" y1="50%" x2="55%" y2="40%" class="map-path-line line-fase8" />
+                        <line x1="55%" y1="40%" x2="72%" y2="30%" class="map-path-line line-fase9" />
+                        <line x1="72%" y1="30%" x2="90%" y2="20%" class="map-path-line line-fase10" />
+                    </svg>
+
+                    <!-- Chapter 2 Map Nodes -->
+                    <div id="node-cap2-start" class="map-node node-active" style="left: 10%; top: 75%;" title="Portal do Caos">
+                        <span class="node-icon">🚪</span>
+                        <span class="node-label">Portal</span>
+                    </div>
+
+                    <div id="node-fase6" class="map-node" style="left: 25%; top: 62%;" title="Fase 6 - O Reino das Fake News">
+                        <span class="node-icon">📰</span>
+                        <span class="node-label">Fase 6</span>
+                    </div>
+
+                    <div id="node-fase7" class="map-node node-locked" style="left: 40%; top: 50%;" title="Fase 7 - O Hater Deselegante">
+                        <span class="node-icon">🔒</span>
+                        <span class="node-label">Fase 7</span>
+                    </div>
+
+                    <div id="node-fase8" class="map-node node-locked" style="left: 55%; top: 40%;" title="Fase 8 - Gerador de Falácias">
+                        <span class="node-icon">🔒</span>
+                        <span class="node-label">Fase 8</span>
+                    </div>
+
+                    <div id="node-fase9" class="map-node node-locked" style="left: 72%; top: 30%;" title="Fase 9 - O Arauto da Discórdia">
+                        <span class="node-icon">🔒</span>
+                        <span class="node-label">Fase 9</span>
+                    </div>
+
+                    <div id="node-fase10" class="map-node node-locked" style="left: 90%; top: 20%;" title="Fase 10 - O Deus da Mentira">
+                        <span class="node-icon">🔒</span>
+                        <span class="node-label">Fase 10 (Boss Cap 2)</span>
+                    </div>
                 </div>
 
-                <div id="node-ggopa" class="map-node node-locked" style="left: 90%; top: 20%;" title="Fase 5 - Fim (Sede do GGOPA)">
-                    <span class="node-icon">🏛️</span>
-                    <span class="node-label">Fase 5 (Fim)</span>
-                </div>
-                
                 <!-- Player Token -->
                 <div id="journey-player-token" class="journey-player-token" style="left: 10%; top: 75%;">
                     <span class="token-avatar">🏃</span>
@@ -367,6 +421,7 @@
                 </div>
             </div>
         </div>
+
 
         <!-- DEBUG Panel (activated by typing GGOPA on the journey map) -->
         <div id="debug-panel" class="debug-panel" style="display: none;">

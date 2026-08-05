@@ -582,6 +582,32 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
     
+    
+    const btnNavPrev = document.getElementById('btn-map-nav-prev');
+    const btnNavNext = document.getElementById('btn-map-nav-next');
+    if (btnNavNext) {
+        btnNavNext.addEventListener('click', () => {
+            switchMapChapter(2);
+            playSound('click');
+        });
+    }
+    if (btnNavPrev) {
+        btnNavPrev.addEventListener('click', () => {
+            switchMapChapter(1);
+            playSound('click');
+        });
+    }
+    
+    const nodeFase6 = document.getElementById('node-fase6');
+    if (nodeFase6) {
+        nodeFase6.addEventListener('click', () => {
+            playSound('click');
+            currentBossEncounter = 'fase6_fakenews';
+            setupBossEncounterUI();
+            journeyEncounterOverlay.classList.add('active');
+        });
+    }
+
     // Initial render of placed background decorations
     renderPlacedDecorations();
 });
@@ -2161,6 +2187,49 @@ btnClosePhone.addEventListener('click', () => {
     playSound('click');
 });
 
+
+// ================================================================
+// CHAPTER 2 MAP & NAVIGATION SYSTEM
+// ================================================================
+let currentMapChapter = parseInt(localStorage.getItem('mandamau_current_map_chapter') || '1');
+
+function switchMapChapter(chapterNum) {
+    currentMapChapter = chapterNum;
+    localStorage.setItem('mandamau_current_map_chapter', chapterNum.toString());
+
+    const mapCap1 = document.getElementById('map-chapter-1');
+    const mapCap2 = document.getElementById('map-chapter-2');
+    const btnNavPrev = document.getElementById('btn-map-nav-prev');
+    const btnNavNext = document.getElementById('btn-map-nav-next');
+    const titleEl = document.getElementById('journey-title');
+    const subtitleEl = document.getElementById('journey-subtitle');
+
+    const isCap1Completed = localStorage.getItem('mandamau_journey_fase5_completed') === 'true';
+
+    if (chapterNum === 2) {
+        if (mapCap1) { mapCap1.style.display = 'none'; mapCap1.classList.remove('active'); }
+        if (mapCap2) { mapCap2.style.display = 'block'; mapCap2.classList.add('active'); }
+        if (titleEl) titleEl.textContent = 'Capítulo 2: O Caos Deselegante';
+        if (subtitleEl) subtitleEl.textContent = 'O Deus da Mentira foi libertado! Enfrente as novas ameaças e restabeleça a ordem!';
+        
+        if (btnNavPrev) btnNavPrev.style.display = 'inline-flex';
+        if (btnNavNext) btnNavNext.style.display = 'none';
+
+        if (journeyPlayerToken) {
+            journeyPlayerToken.style.left = '25%';
+            journeyPlayerToken.style.top = '62%';
+        }
+    } else {
+        if (mapCap2) { mapCap2.style.display = 'none'; mapCap2.classList.remove('active'); }
+        if (mapCap1) { mapCap1.style.display = 'block'; mapCap1.classList.add('active'); }
+        if (titleEl) titleEl.textContent = 'A Jornada pelo Remédio Supremo (Capítulo 1)';
+        if (subtitleEl) subtitleEl.textContent = 'Desbrave o caminho até a sede do GGOPA para curar a maldição do Bako';
+        
+        if (btnNavPrev) btnNavPrev.style.display = 'none';
+        if (btnNavNext) btnNavNext.style.display = isCap1Completed ? 'inline-flex' : 'none';
+    }
+}
+
 const journeyOverlay = document.getElementById('journey-overlay');
 const btnCloseJourneyView = document.getElementById('btn-close-journey-view');
 const journeyPlayerToken = document.getElementById('journey-player-token');
@@ -2228,6 +2297,13 @@ function setupBossEncounterUI() {
         titleText.textContent = 'O Cubo Gey';
         authorText.textContent = 'Cláudio';
         bubblePara.textContent = 'Eu sou um cubo gey, me vença se for capaz!';
+    } else if (currentBossEncounter === 'fase6_fakenews') {
+        portrait.src = "img/kleber_clown.jpg";
+        portrait.alt = "Fake News Kleber";
+        nameText.textContent = "Kleber Fake News";
+        titleText.textContent = "Capítulo 2 - Fase 6";
+        authorText.textContent = "Kleber Fake News";
+        bubblePara.textContent = "Eu voltei no Capítulo 2 e agora espalho FAKE NEWS pelo mundo todo! Tente me parar se for capaz!";
     } else if (currentBossEncounter === 'felifep') {
 
         portrait.onerror = function() { if (!this.src.endsWith('img/kleber_clown.jpg')) this.src = 'img/kleber_clown.jpg'; };
@@ -2299,6 +2375,13 @@ btnAcceptChallenge.addEventListener('click', () => {
 
 function openJourney() {
     journeyOverlay.classList.add('active');
+    
+    // Check Chapter 1 completion and setup navigation
+    const isCap1Completed = localStorage.getItem('mandamau_journey_fase5_completed') === 'true';
+    if (!isCap1Completed && currentMapChapter === 2) {
+        currentMapChapter = 1;
+    }
+    switchMapChapter(currentMapChapter);
     journeyEncounterOverlay.classList.remove('active');
     pathLineFase1.classList.remove('line-active');
     nodeFase1.classList.remove('node-active');
@@ -5017,6 +5100,7 @@ btnBjCh2Close.addEventListener('click', () => {
     bjChapter2.classList.remove('active');
     playSound('rank_up_high');
     localStorage.setItem('mandamau_journey_fase5_completed', 'true');
+    currentMapChapter = 2; // Auto switch to Chapter 2 map upon finishing Cap 1!
     openJourney();
 });
 
