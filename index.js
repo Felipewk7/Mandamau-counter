@@ -4112,6 +4112,45 @@ function initJourneyMapState() {
             pathLineFase5.classList.add('line-active');
         }
     }
+
+    const journeyFase5Completed = localStorage.getItem('mandamau_journey_fase5_completed') === 'true';
+    if (journeyFase5Completed) {
+        const nodeFase6 = document.getElementById('node-fase6');
+        const lineFase6 = document.querySelector('.line-fase6');
+        if (nodeFase6) {
+            nodeFase6.className = 'map-node node-active';
+            nodeFase6.title = 'Fase 6 - Volibear';
+            const iconSpan = nodeFase6.querySelector('.node-icon');
+            if (iconSpan) iconSpan.textContent = '⚡';
+        }
+        if (lineFase6) lineFase6.classList.add('line-active');
+    }
+
+    const journeyFase6Completed = localStorage.getItem('mandamau_journey_fase6_completed') === 'true';
+    if (journeyFase6Completed) {
+        const nodeFase7 = document.getElementById('node-fase7');
+        const lineFase7 = document.querySelector('.line-fase7');
+        if (nodeFase7) {
+            nodeFase7.className = 'map-node node-active';
+            nodeFase7.title = 'Fase 7 - Warwick';
+            const iconSpan = nodeFase7.querySelector('.node-icon');
+            if (iconSpan) iconSpan.textContent = '🐺';
+        }
+        if (lineFase7) lineFase7.classList.add('line-active');
+    }
+
+    const journeyFase7Completed = localStorage.getItem('mandamau_journey_fase7_completed') === 'true';
+    if (journeyFase7Completed) {
+        const nodeFase8 = document.getElementById('node-fase8');
+        const lineFase8 = document.querySelector('.line-fase8');
+        if (nodeFase8) {
+            nodeFase8.className = 'map-node node-active';
+            nodeFase8.title = 'Fase 8 - Disponível';
+            const iconSpan = nodeFase8.querySelector('.node-icon');
+            if (iconSpan) iconSpan.textContent = '🗣️';
+        }
+        if (lineFase8) lineFase8.classList.add('line-active');
+    }
 }
 
 // Add the click listener for Fase 1 Node
@@ -4982,6 +5021,8 @@ function debugCompletePhase(phase) {
     if (phase >= 3) localStorage.setItem('mandamau_journey_fase3_completed', 'true');
     if (phase >= 4) localStorage.setItem('mandamau_journey_fase4_completed', 'true');
     if (phase >= 5) localStorage.setItem('mandamau_journey_fase5_completed', 'true');
+    if (phase >= 6) localStorage.setItem('mandamau_journey_fase6_completed', 'true');
+    if (phase >= 7) localStorage.setItem('mandamau_journey_fase7_completed', 'true');
     playSound('rank_up_high');
     openJourney();
     setTimeout(() => { debugPanel.style.display = 'block'; }, 50);
@@ -4993,6 +5034,8 @@ function debugResetPhase(fromPhase) {
     if (fromPhase <= 3) localStorage.removeItem('mandamau_journey_fase3_completed');
     if (fromPhase <= 4) localStorage.removeItem('mandamau_journey_fase4_completed');
     if (fromPhase <= 5) localStorage.removeItem('mandamau_journey_fase5_completed');
+    if (fromPhase <= 6) localStorage.removeItem('mandamau_journey_fase6_completed');
+    if (fromPhase <= 7) localStorage.removeItem('mandamau_journey_fase7_completed');
     playSound('reset');
     openJourney();
     setTimeout(() => { debugPanel.style.display = 'block'; }, 50);
@@ -5003,12 +5046,20 @@ document.getElementById('dbg-complete-2').addEventListener('click', () => debugC
 document.getElementById('dbg-complete-3').addEventListener('click', () => debugCompletePhase(3));
 document.getElementById('dbg-complete-4').addEventListener('click', () => debugCompletePhase(4));
 document.getElementById('dbg-complete-5').addEventListener('click', () => debugCompletePhase(5));
+const dbgComp6 = document.getElementById('dbg-complete-6');
+if (dbgComp6) dbgComp6.addEventListener('click', () => debugCompletePhase(6));
+const dbgComp7 = document.getElementById('dbg-complete-7');
+if (dbgComp7) dbgComp7.addEventListener('click', () => debugCompletePhase(7));
 
 document.getElementById('dbg-reset-1').addEventListener('click', () => debugResetPhase(1));
 document.getElementById('dbg-reset-2').addEventListener('click', () => debugResetPhase(2));
 document.getElementById('dbg-reset-3').addEventListener('click', () => debugResetPhase(3));
 document.getElementById('dbg-reset-4').addEventListener('click', () => debugResetPhase(4));
 document.getElementById('dbg-reset-5').addEventListener('click', () => debugResetPhase(5));
+const dbgRes6 = document.getElementById('dbg-reset-6');
+if (dbgRes6) dbgRes6.addEventListener('click', () => debugResetPhase(6));
+const dbgRes7 = document.getElementById('dbg-reset-7');
+if (dbgRes7) dbgRes7.addEventListener('click', () => debugResetPhase(7));
 
 document.getElementById('dbg-reset-all').addEventListener('click', () => {
     localStorage.removeItem('mandamau_journey_fase1_completed');
@@ -5016,6 +5067,8 @@ document.getElementById('dbg-reset-all').addEventListener('click', () => {
     localStorage.removeItem('mandamau_journey_fase3_completed');
     localStorage.removeItem('mandamau_journey_fase4_completed');
     localStorage.removeItem('mandamau_journey_fase5_completed');
+    localStorage.removeItem('mandamau_journey_fase6_completed');
+    localStorage.removeItem('mandamau_journey_fase7_completed');
     playSound('reset');
     openJourney();
     setTimeout(() => { debugPanel.style.display = 'block'; }, 50);
