@@ -2686,14 +2686,8 @@ function switchMapChapter(chapterNum) {
             journeyPlayerToken.style.left = '25%';
             journeyPlayerToken.style.top = '62%';
         }
-
-        // Auto open Volibear encounter dialogue when switching to Map 2
-        setTimeout(() => {
-            currentBossEncounter = 'volibear';
-            setupBossEncounterUI();
-            if (journeyEncounterOverlay) journeyEncounterOverlay.classList.add('active');
-        }, 300);
     } else {
+
         if (mapCap2) { mapCap2.style.display = 'none'; mapCap2.classList.remove('active'); }
         if (mapCap1) { mapCap1.style.display = 'block'; mapCap1.classList.add('active'); }
         if (titleEl) titleEl.textContent = 'A Jornada pelo Remédio Supremo (Capítulo 1)';
