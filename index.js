@@ -331,9 +331,11 @@ document.addEventListener('DOMContentLoaded', () => {
             closeWarwickGame();
             try { playSound('rank_up_high'); } catch(e) {}
             
-            // Unlock Fase 8 on Chapter 2 map & auto-walk token
+            // Open journey on Chapter 2 (warwick victory → fase 8 unlocked)
             openJourney();
             setTimeout(() => {
+                // Navigate to Chapter 2 where node-fase8 lives
+                switchMapChapter(2);
                 const nodeF8 = document.getElementById('node-fase8');
                 const lineF8 = document.querySelector('.line-fase8');
                 if (nodeF8) {
@@ -765,14 +767,17 @@ document.addEventListener('DOMContentLoaded', () => {
             closeVolibearGame();
             try { playSound('rank_up_high'); } catch(e) {}
             
-            // Unlock Fase 7 on Chapter 2 map & auto-walk token
+            // Open journey and navigate DIRECTLY to Chapter 2 with Fase 7 unlocked
             openJourney();
             setTimeout(() => {
+                // CRITICAL: go to Chapter 2 map (Volibear is Chapter 2!)
+                switchMapChapter(2);
+                
                 const nodeF7 = document.getElementById('node-fase7');
                 const lineF7 = document.querySelector('.line-fase7');
                 if (nodeF7) {
                     nodeF7.className = 'map-node node-active';
-                    nodeF7.title = 'Fase 7 - Disponível (Warwick)';
+                    nodeF7.title = 'Fase 7 - Warwick (Desbloqueado!)';
                     const iconSpan = nodeF7.querySelector('.node-icon');
                     if (iconSpan) iconSpan.textContent = '🐺';
                 }
@@ -3247,6 +3252,10 @@ btnAcceptChallenge.addEventListener('click', () => {
 
 function openJourney() {
     journeyOverlay.classList.add('active');
+    
+    // CRITICAL: always close game overlays before opening journey map
+    if (warwickStealthOverlay) warwickStealthOverlay.classList.remove('active');
+    if (volibearStormOverlay) volibearStormOverlay.classList.remove('active');
     
     // Always open on Chapter 1 map. User navigates to Chapter 2 via the arrow.
     currentMapChapter = 1;
