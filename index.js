@@ -3020,6 +3020,8 @@ function switchMapChapter(chapterNum) {
         if (btnNavPrev) btnNavPrev.style.display = 'inline-flex';
         if (btnNavNext) btnNavNext.style.display = 'none';
 
+        const isFase6Completed = localStorage.getItem('mandamau_journey_fase6_completed') === 'true';
+
         const nodeFase6 = document.getElementById('node-fase6');
         const lineFase6 = document.querySelector('.line-fase6');
         if (nodeFase6) {
@@ -3030,9 +3032,34 @@ function switchMapChapter(chapterNum) {
         }
         if (lineFase6) lineFase6.classList.add('line-active');
 
+        const nodeFase7 = document.getElementById('node-fase7');
+        const lineFase7 = document.querySelector('.line-fase7');
+        if (isFase6Completed) {
+            if (nodeFase7) {
+                nodeFase7.className = 'map-node node-active';
+                nodeFase7.title = 'Fase 7 - Warwick';
+                const iconSpan = nodeFase7.querySelector('.node-icon');
+                if (iconSpan) iconSpan.textContent = '🐺';
+            }
+            if (lineFase7) lineFase7.classList.add('line-active');
+        } else {
+            if (nodeFase7) {
+                nodeFase7.className = 'map-node node-locked';
+                nodeFase7.title = 'Fase 7 - Bloqueada (Derrote Volibear na Fase 6 primeiro)';
+                const iconSpan = nodeFase7.querySelector('.node-icon');
+                if (iconSpan) iconSpan.textContent = '🔒';
+            }
+            if (lineFase7) lineFase7.classList.remove('line-active');
+        }
+
         if (journeyPlayerToken) {
-            journeyPlayerToken.style.left = '25%';
-            journeyPlayerToken.style.top = '62%';
+            if (isFase6Completed) {
+                journeyPlayerToken.style.left = '40%';
+                journeyPlayerToken.style.top = '50%';
+            } else {
+                journeyPlayerToken.style.left = '25%';
+                journeyPlayerToken.style.top = '62%';
+            }
         }
     } else {
 
@@ -3129,13 +3156,7 @@ function setupBossEncounterUI() {
         titleText.textContent = 'O Cubo Gey';
         authorText.textContent = 'Cláudio';
         bubblePara.textContent = 'Eu sou um cubo gey, me vença se for capaz!';
-    } else if (currentBossEncounter === 'volibear') {
-        portrait.src = "img/volibear.png";
-        portrait.alt = "Volibear O Urso da Tempestade";
-        nameText.textContent = "Volibear";
-        titleText.textContent = "Capítulo 2 — Fase 6: O Urso da Tempestade";
-        authorText.textContent = "Volibear";
-        bubblePara.textContent = "A TEMPESTADE NÃO TEM PIEDADE! Desvie dos meus trovões se for capaz!";
+
     } else if (currentBossEncounter === 'fase6_fakenews') {
         portrait.src = "img/kleber_clown.jpg";
         portrait.alt = "Fake News Kleber";
