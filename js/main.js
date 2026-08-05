@@ -88,10 +88,10 @@ function updateWarwickUI() {
 }
 
 function openWarwickGame() {
-    // 1. Force close Volibear game completely
-    closeVolibearGame();
+    volibearGameActive = false;
+    const vOverlay = document.getElementById('volibear-storm-overlay');
+    if (vOverlay) vOverlay.classList.remove('active');
     
-    // 2. Open Warwick stealth overlay
     const overlay = document.getElementById('warwick-stealth-overlay');
     if (!overlay) return;
     overlay.classList.add('active');
@@ -107,7 +107,7 @@ function openWarwickGame() {
     if (tutModal) tutModal.style.display = 'flex';
     
     warwickGameActive = false;
-    playTheme('fase6');
+    playTheme('fase7');
 }
 
 function startWarwickGame() {
@@ -412,8 +412,9 @@ function updateVolibearRoundUI() {
 }
 
 function openVolibearGame() {
-    // Force close Warwick game completely
-    closeWarwickGame();
+    warwickGameActive = false;
+    const wOverlay = document.getElementById('warwick-stealth-overlay');
+    if (wOverlay) wOverlay.classList.remove('active');
 
     const overlay = document.getElementById('volibear-storm-overlay');
     if (!overlay) return;
@@ -6532,4 +6533,140 @@ bindAllGlobalEvents();
 if (document.readyState !== 'complete') {
     document.addEventListener('DOMContentLoaded', bindAllGlobalEvents);
     window.addEventListener('load', bindAllGlobalEvents);
+}
+
+
+// ================================================================
+// MASTER UNCONDITIONAL EVENT & PERSISTENCE CONTROLLER
+// ================================================================
+function initMasterAppController() {
+    // 1. Initial Render of Saved Background Decorations
+    try {
+        renderPlacedDecorations();
+    } catch(e) {
+        console.warn("Error rendering placed decorations:", e);
+    }
+
+    // 2. Top Bar Decoration Menu Buttons
+    const btnDecTop = document.getElementById('btn-decorations-top');
+    const modalDec = document.getElementById('decorations-modal');
+    const btnCloseDec = document.getElementById('btn-close-decorations');
+
+    if (btnDecTop) {
+        btnDecTop.onclick = (e) => {
+            if (e) e.preventDefault();
+            renderDecorationsModal();
+            const modal = document.getElementById('decorations-modal');
+            if (modal) modal.classList.add('active');
+            try { playSound('click'); } catch(err) {}
+        };
+    }
+    if (btnCloseDec) {
+        btnCloseDec.onclick = (e) => {
+            if (e) e.preventDefault();
+            const modal = document.getElementById('decorations-modal');
+            if (modal) modal.classList.remove('active');
+            try { playSound('click'); } catch(err) {}
+        };
+    }
+
+    // 3. Map Chapter Navigation Buttons (Prev / Next)
+    const btnNavPrev = document.getElementById('btn-map-nav-prev');
+    const btnNavNext = document.getElementById('btn-map-nav-next');
+
+    if (btnNavPrev) {
+        btnNavPrev.onclick = (e) => {
+            if (e) e.preventDefault();
+            switchMapChapter(1);
+            try { playSound('click'); } catch(err) {}
+        };
+    }
+    if (btnNavNext) {
+        btnNavNext.onclick = (e) => {
+            if (e) e.preventDefault();
+            switchMapChapter(2);
+            try { playSound('click'); } catch(err) {}
+        };
+    }
+
+    // 4. Volibear & Warwick Buttons
+    const btnCloseVolTut = document.getElementById('btn-close-volibear-tutorial');
+    const btnVolQuit = document.getElementById('btn-volibear-quit');
+    const btnVolRestart = document.getElementById('btn-volibear-restart');
+    const btnVolWinOk = document.getElementById('btn-volibear-win-ok');
+
+    if (btnCloseVolTut) {
+        btnCloseVolTut.onclick = (e) => {
+            if (e) e.preventDefault();
+            try { playSound('click'); } catch(err) {}
+            startVolibearGame();
+        };
+    }
+    if (btnVolQuit) {
+        btnVolQuit.onclick = (e) => {
+            if (e) e.preventDefault();
+            closeVolibearGame();
+            try { playSound('click'); } catch(err) {}
+        };
+    }
+    if (btnVolRestart) {
+        btnVolRestart.onclick = (e) => {
+            if (e) e.preventDefault();
+            try { playSound('click'); } catch(err) {}
+            startVolibearGame();
+        };
+    }
+    if (btnVolWinOk) {
+        btnVolWinOk.onclick = (e) => {
+            if (e) e.preventDefault();
+            closeVolibearGame();
+            try { playSound('rank_up_high'); } catch(err) {}
+            openJourney();
+            setTimeout(() => {
+                switchMapChapter(2);
+                const nodeF7 = document.getElementById('node-fase7');
+                const lineF7 = document.querySelector('.line-fase7');
+                if (nodeF7) {
+                    nodeF7.className = 'map-node node-active';
+                    nodeF7.title = 'Fase 7 - Warwick (Desbloqueado!)';
+                    const iconSpan = nodeF7.querySelector('.node-icon');
+                    if (iconSpan) iconSpan.textContent = '🐺';
+                }
+                if (lineF7) lineF7.classList.add('line-active');
+            }, 500);
+        };
+    }
+
+    const btnCloseWarTut = document.getElementById('btn-close-warwick-tutorial');
+    const btnWarQuit = document.getElementById('btn-warwick-quit');
+    const btnWarRestart = document.getElementById('btn-warwick-restart');
+
+    if (btnCloseWarTut) {
+        btnCloseWarTut.onclick = (e) => {
+            if (e) e.preventDefault();
+            try { playSound('click'); } catch(err) {}
+            startWarwickGame();
+        };
+    }
+    if (btnWarQuit) {
+        btnWarQuit.onclick = (e) => {
+            if (e) e.preventDefault();
+            closeWarwickGame();
+            try { playSound('click'); } catch(err) {}
+        };
+    }
+    if (btnWarRestart) {
+        btnWarRestart.onclick = (e) => {
+            if (e) e.preventDefault();
+            try { playSound('click'); } catch(err) {}
+            startWarwickGame();
+        };
+    }
+}
+
+// Run master controller immediately and on ready/load
+initMasterAppController();
+if (document.readyState !== 'complete') {
+    document.addEventListener('DOMContentLoaded', initMasterAppController);
+    window.addEventListener('load', initMasterAppController);
 }
