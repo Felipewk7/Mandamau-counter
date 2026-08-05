@@ -1385,7 +1385,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const nodeFase6 = document.getElementById('node-fase6');
     if (nodeFase6) {
         nodeFase6.addEventListener('click', () => {
-            playSound('click');
+            // Only open encounter if the node is active (not locked)
+            if (!nodeFase6.classList.contains('node-active')) return;
+            try { playSound('click'); } catch(e) {}
             currentBossEncounter = 'volibear';
             setupBossEncounterUI();
             journeyEncounterOverlay.classList.add('active');
@@ -2996,7 +2998,7 @@ btnClosePhone.addEventListener('click', () => {
 // ================================================================
 // CHAPTER 2 MAP & NAVIGATION SYSTEM
 // ================================================================
-let currentMapChapter = parseInt(localStorage.getItem('mandamau_current_map_chapter') || '1');
+let currentMapChapter = 1; // Always start on Chapter 1; user must navigate to Chapter 2 via arrow
 
 function switchMapChapter(chapterNum) {
     currentMapChapter = chapterNum;
@@ -3247,12 +3249,9 @@ btnAcceptChallenge.addEventListener('click', () => {
 function openJourney() {
     journeyOverlay.classList.add('active');
     
-    // Check Chapter 1 completion and setup navigation
-    const isCap1Completed = localStorage.getItem('mandamau_journey_fase5_completed') === 'true';
-    if (!isCap1Completed && currentMapChapter === 2) {
-        currentMapChapter = 1;
-    }
-    switchMapChapter(currentMapChapter);
+    // Always open on Chapter 1 map. User navigates to Chapter 2 via the arrow.
+    currentMapChapter = 1;
+    switchMapChapter(1);
     journeyEncounterOverlay.classList.remove('active');
     pathLineFase1.classList.remove('line-active');
     nodeFase1.classList.remove('node-active');
@@ -3310,21 +3309,7 @@ function openJourney() {
     // Run map initialization to unlock correct nodes/paths
     initJourneyMapState();
     
-    const journeyFase6Completed = localStorage.getItem('mandamau_journey_fase6_completed') === 'true';
-    const journeyFase7Completed = localStorage.getItem('mandamau_journey_fase7_completed') === 'true';
-
-    if (currentMapChapter === 2) {
-        if (journeyFase7Completed) {
-            journeyPlayerToken.style.left = '55%';
-            journeyPlayerToken.style.top = '40%';
-        } else if (journeyFase6Completed) {
-            journeyPlayerToken.style.left = '40%';
-            journeyPlayerToken.style.top = '50%';
-        } else {
-            journeyPlayerToken.style.left = '25%';
-            journeyPlayerToken.style.top = '62%';
-        }
-    } else if (journeyFase4Completed) {
+    if (journeyFase4Completed) {
         journeyPlayerToken.style.left = '90%';
         journeyPlayerToken.style.top = '20%';
     } else if (journeyFase3Completed) {
@@ -6044,7 +6029,7 @@ btnBjCh2Close.addEventListener('click', () => {
     bjChapter2.classList.remove('active');
     playSound('rank_up_high');
     localStorage.setItem('mandamau_journey_fase5_completed', 'true');
-    currentMapChapter = 2; // Auto switch to Chapter 2 map upon finishing Cap 1!
+    currentMapChapter = 1; // Stay on Chapter 1 — player uses the arrow to go to Chapter 2
     openJourney();
 });
 
