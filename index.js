@@ -1,34 +1,4 @@
 // ================================================================
-(function initStandaloneDecorationButton() {
-    function bindDec() {
-        const btn = document.getElementById('btn-decorations-top');
-        const modal = document.getElementById('decorations-modal');
-        const closeBtn = document.getElementById('btn-close-decorations');
-        
-        if (btn && modal) {
-            btn.onclick = function(e) {
-                if (e) e.preventDefault();
-                try { if (typeof renderDecorationsModal === 'function') renderDecorationsModal(); } catch(err) {}
-                modal.classList.add('active');
-                try { playSound('click'); } catch(err) {}
-            };
-        }
-        if (closeBtn && modal) {
-            closeBtn.onclick = function(e) {
-                if (e) e.preventDefault();
-                modal.classList.remove('active');
-                try { playSound('click'); } catch(err) {}
-            };
-        }
-    }
-    bindDec();
-    if (document.readyState !== 'complete') {
-        document.addEventListener('DOMContentLoaded', bindDec);
-        window.addEventListener('load', bindDec);
-    }
-})();
-
-// ================================================================
 // THEME MUSIC SYSTEM
 // ================================================================
 const gameThemeAudio = document.getElementById('game-theme');
@@ -1371,7 +1341,7 @@ function renderDecorationsModal() {
     });
 }
 
-function initAppUIListeners() {
+function bindUIDOMListeners() {
     const btnDecTop = document.getElementById('btn-decorations-top');
     const modalDec = document.getElementById('decorations-modal');
     const btnCloseDec = document.getElementById('btn-close-decorations');
@@ -1380,53 +1350,59 @@ function initAppUIListeners() {
         btnDecTop.onclick = () => {
             renderDecorationsModal();
             modalDec.classList.add('active');
-            playSound('click');
+            try { playSound('click'); } catch(e) {}
         };
     }
     if (btnCloseDec && modalDec) {
         btnCloseDec.onclick = () => {
             modalDec.classList.remove('active');
-            playSound('click');
+            try { playSound('click'); } catch(e) {}
         };
     }
+}
+bindUIDOMListeners();
+
+document.addEventListener('DOMContentLoaded', () => {
+    bindUIDOMListeners();
     
     const modalUnlock = document.getElementById('cosmetic-unlock-modal');
     const btnUnlockClose = document.getElementById('btn-cosmetic-unlock-close');
     const btnUnlockOpenMenu = document.getElementById('btn-cosmetic-unlock-open-menu');
 
     if (btnUnlockClose && modalUnlock) {
-        btnUnlockClose.onclick = () => {
+        btnUnlockClose.addEventListener('click', () => {
             modalUnlock.classList.remove('active');
             playSound('click');
-        };
+        });
     }
     if (btnUnlockOpenMenu && modalUnlock && modalDec) {
-        btnUnlockOpenMenu.onclick = () => {
+        btnUnlockOpenMenu.addEventListener('click', () => {
             modalUnlock.classList.remove('active');
             renderDecorationsModal();
             modalDec.classList.add('active');
             playSound('click');
-        };
+        });
     }
+    
     
     const btnNavPrev = document.getElementById('btn-map-nav-prev');
     const btnNavNext = document.getElementById('btn-map-nav-next');
     if (btnNavNext) {
-        btnNavNext.onclick = () => {
+        btnNavNext.addEventListener('click', () => {
             switchMapChapter(2);
             playSound('click');
-        };
+        });
     }
     if (btnNavPrev) {
-        btnNavPrev.onclick = () => {
+        btnNavPrev.addEventListener('click', () => {
             switchMapChapter(1);
             playSound('click');
-        };
+        });
     }
     
     const nodeFase6 = document.getElementById('node-fase6');
     if (nodeFase6) {
-        nodeFase6.onclick = () => {
+        nodeFase6.addEventListener('click', () => {
             try { playSound('click'); } catch(e) {}
             if (journeyPlayerToken) {
                 journeyPlayerToken.style.left = '25%';
@@ -1436,12 +1412,12 @@ function initAppUIListeners() {
             setupBossEncounterUI();
             const overlay = document.getElementById('journey-encounter-overlay') || journeyEncounterOverlay;
             if (overlay) overlay.classList.add('active');
-        };
+        });
     }
 
     const nodeFase7 = document.getElementById('node-fase7');
     if (nodeFase7) {
-        nodeFase7.onclick = () => {
+        nodeFase7.addEventListener('click', () => {
             const isFase6Done = localStorage.getItem('mandamau_journey_fase6_completed') === 'true';
             if (isFase6Done) {
                 try { playSound('click'); } catch(e) {}
@@ -1461,17 +1437,12 @@ function initAppUIListeners() {
                     desc: 'Derrote Volibear na Fase 6 primeiro para desbloquear a Fase 7!'
                 });
             }
-        };
+        });
     }
 
     // Initial render of placed background decorations
     renderPlacedDecorations();
-}
-
-initAppUIListeners();
-if (document.readyState !== 'complete') {
-    document.addEventListener('DOMContentLoaded', initAppUIListeners);
-}
+});
 
 // ================================================================
 
@@ -3071,31 +3042,29 @@ function switchMapChapter(chapterNum) {
         if (mapCap1) { mapCap1.style.display = 'none'; mapCap1.classList.remove('active'); }
         if (mapCap2) { mapCap2.style.display = 'block'; mapCap2.classList.add('active'); }
         if (titleEl) titleEl.textContent = 'Capítulo 2: O Caos Deselegante';
-        if (subtitleEl) subtitleEl.textContent = 'Enfrente as ameaças do Capítulo 2 e avance rumo ao Confronto Final!';
+        if (subtitleEl) subtitleEl.textContent = 'O Deus da Mentira foi libertado! Enfrente as novas ameaças e restabeleça a ordem!';
         
         if (btnNavPrev) btnNavPrev.style.display = 'inline-flex';
         if (btnNavNext) btnNavNext.style.display = 'none';
 
         const isFase6Completed = localStorage.getItem('mandamau_journey_fase6_completed') === 'true';
 
-        // NODE FASE 6 (VOLIBEAR - POSITION: LEFT 25%, TOP 62%)
         const nodeFase6 = document.getElementById('node-fase6');
         const lineFase6 = document.querySelector('.line-fase6');
         if (nodeFase6) {
             nodeFase6.className = 'map-node node-active';
-            nodeFase6.title = 'Fase 6 - Volibear (O Urso da Tempestade)';
+            nodeFase6.title = 'Fase 6 - O Urso da Tempestade (Volibear)';
             const iconSpan = nodeFase6.querySelector('.node-icon');
             if (iconSpan) iconSpan.textContent = '⚡';
         }
         if (lineFase6) lineFase6.classList.add('line-active');
 
-        // NODE FASE 7 (WARWICK - POSITION: LEFT 65%, TOP 40% - TOTALLY SEPARATE)
         const nodeFase7 = document.getElementById('node-fase7');
         const lineFase7 = document.querySelector('.line-fase7');
         if (isFase6Completed) {
             if (nodeFase7) {
                 nodeFase7.className = 'map-node node-active';
-                nodeFase7.title = 'Fase 7 - Warwick (O Caçador Furtivo)';
+                nodeFase7.title = 'Fase 7 - Warwick';
                 const iconSpan = nodeFase7.querySelector('.node-icon');
                 if (iconSpan) iconSpan.textContent = '🐺';
             }
@@ -3110,16 +3079,18 @@ function switchMapChapter(chapterNum) {
             if (lineFase7) lineFase7.classList.remove('line-active');
         }
 
-        // PLAYER TOKEN POSITIONING
         if (journeyPlayerToken) {
             if (isFase6Completed) {
-                journeyPlayerToken.style.left = '65%';
-                journeyPlayerToken.style.top = '40%';
+                journeyPlayerToken.style.left = '40%';
+                journeyPlayerToken.style.top = '50%';
             } else {
                 journeyPlayerToken.style.left = '25%';
                 journeyPlayerToken.style.top = '62%';
             }
         }
+    } else {
+
+        if (mapCap2) { mapCap2.style.display = 'none'; mapCap2.classList.remove('active'); }
         if (mapCap1) { mapCap1.style.display = 'block'; mapCap1.classList.add('active'); }
         if (titleEl) titleEl.textContent = 'A Jornada pelo Remédio Supremo (Capítulo 1)';
         if (subtitleEl) subtitleEl.textContent = 'Desbrave o caminho até a sede do GGOPA para curar a maldição do Bako';
@@ -6225,33 +6196,3 @@ if (dbgLaunchWarwick) {
 }
 
 
-
-
-// ================================================================
-// DELEGATED DECORATION & NAVIGATION EVENT LISTENER
-// ================================================================
-document.addEventListener('click', (e) => {
-    // 🖼️ Top Bar Decoration Button
-    const btnDec = e.target.closest('#btn-decorations-top');
-    if (btnDec) {
-        e.preventDefault();
-        const modalDec = document.getElementById('decorations-modal');
-        if (modalDec) {
-            if (typeof renderDecorationsModal === 'function') renderDecorationsModal();
-            modalDec.classList.add('active');
-        }
-        try { playSound('click'); } catch(err) {}
-        return;
-    }
-
-    const btnCloseDec = e.target.closest('#btn-close-decorations');
-    if (btnCloseDec) {
-        e.preventDefault();
-        const modalDec = document.getElementById('decorations-modal');
-        if (modalDec) {
-            modalDec.classList.remove('active');
-        }
-        try { playSound('click'); } catch(err) {}
-        return;
-    }
-});
