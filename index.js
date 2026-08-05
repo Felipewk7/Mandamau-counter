@@ -3228,6 +3228,8 @@ function setupBossEncounterUI() {
 
 btnAcceptChallenge.addEventListener('click', () => {
     journeyEncounterOverlay.classList.remove('active');
+    // CRITICAL: close journey overlay so it doesn't block clicks after game ends
+    journeyOverlay.classList.remove('active');
     playSound('click');
     
     if (currentBossEncounter === 'kleber') {
@@ -6219,107 +6221,3 @@ if (dbgLaunchWarwick) {
 
 
 
-
-// ================================================================
-// DELEGATED EVENT LISTENERS (BULLETPROOF MODAL & BUTTON CONTROL)
-// ================================================================
-document.addEventListener('click', (e) => {
-    // 🖼️ Decoration Top Button & Close
-    if (e.target.closest('#btn-decorations-top')) {
-        e.preventDefault();
-        const modalDec = document.getElementById('decorations-modal');
-        if (modalDec) {
-            renderDecorationsModal();
-            modalDec.classList.add('active');
-            try { playSound('click'); } catch(err) {}
-        }
-    }
-    if (e.target.closest('#btn-close-decorations')) {
-        e.preventDefault();
-        const modalDec = document.getElementById('decorations-modal');
-        if (modalDec) {
-            modalDec.classList.remove('active');
-            try { playSound('click'); } catch(err) {}
-        }
-    }
-
-    // 🐺 Warwick Buttons
-    if (e.target.closest('#btn-close-warwick-tutorial')) {
-        e.preventDefault();
-        try { playSound('click'); } catch(err) {}
-        startWarwickGame();
-    }
-    if (e.target.closest('#btn-warwick-quit')) {
-        e.preventDefault();
-        closeWarwickGame();
-        try { playSound('click'); } catch(err) {}
-    }
-    if (e.target.closest('#btn-warwick-restart')) {
-        e.preventDefault();
-        try { playSound('click'); } catch(err) {}
-        startWarwickGame();
-    }
-    if (e.target.closest('#btn-warwick-win-ok')) {
-        e.preventDefault();
-        closeWarwickGame();
-        try { playSound('rank_up_high'); } catch(err) {}
-        openJourney();
-        setTimeout(() => {
-            switchMapChapter(2);
-            const nodeF8 = document.getElementById('node-fase8');
-            const lineF8 = document.querySelector('.line-fase8');
-            if (nodeF8) {
-                nodeF8.className = 'map-node node-active';
-                nodeF8.title = 'Fase 8 - Disponível';
-                const iconSpan = nodeF8.querySelector('.node-icon');
-                if (iconSpan) iconSpan.textContent = '🗣️';
-            }
-            if (lineF8) lineF8.classList.add('line-active');
-            const token = document.getElementById('journey-player-token');
-            if (token) {
-                token.style.left = '55%';
-                token.style.top = '40%';
-            }
-        }, 600);
-    }
-
-    // ⚡ Volibear Buttons
-    if (e.target.closest('#btn-close-volibear-tutorial')) {
-        e.preventDefault();
-        try { playSound('click'); } catch(err) {}
-        startVolibearGame();
-    }
-    if (e.target.closest('#btn-volibear-quit')) {
-        e.preventDefault();
-        closeVolibearGame();
-        try { playSound('click'); } catch(err) {}
-    }
-    if (e.target.closest('#btn-volibear-restart')) {
-        e.preventDefault();
-        try { playSound('click'); } catch(err) {}
-        startVolibearGame();
-    }
-    if (e.target.closest('#btn-volibear-win-ok')) {
-        e.preventDefault();
-        closeVolibearGame();
-        try { playSound('rank_up_high'); } catch(err) {}
-        openJourney();
-        setTimeout(() => {
-            switchMapChapter(2);
-            const nodeF7 = document.getElementById('node-fase7');
-            const lineF7 = document.querySelector('.line-fase7');
-            if (nodeF7) {
-                nodeF7.className = 'map-node node-active';
-                nodeF7.title = 'Fase 7 - Warwick (Desbloqueado!)';
-                const iconSpan = nodeF7.querySelector('.node-icon');
-                if (iconSpan) iconSpan.textContent = '🐺';
-            }
-            if (lineF7) lineF7.classList.add('line-active');
-            const token = document.getElementById('journey-player-token');
-            if (token) {
-                token.style.left = '40%';
-                token.style.top = '50%';
-            }
-        }, 600);
-    }
-});
