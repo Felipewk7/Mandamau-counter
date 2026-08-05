@@ -1396,10 +1396,20 @@ document.addEventListener('DOMContentLoaded', () => {
     const nodeFase7 = document.getElementById('node-fase7');
     if (nodeFase7) {
         nodeFase7.addEventListener('click', () => {
-            try { playSound('click'); } catch(e) {}
-            currentBossEncounter = 'warwick';
-            setupBossEncounterUI();
-            if (journeyEncounterOverlay) journeyEncounterOverlay.classList.add('active');
+            const isFase6Done = localStorage.getItem('mandamau_journey_fase6_completed') === 'true';
+            if (isFase6Done) {
+                try { playSound('click'); } catch(e) {}
+                currentBossEncounter = 'warwick';
+                setupBossEncounterUI();
+                if (journeyEncounterOverlay) journeyEncounterOverlay.classList.add('active');
+            } else {
+                try { playSound('click'); } catch(e) {}
+                showAchievementToast({
+                    icon: '🔒',
+                    title: 'FASE BLOQUEADA',
+                    desc: 'Derrote Volibear na Fase 6 primeiro para desbloquear a Fase 7!'
+                });
+            }
         });
     }
 
@@ -3279,18 +3289,30 @@ function openJourney() {
     // Run map initialization to unlock correct nodes/paths
     initJourneyMapState();
     
-    if (journeyFase4Completed) {
+    const journeyFase6Completed = localStorage.getItem('mandamau_journey_fase6_completed') === 'true';
+    const journeyFase7Completed = localStorage.getItem('mandamau_journey_fase7_completed') === 'true';
+
+    if (currentMapChapter === 2) {
+        if (journeyFase7Completed) {
+            journeyPlayerToken.style.left = '55%';
+            journeyPlayerToken.style.top = '40%';
+        } else if (journeyFase6Completed) {
+            journeyPlayerToken.style.left = '40%';
+            journeyPlayerToken.style.top = '50%';
+        } else {
+            journeyPlayerToken.style.left = '25%';
+            journeyPlayerToken.style.top = '62%';
+        }
+    } else if (journeyFase4Completed) {
         journeyPlayerToken.style.left = '90%';
         journeyPlayerToken.style.top = '20%';
     } else if (journeyFase3Completed) {
         journeyPlayerToken.style.left = '55%';
         journeyPlayerToken.style.top = '40%';
     } else if (journeyFase2Completed) {
-        // Starts at Fase 2 node (since Fase 2 is completed, standing there)
         journeyPlayerToken.style.left = '40%';
         journeyPlayerToken.style.top = '50%';
     } else if (journeyFase1Completed) {
-        // Starts at Fase 1 node (already completed Kleber)
         journeyPlayerToken.style.left = '25%';
         journeyPlayerToken.style.top = '62%';
     } else {
@@ -4127,9 +4149,9 @@ function initJourneyMapState() {
     }
 
     const journeyFase6Completed = localStorage.getItem('mandamau_journey_fase6_completed') === 'true';
+    const nodeFase7 = document.getElementById('node-fase7');
+    const lineFase7 = document.querySelector('.line-fase7');
     if (journeyFase6Completed) {
-        const nodeFase7 = document.getElementById('node-fase7');
-        const lineFase7 = document.querySelector('.line-fase7');
         if (nodeFase7) {
             nodeFase7.className = 'map-node node-active';
             nodeFase7.title = 'Fase 7 - Warwick';
@@ -4137,6 +4159,14 @@ function initJourneyMapState() {
             if (iconSpan) iconSpan.textContent = '🐺';
         }
         if (lineFase7) lineFase7.classList.add('line-active');
+    } else {
+        if (nodeFase7) {
+            nodeFase7.className = 'map-node node-locked';
+            nodeFase7.title = 'Fase 7 - Bloqueada (Derrote Volibear primeiro)';
+            const iconSpan = nodeFase7.querySelector('.node-icon');
+            if (iconSpan) iconSpan.textContent = '🔒';
+        }
+        if (lineFase7) lineFase7.classList.remove('line-active');
     }
 
     const journeyFase7Completed = localStorage.getItem('mandamau_journey_fase7_completed') === 'true';
