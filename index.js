@@ -250,33 +250,34 @@ function scheduleNextLightning() {
             break;
             
         case 3:
-            // Round 3: Absurd Crossfire Grid Matrix + Constant Player Pursuit
-            delay = 200;
+            // Round 3: Rebalanced Grid Matrix + Periodic Pursuit
+            delay = 380;
             volibearGridStep++;
             
-            // ALWAYS spawn a targeted pursuit strike directly on the player's position to prevent camping in corners!
-            spawnStrikeAt(volibearPlayerPos.x + (Math.random() * 24 - 12), volibearPlayerPos.y + (Math.random() * 24 - 12));
-            
             if (volibearGridStep % 3 === 0) {
-                // 3x3 Grid with 1 random safe cell
-                const safeCol = Math.floor(Math.random() * 3);
-                const safeRow = Math.floor(Math.random() * 3);
-                for (let c = 0; c < 3; c++) {
-                    for (let rCell = 0; rCell < 3; rCell++) {
+                spawnStrikeAt(volibearPlayerPos.x + (Math.random() * 20 - 10), volibearPlayerPos.y + (Math.random() * 20 - 10), 650);
+            }
+            
+            if (volibearGridStep % 2 === 0) {
+                // 2x2 Grid matrix with 1 random safe quadrant (3 danger cells)
+                const safeCol = Math.floor(Math.random() * 2);
+                const safeRow = Math.floor(Math.random() * 2);
+                for (let c = 0; c < 2; c++) {
+                    for (let rCell = 0; rCell < 2; rCell++) {
                         if (c !== safeCol || rCell !== safeRow) {
-                            const gx = (arenaW / 4) * (c + 1);
-                            const gy = (arenaH / 4) * (rCell + 1);
-                            spawnStrikeAt(gx, gy);
+                            const gx = (arenaW / 3) * (c + 1);
+                            const gy = (arenaH / 3) * (rCell + 1);
+                            spawnStrikeAt(gx, gy, 650);
                         }
                     }
                 }
             } else {
-                // Diagonal Sweep Beam
-                const diagOffset = (volibearGridStep * 40) % arenaW;
-                for (let i = 0; i < 4; i++) {
-                    const dx = (diagOffset + i * 70) % arenaW;
-                    const dy = (diagOffset * 0.7 + i * 50) % arenaH;
-                    spawnStrikeAt(dx, dy);
+                // Light 3-beam diagonal sweep
+                const diagOffset = (volibearGridStep * 50) % arenaW;
+                for (let i = 0; i < 3; i++) {
+                    const dx = (diagOffset + i * 85) % arenaW;
+                    const dy = (diagOffset * 0.6 + i * 65) % arenaH;
+                    spawnStrikeAt(dx, dy, 650);
                 }
             }
             break;
@@ -303,7 +304,7 @@ function scheduleNextLightning() {
     volibearSpawnTimeout = setTimeout(scheduleNextLightning, delay);
 }
 
-function spawnStrikeAt(x, y) {
+function spawnStrikeAt(x, y, customWarningDelay) {
     if (!volibearGameActive || !volibearArena) return;
     
     const rect = volibearArena.getBoundingClientRect();
@@ -326,7 +327,7 @@ function spawnStrikeAt(x, y) {
     volibearArena.appendChild(dangerZone);
     
     // Warning delay (faster in higher rounds: 0.65s to 0.5s)
-    const warningDelay = Math.max(480, 680 - (volibearRound * 35));
+    const warningDelay = customWarningDelay || Math.max(480, 680 - (volibearRound * 35));
     
     setTimeout(() => {
         if (dangerZone.parentNode) dangerZone.remove();
@@ -2671,10 +2672,27 @@ function switchMapChapter(chapterNum) {
         if (btnNavPrev) btnNavPrev.style.display = 'inline-flex';
         if (btnNavNext) btnNavNext.style.display = 'none';
 
+        const nodeFase6 = document.getElementById('node-fase6');
+        const lineFase6 = document.querySelector('.line-fase6');
+        if (nodeFase6) {
+            nodeFase6.className = 'map-node node-active';
+            nodeFase6.title = 'Fase 6 - O Urso da Tempestade (Volibear)';
+            const iconSpan = nodeFase6.querySelector('.node-icon');
+            if (iconSpan) iconSpan.textContent = '⚡';
+        }
+        if (lineFase6) lineFase6.classList.add('line-active');
+
         if (journeyPlayerToken) {
             journeyPlayerToken.style.left = '25%';
             journeyPlayerToken.style.top = '62%';
         }
+
+        // Auto open Volibear encounter dialogue when switching to Map 2
+        setTimeout(() => {
+            currentBossEncounter = 'volibear';
+            setupBossEncounterUI();
+            if (journeyEncounterOverlay) journeyEncounterOverlay.classList.add('active');
+        }, 300);
     } else {
         if (mapCap2) { mapCap2.style.display = 'none'; mapCap2.classList.remove('active'); }
         if (mapCap1) { mapCap1.style.display = 'block'; mapCap1.classList.add('active'); }
