@@ -5,6 +5,321 @@ const gameThemeAudio = document.getElementById('game-theme');
 const bgMusicAudio   = document.getElementById('bg-music');
 let currentThemeFile = '';
 
+
+// ================================================================
+// LEVEL 6 — VOLIBEAR STORM GAME ENGINE
+// ================================================================
+const volibearStormOverlay = document.getElementById('volibear-storm-overlay');
+const volibearArena        = document.getElementById('volibear-arena');
+const volibearPlayerToken  = document.getElementById('volibear-player-token');
+const volibearTimerNum     = document.getElementById('volibear-timer-num');
+const volibearLivesHearts  = document.getElementById('volibear-lives-hearts');
+const volibearSpeechBubble = document.getElementById('volibear-speech-bubble');
+const volibearWinOverlay   = document.getElementById('volibear-win-overlay');
+const volibearLoseOverlay  = document.getElementById('volibear-lose-overlay');
+const volibearTutorialModal= document.getElementById('volibear-tutorial-modal');
+const btnCloseVolibearTut  = document.getElementById('btn-close-volibear-tutorial');
+const btnVolibearQuit      = document.getElementById('btn-volibear-quit');
+const btnVolibearWinOk     = document.getElementById('btn-volibear-win-ok');
+const btnVolibearRestart   = document.getElementById('btn-volibear-restart');
+
+const VOLIBEAR_SPEECHES = [
+    "A TEMPESTADE NÃO TEM PIEDADE!",
+    "SINTA O PODER DOS RAIOS!",
+    "o boga do bako é meu",
+    "Nenhum mortal se esquiva do meu trovão!",
+    "Renda-se à fúria dos céus!"
+];
+
+let volibearGameActive = false;
+let volibearTimeLeft = 20;
+let volibearLives = 3;
+let volibearPlayerPos = { x: 225, y: 150 };
+let volibearKeys = {};
+let volibearTimerInterval = null;
+let volibearSpawnTimeout = null;
+let volibearAnimFrame = null;
+let volibearSpeechInterval = null;
+
+function updateVolibearLivesUI() {
+    if (!volibearLivesHearts) return;
+    let hearts = '';
+    for (let i = 0; i < 3; i++) {
+        hearts += i < volibearLives ? '❤️' : '🖤';
+    }
+    volibearLivesHearts.textContent = hearts;
+}
+
+function openVolibearGame() {
+    if (!volibearStormOverlay) return;
+    volibearStormOverlay.classList.add('active');
+    if (volibearWinOverlay) volibearWinOverlay.style.display = 'none';
+    if (volibearLoseOverlay) volibearLoseOverlay.style.display = 'none';
+    if (volibearTutorialModal) volibearTutorialModal.style.display = 'flex';
+    volibearGameActive = false;
+    playTheme('fase6');
+}
+
+function startVolibearGame() {
+    if (volibearTutorialModal) volibearTutorialModal.style.display = 'none';
+    if (volibearWinOverlay) volibearWinOverlay.style.display = 'none';
+    if (volibearLoseOverlay) volibearLoseOverlay.style.display = 'none';
+    
+    volibearTimeLeft = 20;
+    volibearLives = 3;
+    volibearGameActive = true;
+    
+    // Center player in arena
+    const rect = volibearArena.getBoundingClientRect();
+    const arenaW = rect.width || 480;
+    const arenaH = rect.height || 300;
+    volibearPlayerPos = { x: arenaW / 2, y: arenaH / 2 };
+    
+    updateVolibearPlayerPosition();
+    updateVolibearLivesUI();
+    if (volibearTimerNum) volibearTimerNum.textContent = '20s';
+    
+    // Clear previous intervals/timeouts
+    if (volibearTimerInterval) clearInterval(volibearTimerInterval);
+    if (volibearSpawnTimeout) clearTimeout(volibearSpawnTimeout);
+    if (volibearSpeechInterval) clearInterval(volibearSpeechInterval);
+    if (volibearAnimFrame) cancelAnimationFrame(volibearAnimFrame);
+    
+    // Remove lingering strikes/danger zones
+    if (volibearArena) {
+        volibearArena.querySelectorAll('.volibear-danger-zone, .volibear-lightning-strike').forEach(el => el.remove());
+    }
+    
+    // Timer countdown (20s to 0s)
+    volibearTimerInterval = setInterval(() => {
+        if (!volibearGameActive) return;
+        volibearTimeLeft--;
+        if (volibearTimerNum) volibearTimerNum.textContent = `${volibearTimeLeft}s`;
+        
+        if (volibearTimeLeft <= 0) {
+            volibearTimeLeft = 0;
+            clearInterval(volibearTimerInterval);
+            endVolibearGame(true);
+        }
+    }, 1000);
+    
+    // Speech bubble rotation
+    volibearSpeechInterval = setInterval(() => {
+        if (!volibearGameActive) return;
+        if (volibearSpeechBubble) {
+            volibearSpeechBubble.textContent = VOLIBEAR_SPEECHES[Math.floor(Math.random() * VOLIBEAR_SPEECHES.length)];
+        }
+    }, 3500);
+    
+    // Start Game Loop & Lightning Spawner
+    scheduleNextLightning();
+    runVolibearGameLoop();
+}
+
+function updateVolibearPlayerPosition() {
+    if (!volibearPlayerToken) return;
+    volibearPlayerToken.style.left = `${volibearPlayerPos.x}px`;
+    volibearPlayerToken.style.top = `${volibearPlayerPos.y}px`;
+}
+
+function runVolibearGameLoop() {
+    if (!volibearGameActive) return;
+    
+    const rect = volibearArena.getBoundingClientRect();
+    const arenaW = rect.width || 480;
+    const arenaH = rect.height || 300;
+    const speed = 4.2; // px per frame
+    
+    if (volibearKeys['KeyW'] || volibearKeys['ArrowUp'])    volibearPlayerPos.y -= speed;
+    if (volibearKeys['KeyS'] || volibearKeys['ArrowDown'])  volibearPlayerPos.y += speed;
+    if (volibearKeys['KeyA'] || volibearKeys['ArrowLeft'])  volibearPlayerPos.x -= speed;
+    if (volibearKeys['KeyD'] || volibearKeys['ArrowRight']) volibearPlayerPos.x += speed;
+    
+    // Clamp to arena bounds
+    const radius = 14;
+    volibearPlayerPos.x = Math.max(radius, Math.min(arenaW - radius, volibearPlayerPos.x));
+    volibearPlayerPos.y = Math.max(radius, Math.min(arenaH - radius, volibearPlayerPos.y));
+    
+    updateVolibearPlayerPosition();
+    
+    volibearAnimFrame = requestAnimationFrame(runVolibearGameLoop);
+}
+
+function scheduleNextLightning() {
+    if (!volibearGameActive) return;
+    
+    // Progressively faster spawn rate: 750ms at start -> 280ms near end
+    const progressRatio = (20 - volibearTimeLeft) / 20; // 0 to 1
+    const minDelay = 280;
+    const maxDelay = 750;
+    const delay = Math.max(minDelay, maxDelay - (progressRatio * (maxDelay - minDelay)));
+    
+    // Final 5 seconds: bullet hell mode (spawn 2 strikes)
+    const strikeCount = volibearTimeLeft <= 5 ? (Math.random() > 0.4 ? 2 : 1) : 1;
+    
+    for (let i = 0; i < strikeCount; i++) {
+        spawnLightningZone();
+    }
+    
+    volibearSpawnTimeout = setTimeout(scheduleNextLightning, delay);
+}
+
+function spawnLightningZone() {
+    if (!volibearGameActive || !volibearArena) return;
+    
+    const rect = volibearArena.getBoundingClientRect();
+    const arenaW = rect.width || 480;
+    const arenaH = rect.height || 300;
+    const strikeRadius = 34; // px
+    
+    // Random position in arena
+    const rx = Math.floor(Math.random() * (arenaW - strikeRadius * 2)) + strikeRadius;
+    const ry = Math.floor(Math.random() * (arenaH - strikeRadius * 2)) + strikeRadius;
+    
+    // Create warning danger zone circle
+    const dangerZone = document.createElement('div');
+    dangerZone.className = 'volibear-danger-zone';
+    dangerZone.style.width = `${strikeRadius * 2}px`;
+    dangerZone.style.height = `${strikeRadius * 2}px`;
+    dangerZone.style.left = `${rx}px`;
+    dangerZone.style.top = `${ry}px`;
+    
+    volibearArena.appendChild(dangerZone);
+    
+    // After 0.7s (700ms) warning delay, lightning strikes!
+    setTimeout(() => {
+        if (dangerZone.parentNode) dangerZone.remove();
+        if (!volibearGameActive) return;
+        
+        // Spawn lightning strike flash effect
+        const strike = document.createElement('div');
+        strike.className = 'volibear-lightning-strike';
+        strike.style.width = `${strikeRadius * 2.2}px`;
+        strike.style.height = `${strikeRadius * 2.2}px`;
+        strike.style.left = `${rx}px`;
+        strike.style.top = `${ry}px`;
+        volibearArena.appendChild(strike);
+        setTimeout(() => strike.remove(), 350);
+        
+        try { playSound('click'); } catch(e) {}
+        
+        // Check collision with player
+        const dist = Math.hypot(volibearPlayerPos.x - rx, volibearPlayerPos.y - ry);
+        if (dist <= strikeRadius) {
+            // Player hit!
+            volibearLives--;
+            updateVolibearLivesUI();
+            try { playSound('bako_cheat'); } catch(e) {}
+            
+            // Screen Shake
+            const card = document.querySelector('.volibear-card');
+            if (card) {
+                card.classList.add('volibear-shake');
+                setTimeout(() => card.classList.remove('volibear-shake'), 220);
+            }
+            
+            if (volibearLives <= 0) {
+                endVolibearGame(false);
+            }
+        }
+    }, 700);
+}
+
+function endVolibearGame(isVictory) {
+    volibearGameActive = false;
+    if (volibearTimerInterval) clearInterval(volibearTimerInterval);
+    if (volibearSpawnTimeout) clearTimeout(volibearSpawnTimeout);
+    if (volibearSpeechInterval) clearInterval(volibearSpeechInterval);
+    if (volibearAnimFrame) cancelAnimationFrame(volibearAnimFrame);
+    
+    if (isVictory) {
+        try { playSound('rank_up'); } catch(e) {}
+        localStorage.setItem('mandamau_journey_fase6_completed', 'true');
+        if (volibearWinOverlay) volibearWinOverlay.style.display = 'flex';
+    } else {
+        try { playSound('reset'); } catch(e) {}
+        if (volibearLoseOverlay) volibearLoseOverlay.style.display = 'flex';
+    }
+}
+
+function closeVolibearGame() {
+    volibearGameActive = false;
+    if (volibearTimerInterval) clearInterval(volibearTimerInterval);
+    if (volibearSpawnTimeout) clearTimeout(volibearSpawnTimeout);
+    if (volibearSpeechInterval) clearInterval(volibearSpeechInterval);
+    if (volibearAnimFrame) cancelAnimationFrame(volibearAnimFrame);
+    fadeOutTheme();
+    if (volibearStormOverlay) volibearStormOverlay.classList.remove('active');
+}
+
+// Key listeners for player WASD / Arrow movement
+window.addEventListener('keydown', (e) => {
+    if (!volibearGameActive) return;
+    if (['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.code)) {
+        volibearKeys[e.code] = true;
+        if (e.code.startsWith('Arrow')) e.preventDefault(); // prevent scrolling
+    }
+});
+
+window.addEventListener('keyup', (e) => {
+    if (!volibearGameActive) return;
+    if (['KeyW', 'KeyA', 'KeyS', 'KeyD', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.code)) {
+        volibearKeys[e.code] = false;
+    }
+});
+
+// UI Event Handlers
+document.addEventListener('DOMContentLoaded', () => {
+    if (btnCloseVolibearTut) {
+        btnCloseVolibearTut.addEventListener('click', () => {
+            try { playSound('click'); } catch(e) {}
+            startVolibearGame();
+        });
+    }
+
+    if (btnVolibearQuit) {
+        btnVolibearQuit.addEventListener('click', () => {
+            closeVolibearGame();
+            try { playSound('click'); } catch(e) {}
+        });
+    }
+
+    if (btnVolibearRestart) {
+        btnVolibearRestart.addEventListener('click', () => {
+            try { playSound('click'); } catch(e) {}
+            startVolibearGame();
+        });
+    }
+
+    if (btnVolibearWinOk) {
+        btnVolibearWinOk.addEventListener('click', () => {
+            closeVolibearGame();
+            try { playSound('rank_up_high'); } catch(e) {}
+            
+            // Unlock Fase 7 on Chapter 2 map & auto-walk token
+            openJourney();
+            setTimeout(() => {
+                const nodeF7 = document.getElementById('node-fase7');
+                const lineF7 = document.querySelector('.line-fase7');
+                if (nodeF7) {
+                    nodeF7.className = 'map-node node-active';
+                    nodeF7.title = 'Fase 7 - Disponível (Warwick)';
+                    const iconSpan = nodeF7.querySelector('.node-icon');
+                    if (iconSpan) iconSpan.textContent = '🐺';
+                }
+                if (lineF7) lineF7.classList.add('line-active');
+                
+                const token = document.getElementById('journey-player-token');
+                if (token) {
+                    token.style.left = '40%';
+                    token.style.top = '50%';
+                }
+            }, 600);
+        });
+    }
+});
+// ================================================================
+
 const THEMES = {
     fase1: 'audio/fase1_kleber.mp3',
     fase2: 'audio/fase2_gwen.mp3',
@@ -602,7 +917,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (nodeFase6) {
         nodeFase6.addEventListener('click', () => {
             playSound('click');
-            currentBossEncounter = 'fase6_fakenews';
+            currentBossEncounter = 'volibear';
             setupBossEncounterUI();
             journeyEncounterOverlay.classList.add('active');
         });
@@ -2268,6 +2583,9 @@ function setupBossEncounterUI() {
         titleText.textContent = "O palhaço dos mil dentes";
         authorText.textContent = "Kleber";
         bubblePara.textContent = "pra passar de mim terá que me vencer numa queda de braço krl";
+    } else if (currentBossEncounter === 'volibear') {
+        journeyEncounterOverlay.classList.remove('active');
+        openVolibearGame();
     } else if (currentBossEncounter === 'gwen') {
         portrait.src = "img/gwen.jpg";
         portrait.alt = "Gwen";
@@ -2297,6 +2615,13 @@ function setupBossEncounterUI() {
         titleText.textContent = 'O Cubo Gey';
         authorText.textContent = 'Cláudio';
         bubblePara.textContent = 'Eu sou um cubo gey, me vença se for capaz!';
+    } else if (currentBossEncounter === 'volibear') {
+        portrait.src = "img/volibear.png";
+        portrait.alt = "Volibear O Urso da Tempestade";
+        nameText.textContent = "Volibear";
+        titleText.textContent = "Capítulo 2 — Fase 6: O Urso da Tempestade";
+        authorText.textContent = "Volibear";
+        bubblePara.textContent = "A TEMPESTADE NÃO TEM PIEDADE! Desvie dos meus trovões se for capaz!";
     } else if (currentBossEncounter === 'fase6_fakenews') {
         portrait.src = "img/kleber_clown.jpg";
         portrait.alt = "Fake News Kleber";
@@ -5207,3 +5532,13 @@ document.getElementById('dbg-launch-bj').addEventListener('click', () => {
     journeyOverlay.classList.remove('active');
     openBlackjack();
 });
+
+const dbgLaunchVolibear = document.getElementById('dbg-launch-volibear');
+if (dbgLaunchVolibear) {
+    dbgLaunchVolibear.addEventListener('click', () => {
+        if (debugPanel) debugPanel.style.display = 'none';
+        if (journeyOverlay) journeyOverlay.classList.remove('active');
+        openVolibearGame();
+    });
+}
+

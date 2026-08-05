@@ -5037,6 +5037,341 @@ body::before {
     opacity: 0;
 }
 
+/* ================================================================
+   LEVEL 6 — VOLIBEAR STORM (CHAPTER 2 FASE 6)
+   ================================================================ */
+.volibear-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(4, 6, 18, 0.95);
+    backdrop-filter: blur(12px);
+    z-index: 10000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+}
+
+.volibear-overlay.active {
+    display: flex;
+}
+
+.volibear-card {
+    position: relative;
+    width: 100%;
+    max-width: 520px;
+    background: #080a1a;
+    border: 2px solid #00f0ff;
+    border-radius: 20px;
+    padding: 20px;
+    box-shadow: 0 0 35px rgba(0, 240, 255, 0.4), 0 20px 50px rgba(0, 0, 0, 0.9);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.volibear-boss-header {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    position: relative;
+}
+
+.volibear-portrait-wrap {
+    width: 68px;
+    height: 68px;
+    border-radius: 14px;
+    overflow: hidden;
+    border: 2px solid #00f0ff;
+    box-shadow: 0 0 15px rgba(0, 240, 255, 0.5);
+    flex-shrink: 0;
+    background: #000;
+}
+
+.volibear-portrait {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.volibear-boss-info {
+    flex: 1;
+    overflow: hidden;
+}
+
+.volibear-nameplate {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 4px;
+}
+
+.volibear-name {
+    font-size: 1.2rem;
+    font-weight: 900;
+    color: #ffffff;
+    letter-spacing: 0.05em;
+    text-shadow: 0 0 10px rgba(0, 240, 255, 0.6);
+}
+
+.volibear-title {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #00f0ff;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.volibear-speech-bubble {
+    background: rgba(0, 240, 255, 0.1);
+    border: 1px solid rgba(0, 240, 255, 0.35);
+    border-radius: 10px;
+    padding: 6px 10px;
+    font-size: 0.78rem;
+    font-weight: 800;
+    color: #e0f2fe;
+    line-height: 1.3;
+    animation: pulse-speech 2s infinite alternate;
+}
+
+.volibear-quit-btn {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    color: #94a3b8;
+    font-size: 1.1rem;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.volibear-quit-btn:hover {
+    background: rgba(239, 68, 68, 0.3);
+    color: #ef4444;
+}
+
+/* Status Bar */
+.volibear-status-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(0, 240, 255, 0.2);
+    border-radius: 12px;
+    padding: 8px 16px;
+}
+
+.volibear-timer-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.volibear-timer-label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #94a3b8;
+}
+
+.volibear-timer-num {
+    font-size: 1.2rem;
+    font-weight: 900;
+    color: #00f0ff;
+    text-shadow: 0 0 10px rgba(0, 240, 255, 0.8);
+    font-family: monospace;
+}
+
+.volibear-lives-wrap {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.volibear-lives-label {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: #94a3b8;
+}
+
+.volibear-lives-hearts {
+    font-size: 1.1rem;
+    letter-spacing: 2px;
+}
+
+/* Arena */
+.volibear-arena {
+    position: relative;
+    width: 100%;
+    height: 300px;
+    background: radial-gradient(circle at center, #070d24, #020308);
+    border: 2px solid rgba(0, 240, 255, 0.4);
+    border-radius: 14px;
+    overflow: hidden;
+    box-shadow: inset 0 0 30px rgba(0, 240, 255, 0.15);
+    touch-action: none;
+}
+
+.volibear-player-token {
+    position: absolute;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #ffffff, #00f0ff);
+    border: 2px solid #00f0ff;
+    box-shadow: 0 0 15px #00f0ff, 0 0 25px rgba(0, 240, 255, 0.8);
+    transform: translate(-50%, -50%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 20;
+    pointer-events: none;
+    transition: transform 0.05s ease-out;
+}
+
+.volibear-player-icon {
+    font-size: 0.75rem;
+}
+
+/* Danger Zone Warning Circles */
+.volibear-danger-zone {
+    position: absolute;
+    border-radius: 50%;
+    border: 2px dashed #ef4444;
+    background: rgba(239, 68, 68, 0.28);
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 10;
+    animation: warning-pulse 0.25s infinite alternate;
+}
+
+@keyframes warning-pulse {
+    0% { background: rgba(239, 68, 68, 0.2); border-color: #ef4444; }
+    100% { background: rgba(239, 68, 68, 0.45); border-color: #f87171; }
+}
+
+/* Lightning Strike Impact */
+.volibear-lightning-strike {
+    position: absolute;
+    border-radius: 50%;
+    background: radial-gradient(circle, #ffffff 20%, #00f0ff 60%, rgba(0, 240, 255, 0) 100%);
+    box-shadow: 0 0 40px #ffffff, 0 0 80px #00f0ff;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    z-index: 15;
+    animation: flash-strike 0.35s ease-out forwards;
+}
+
+@keyframes flash-strike {
+    0% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+    100% { opacity: 0; transform: translate(-50%, -50%) scale(1.4); }
+}
+
+.volibear-controls-hint {
+    font-size: 0.75rem;
+    color: #94a3b8;
+    text-align: center;
+    margin: 0;
+}
+
+.volibear-controls-hint strong {
+    color: #00f0ff;
+}
+
+/* End Overlays */
+.volibear-end-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(4, 6, 18, 0.92);
+    backdrop-filter: blur(8px);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    border-radius: 20px;
+}
+
+.volibear-end-card {
+    width: 100%;
+    max-width: 360px;
+    background: #0d0f22;
+    border-radius: 16px;
+    padding: 24px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.win-card {
+    border: 2px solid #00f0ff;
+    box-shadow: 0 0 30px rgba(0, 240, 255, 0.4);
+}
+
+.lose-card {
+    border: 2px solid #ef4444;
+    box-shadow: 0 0 30px rgba(239, 68, 68, 0.4);
+}
+
+.volibear-end-icon {
+    font-size: 2.5rem;
+}
+
+.volibear-end-title {
+    font-size: 1.3rem;
+    font-weight: 900;
+    color: #ffffff;
+    margin: 0;
+}
+
+.win-card .volibear-end-title { color: #00f0ff; }
+.lose-card .volibear-end-title { color: #ef4444; }
+
+.volibear-end-desc {
+    font-size: 0.85rem;
+    color: #94a3b8;
+    margin: 0;
+    line-height: 1.4;
+}
+
+/* Screen Tremor / Shake Effect */
+.volibear-shake {
+    animation: volibear-card-shake 0.2s linear infinite;
+}
+
+@keyframes volibear-card-shake {
+    0% { transform: translate(0, 0); }
+    20% { transform: translate(-4px, 4px); }
+    40% { transform: translate(4px, -4px); }
+    60% { transform: translate(-4px, -2px); }
+    80% { transform: translate(4px, 2px); }
+    100% { transform: translate(0, 0); }
+}
+
+.volibear-tutorial-modal {
+    position: absolute;
+    inset: 0;
+    background: rgba(4, 6, 18, 0.94);
+    backdrop-filter: blur(8px);
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    border-radius: 20px;
+}
+
+
 
 
 

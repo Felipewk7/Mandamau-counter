@@ -448,6 +448,8 @@
                 </div>
                 <button id="dbg-reset-all" class="debug-action-btn debug-danger" style="width: 100%; margin-top: 10px;">💀 Resetar Tudo</button>
                 <button id="dbg-launch-bj" class="debug-action-btn" style="width:100%; margin-top:6px; background:linear-gradient(135deg,#7c3aed,#c026d3); color:#fff;">⚔️ Abrir Blackjack (Fase 5)</button>
+                <button id="dbg-launch-volibear" class="debug-action-btn" style="width:100%; margin-top:6px; background:linear-gradient(135deg,#00f0ff,#0284c7); color:#000; font-weight:800;">⚡ Abrir Volibear (Fase 6)</button>
+
             </div>
         </div>
 
@@ -1008,6 +1010,85 @@
                 <button id="btn-bj-restart" class="bj-btn bj-btn-restart">🔄 Tentar Novamente</button>
             </div>
         </div>
+
+        <!-- =============================================
+             LEVEL 6 — VOLIBEAR STORM (CHAPTER 2 FASE 6)
+             ============================================= -->
+        <div id="volibear-storm-overlay" class="volibear-overlay">
+            <div class="volibear-card">
+                <!-- Volibear Boss Top Section -->
+                <div class="volibear-boss-header">
+                    <div class="volibear-portrait-wrap">
+                        <img id="volibear-img" src="img/volibear.png" alt="Volibear" class="volibear-portrait" onerror="this.src='img/kleber_clown.jpg'">
+                    </div>
+                    <div class="volibear-boss-info">
+                        <div class="volibear-nameplate">
+                            <span class="volibear-name">Volibear</span>
+                            <span class="volibear-title">O Urso da Tempestade</span>
+                        </div>
+                        <div id="volibear-speech-bubble" class="volibear-speech-bubble">
+                            A TEMPESTADE NÃO TEM PIEDADE!
+                        </div>
+                    </div>
+                    <button id="btn-volibear-quit" class="volibear-quit-btn" title="Sair">✕</button>
+                </div>
+
+                <!-- Survival Top Status Bar -->
+                <div class="volibear-status-bar">
+                    <div class="volibear-timer-wrap">
+                        <span class="volibear-timer-label">Sobreviva por:</span>
+                        <span id="volibear-timer-num" class="volibear-timer-num">20s</span>
+                    </div>
+                    <div class="volibear-lives-wrap">
+                        <span class="volibear-lives-label">Vidas:</span>
+                        <span id="volibear-lives-hearts" class="volibear-lives-hearts">❤️❤️❤️</span>
+                    </div>
+                </div>
+
+                <!-- Battle Arena -->
+                <div id="volibear-arena" class="volibear-arena">
+                    <!-- Dynamic Lightning Warning & Strikes appended here -->
+                    <div id="volibear-player-token" class="volibear-player-token">
+                        <span class="volibear-player-icon">⚡</span>
+                    </div>
+                </div>
+
+                <p class="volibear-controls-hint">Use <strong>WASD</strong> ou as <strong>Setas do Teclado</strong> para esquivar das marcas vermelhas de trovão!</p>
+            </div>
+
+            <!-- Volibear Victory Overlay -->
+            <div id="volibear-win-overlay" class="volibear-end-overlay" style="display:none;">
+                <div class="volibear-end-card win-card">
+                    <div class="volibear-end-icon">⚡</div>
+                    <h2 class="volibear-end-title">VITÓRIA DA TEMPESTADE!</h2>
+                    <p class="volibear-end-desc">Você reviveu da tempestade e derrotou Volibear!</p>
+                    <button id="btn-volibear-win-ok" class="btn btn-sum">Avançar para Fase 7 (Warwick) ▶</button>
+                </div>
+            </div>
+
+            <!-- Volibear Game Over Overlay -->
+            <div id="volibear-lose-overlay" class="volibear-end-overlay" style="display:none;">
+                <div class="volibear-end-card lose-card">
+                    <div class="volibear-end-icon">💀</div>
+                    <h2 class="volibear-end-title">GAME OVER</h2>
+                    <p class="volibear-end-desc">Você foi molestado pela tempestade!</p>
+                    <button id="btn-volibear-restart" class="btn btn-sum">🔄 Tentar Novamente</button>
+                </div>
+            </div>
+
+            <!-- Tutorial Modal -->
+            <div id="volibear-tutorial-modal" class="volibear-tutorial-modal">
+                <div class="tutorial-card">
+                    <h3 style="color:#00f0ff; font-size:1.4rem; margin-bottom:12px;">⚡ Desafio da Tempestade: Volibear</h3>
+                    <p>1. Mova sua esfera azul com <strong>WASD</strong> ou <strong>Setas do Teclado</strong>.<br>
+                    2. Evite ficar dentro das <strong>marcas de perigo vermelhas</strong>.<br>
+                    3. Raios mortais caem 0.7s após o aviso!<br>
+                    4. Sobreviva por <strong>20 segundos</strong> sem perder suas 3 vidas!</p>
+                    <button id="btn-close-volibear-tutorial" class="btn btn-sum" style="width:100%; margin-top:14px;">⚡ Iniciar Desafio!</button>
+                </div>
+            </div>
+        </div>
+
 
         <!-- Jumpscare Overlay -->
         <div id="arm-jumpscare-overlay" class="arm-jumpscare-overlay">
