@@ -30,8 +30,8 @@ const btnVolibearRestart   = document.getElementById('btn-volibear-restart');
 
 const VOLIBEAR_ROUND_SPEECHES = {
     1: ["A TEMPESTADE NÃO TEM PIEDADE!", "SINTA O PODER DOS RAIOS!", "o boga do bako é meu"],
-    2: ["SIRENE DE CORRENTES ELÉTRICAS! GIRE E CORRA!", "A ESPIRAL VAI TE ESMAGAR!", "Não há para onde fugir!"],
-    3: ["MURALHAS DE TROVÃO! TENTE ATRAVESSAR!", "CORTES ELÉTRICOS EM GRADE!", "Nenhum mortal escapa!"],
+    2: ["ESPIRAL DUPLA INVERTIDA! NÃO HÁ PARA ONDE FUGIR!", "GIRE NO RITMO DA MORTE!", "O VÓRTEX VAI TE ENGOLIR!"],
+    3: ["MATRIZ DE TROVÕES DESTRUTIVA! ACHE O QUADRADO DA SALVAÇÃO!", "GRADE DE LASERS ABSURDA!", "DESVIE DA MATRIZ ELÉTRICA!"],
     4: ["EU FECHO O SEU CERCO! O BOGA É MEU!", "RAIOS PERSEGUIDORES EM VOCÊ!", "Sinta meu trovão te caçar!"],
     5: ["APOCALIPSE ELÉTRICO! NINGUÉM ESCAPA DA MINHA FÚRIA!", "CAOS TOTAL! DESVIE SE FOR CAPAZ!", "O MUNDO VAI SUBMERGIR EM TROVÕES!"]
 };
@@ -107,10 +107,10 @@ function startVolibearRound(roundNum) {
         volibearBannerTitle.textContent = `⚡ RODADA ${volibearRound} / 5 ⚡`;
         const subTitles = {
             1: "Tempestade Aleatória de Aquecimento!",
-            2: "Ataque da Espiral de Trovões!",
-            3: "Muralhas de Raios Horizontais e Verticais!",
+            2: "🔥 ESPIRAL DUPLA INVERTIDA + VÓRTEX! 🔥",
+            3: "⚡ MATRIZ DE DISPARO CRUZADO 3x3! ⚡",
             4: "Cerco Fechado e Raios Perseguidores!",
-            5: "🔥 APOCALIPSE ELÉTRICO FINAL! 🔥"
+            5: "☠️ APOCALIPSE ELÉTRICO FINAL! ☠️"
         };
         volibearBannerSub.textContent = subTitles[volibearRound] || "Prepare-se!";
         volibearRoundBanner.style.display = 'flex';
@@ -222,34 +222,54 @@ function scheduleNextLightning() {
             break;
             
         case 2:
-            // Round 2: Rotating Spiral Pattern
-            delay = 320;
-            volibearSpiralAngle += 0.45;
-            const r = 30 + ((volibearTimeLeft * 12) % 110);
-            const sx = (arenaW / 2) + Math.cos(volibearSpiralAngle) * r;
-            const sy = (arenaH / 2) + Math.sin(volibearSpiralAngle) * r;
-            spawnStrikeAt(sx, sy);
+            // Round 2: Absurd Double Spiral + Pulse Pursuit
+            delay = 180;
+            volibearSpiralAngle += 0.55;
+            const radiusArm = 30 + ((volibearTimeLeft * 18) % 120);
+            const cx = arenaW / 2;
+            const cy = arenaH / 2;
+            
+            // Arm 1 (Clockwise)
+            const sx1 = cx + Math.cos(volibearSpiralAngle) * radiusArm;
+            const sy1 = cy + Math.sin(volibearSpiralAngle) * radiusArm;
+            spawnStrikeAt(sx1, sy1);
+            
+            // Arm 2 (Counter-Clockwise)
+            const sx2 = cx + Math.cos(-volibearSpiralAngle) * radiusArm;
+            const sy2 = cy + Math.sin(-volibearSpiralAngle) * radiusArm;
+            spawnStrikeAt(sx2, sy2);
+
+            // Targeted pulse under player
+            if (volibearGridStep % 4 === 0) {
+                spawnStrikeAt(volibearPlayerPos.x + (Math.random() * 20 - 10), volibearPlayerPos.y + (Math.random() * 20 - 10));
+            }
+            volibearGridStep++;
             break;
             
         case 3:
-            // Round 3: Grid Wall Sweeps
-            delay = 450;
+            // Round 3: Absurd Crossfire Grid Matrix
+            delay = 200;
             volibearGridStep++;
-            if (volibearGridStep % 2 === 0) {
-                // Horizontal wall with safe gap
-                const wallY = Math.random() * (arenaH - 60) + 30;
-                for (let x = 30; x < arenaW; x += 65) {
-                    if (Math.abs(x - volibearPlayerPos.x) > 55) { // Leave gap near player or random
-                        spawnStrikeAt(x, wallY);
+            if (volibearGridStep % 3 === 0) {
+                // 3x3 Grid with 1 random safe cell
+                const safeCol = Math.floor(Math.random() * 3);
+                const safeRow = Math.floor(Math.random() * 3);
+                for (let c = 0; c < 3; c++) {
+                    for (let rCell = 0; rCell < 3; rCell++) {
+                        if (c !== safeCol || rCell !== safeRow) {
+                            const gx = (arenaW / 4) * (c + 1);
+                            const gy = (arenaH / 4) * (rCell + 1);
+                            spawnStrikeAt(gx, gy);
+                        }
                     }
                 }
             } else {
-                // Vertical wall with safe gap
-                const wallX = Math.random() * (arenaW - 60) + 30;
-                for (let y = 30; y < arenaH; y += 60) {
-                    if (Math.abs(y - volibearPlayerPos.y) > 55) {
-                        spawnStrikeAt(wallX, y);
-                    }
+                // Diagonal Sweep Beam
+                const diagOffset = (volibearGridStep * 40) % arenaW;
+                for (let i = 0; i < 4; i++) {
+                    const dx = (diagOffset + i * 70) % arenaW;
+                    const dy = (diagOffset * 0.7 + i * 50) % arenaH;
+                    spawnStrikeAt(dx, dy);
                 }
             }
             break;
