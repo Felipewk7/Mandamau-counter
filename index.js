@@ -88,6 +88,11 @@ function updateWarwickUI() {
 }
 
 function openWarwickGame() {
+    // 1. Force close Volibear overlay so they never run simultaneously
+    const volibearOverlay = document.getElementById('volibear-storm-overlay') || volibearStormOverlay;
+    if (volibearOverlay) volibearOverlay.classList.remove('active');
+
+    // 2. Open Warwick stealth overlay
     const overlay = document.getElementById('warwick-stealth-overlay') || warwickStealthOverlay;
     if (!overlay) return;
     overlay.classList.add('active');
@@ -101,16 +106,46 @@ function openWarwickGame() {
     if (loseOv) loseOv.style.display = 'none';
     if (jumpOv) jumpOv.style.display = 'none';
     if (tutModal) tutModal.style.display = 'flex';
+
+    // 3. Dynamically bind tutorial and quit buttons
+    const btnCloseTut = document.getElementById('btn-close-warwick-tutorial') || btnCloseWarwickTut;
+    if (btnCloseTut) {
+        btnCloseTut.onclick = () => {
+            try { playSound('click'); } catch(e) {}
+            startWarwickGame();
+        };
+    }
+
+    const btnQuit = document.getElementById('btn-warwick-quit') || btnWarwickQuit;
+    if (btnQuit) {
+        btnQuit.onclick = () => {
+            closeWarwickGame();
+            try { playSound('click'); } catch(e) {}
+        };
+    }
+
+    const btnRestart = document.getElementById('btn-warwick-restart') || btnWarwickRestart;
+    if (btnRestart) {
+        btnRestart.onclick = () => {
+            try { playSound('click'); } catch(e) {}
+            startWarwickGame();
+        };
+    }
     
     warwickGameActive = false;
     playTheme('fase6');
 }
 
 function startWarwickGame() {
-    if (warwickTutorialModal) warwickTutorialModal.style.display = 'none';
-    if (warwickWinOverlay) warwickWinOverlay.style.display = 'none';
-    if (warwickLoseOverlay) warwickLoseOverlay.style.display = 'none';
-    if (warwickJumpscare) warwickJumpscare.style.display = 'none';
+    const tutModal = document.getElementById('warwick-tutorial-modal') || warwickTutorialModal;
+    const winOv = document.getElementById('warwick-win-overlay') || warwickWinOverlay;
+    const loseOv = document.getElementById('warwick-lose-overlay') || warwickLoseOverlay;
+    const jumpOv = document.getElementById('warwick-jumpscare-overlay') || warwickJumpscare;
+
+    if (tutModal) tutModal.style.display = 'none';
+    if (winOv) winOv.style.display = 'none';
+    if (loseOv) loseOv.style.display = 'none';
+    if (jumpOv) jumpOv.style.display = 'none';
     
     warwickDistance = 0;
     warwickOxygen = 100;
@@ -120,8 +155,11 @@ function startWarwickGame() {
     warwickWarningMode = false;
     warwickGameActive = true;
     
-    if (warwickCard) warwickCard.classList.remove('hunt-mode-active');
-    if (warwickBloodAlert) warwickBloodAlert.style.display = 'none';
+    const card = document.getElementById('warwick-card') || warwickCard;
+    const bloodAlert = document.getElementById('warwick-blood-alert') || warwickBloodAlert;
+
+    if (card) card.classList.remove('hunt-mode-active');
+    if (bloodAlert) bloodAlert.style.display = 'none';
     
     updateWarwickUI();
     
@@ -400,12 +438,48 @@ function updateVolibearRoundUI() {
 }
 
 function openVolibearGame() {
-    if (!volibearStormOverlay) return;
-    volibearStormOverlay.classList.add('active');
-    if (volibearWinOverlay) volibearWinOverlay.style.display = 'none';
-    if (volibearLoseOverlay) volibearLoseOverlay.style.display = 'none';
-    if (volibearTutorialModal) volibearTutorialModal.style.display = 'flex';
-    if (volibearRoundBanner) volibearRoundBanner.style.display = 'none';
+    // Force close Warwick overlay so they never run simultaneously
+    const warwickOverlay = document.getElementById('warwick-stealth-overlay') || warwickStealthOverlay;
+    if (warwickOverlay) warwickOverlay.classList.remove('active');
+
+    const overlay = document.getElementById('volibear-storm-overlay') || volibearStormOverlay;
+    if (!overlay) return;
+    overlay.classList.add('active');
+    
+    const winOv = document.getElementById('volibear-win-overlay');
+    const loseOv = document.getElementById('volibear-lose-overlay');
+    const tutModal = document.getElementById('volibear-tutorial-modal');
+    const roundBanner = document.getElementById('volibear-round-banner');
+
+    if (winOv) winOv.style.display = 'none';
+    if (loseOv) loseOv.style.display = 'none';
+    if (tutModal) tutModal.style.display = 'flex';
+    if (roundBanner) roundBanner.style.display = 'none';
+
+    const btnCloseTut = document.getElementById('btn-close-volibear-tutorial') || btnCloseVolibearTut;
+    if (btnCloseTut) {
+        btnCloseTut.onclick = () => {
+            try { playSound('click'); } catch(e) {}
+            startVolibearGame();
+        };
+    }
+
+    const btnQuit = document.getElementById('btn-volibear-quit') || btnVolibearQuit;
+    if (btnQuit) {
+        btnQuit.onclick = () => {
+            closeVolibearGame();
+            try { playSound('click'); } catch(e) {}
+        };
+    }
+
+    const btnRestart = document.getElementById('btn-volibear-restart') || btnVolibearRestart;
+    if (btnRestart) {
+        btnRestart.onclick = () => {
+            try { playSound('click'); } catch(e) {}
+            startVolibearGame();
+        };
+    }
+    
     volibearGameActive = false;
     playTheme('fase6');
 }
@@ -1341,24 +1415,29 @@ function renderDecorationsModal() {
     });
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+function bindDecorationModalEvents() {
     const btnDecTop = document.getElementById('btn-decorations-top');
     const modalDec = document.getElementById('decorations-modal');
     const btnCloseDec = document.getElementById('btn-close-decorations');
 
     if (btnDecTop && modalDec) {
-        btnDecTop.addEventListener('click', () => {
+        btnDecTop.onclick = () => {
             renderDecorationsModal();
             modalDec.classList.add('active');
-            playSound('click');
-        });
+            try { playSound('click'); } catch(e) {}
+        };
     }
     if (btnCloseDec && modalDec) {
-        btnCloseDec.addEventListener('click', () => {
+        btnCloseDec.onclick = () => {
             modalDec.classList.remove('active');
-            playSound('click');
-        });
+            try { playSound('click'); } catch(e) {}
+        };
     }
+}
+bindDecorationModalEvents();
+
+document.addEventListener('DOMContentLoaded', () => {
+    bindDecorationModalEvents();
     
     const modalUnlock = document.getElementById('cosmetic-unlock-modal');
     const btnUnlockClose = document.getElementById('btn-cosmetic-unlock-close');
@@ -1378,7 +1457,6 @@ document.addEventListener('DOMContentLoaded', () => {
             playSound('click');
         });
     }
-    
     
     const btnNavPrev = document.getElementById('btn-map-nav-prev');
     const btnNavNext = document.getElementById('btn-map-nav-next');
