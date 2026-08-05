@@ -1,3 +1,58 @@
+
+// ================================================================
+// IMMEDIATE TOP BUTTONS INITIALIZER
+// ================================================================
+(function initTopButtonsImmediately() {
+    function setupButtons() {
+        const btnJourney = document.getElementById('btn-journey-trigger');
+        const btnDecTop = document.getElementById('btn-decorations-top');
+        const modalDec = document.getElementById('decorations-modal');
+        const btnCloseDec = document.getElementById('btn-close-decorations');
+        const journeyOverlay = document.getElementById('journey-overlay');
+        const btnCloseJourney = document.getElementById('btn-close-journey-view');
+
+        if (btnJourney) {
+            btnJourney.style.display = 'flex';
+            btnJourney.classList.add('active');
+            btnJourney.onclick = function(e) {
+                if (e) e.preventDefault();
+                try { playSound('click'); } catch(err) {}
+                openJourney();
+            };
+        }
+
+        if (btnDecTop && modalDec) {
+            btnDecTop.onclick = function(e) {
+                if (e) e.preventDefault();
+                try { if (typeof renderDecorationsModal === 'function') renderDecorationsModal(); } catch(err) {}
+                modalDec.classList.add('active');
+                try { playSound('click'); } catch(err) {}
+            };
+        }
+
+        if (btnCloseDec && modalDec) {
+            btnCloseDec.onclick = function(e) {
+                if (e) e.preventDefault();
+                modalDec.classList.remove('active');
+                try { playSound('click'); } catch(err) {}
+            };
+        }
+
+        if (btnCloseJourney && journeyOverlay) {
+            btnCloseJourney.onclick = function(e) {
+                if (e) e.preventDefault();
+                journeyOverlay.classList.remove('active');
+                try { playSound('click'); } catch(err) {}
+            };
+        }
+    }
+    setupButtons();
+    if (document.readyState !== 'complete') {
+        document.addEventListener('DOMContentLoaded', setupButtons);
+        window.addEventListener('load', setupButtons);
+    }
+})();
+
 // ================================================================
 // THEME MUSIC SYSTEM
 // ================================================================
