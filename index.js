@@ -2814,8 +2814,14 @@ btnAcceptChallenge.addEventListener('click', () => {
         closeGwenQuiz();
         closeSamGame();
         openBlackjack();
+    } else if (currentBossEncounter === 'volibear') {
+        cleanupArmWrestlingEffects();
+        closeGwenQuiz();
+        closeSamGame();
+        openVolibearGame();
     }
 });
+
 
 function openJourney() {
     journeyOverlay.classList.add('active');
