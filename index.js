@@ -87,6 +87,7 @@ function startVolibearRound(roundNum) {
     volibearRound = roundNum;
     volibearTimeLeft = 15;
     volibearGameActive = false; // pause briefly during banner
+    volibearKeys = {}; // Reset held movement keys to prevent drifting bug!
     
     updateVolibearRoundUI();
     updateVolibearLivesUI();
@@ -125,6 +126,7 @@ function startVolibearRound(roundNum) {
     // Start active round after banner
     setTimeout(() => {
         if (volibearRoundBanner) volibearRoundBanner.style.display = 'none';
+        volibearKeys = {}; // Clean key state right as round starts!
         volibearGameActive = true;
         
         // Center player
@@ -160,6 +162,7 @@ function startVolibearRound(roundNum) {
 
 function handleVolibearRoundComplete() {
     volibearGameActive = false;
+    volibearKeys = {};
     if (volibearTimerInterval) clearInterval(volibearTimerInterval);
     if (volibearSpawnTimeout) clearTimeout(volibearSpawnTimeout);
     if (volibearSpeechInterval) clearInterval(volibearSpeechInterval);
@@ -247,9 +250,13 @@ function scheduleNextLightning() {
             break;
             
         case 3:
-            // Round 3: Absurd Crossfire Grid Matrix
+            // Round 3: Absurd Crossfire Grid Matrix + Constant Player Pursuit
             delay = 200;
             volibearGridStep++;
+            
+            // ALWAYS spawn a targeted pursuit strike directly on the player's position to prevent camping in corners!
+            spawnStrikeAt(volibearPlayerPos.x + (Math.random() * 24 - 12), volibearPlayerPos.y + (Math.random() * 24 - 12));
+            
             if (volibearGridStep % 3 === 0) {
                 // 3x3 Grid with 1 random safe cell
                 const safeCol = Math.floor(Math.random() * 3);
