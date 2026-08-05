@@ -6381,3 +6381,155 @@ if (document.readyState === 'complete' || document.readyState === 'interactive')
 } else {
     document.addEventListener('DOMContentLoaded', setupCentralizedMapListeners);
 }
+
+
+// ================================================================
+// CENTRALIZED RESILIENT MAP & UI EVENT CONTROLLER
+// ================================================================
+function bindAllGlobalEvents() {
+    // 1. Decoration Modal Toggle
+    const btnDecTop = document.getElementById('btn-decorations-top');
+    const modalDec = document.getElementById('decorations-modal');
+    const btnCloseDec = document.getElementById('btn-close-decorations');
+
+    if (btnDecTop) {
+        btnDecTop.onclick = (e) => {
+            if (e) e.preventDefault();
+            const modal = document.getElementById('decorations-modal');
+            if (modal) {
+                renderDecorationsModal();
+                modal.classList.add('active');
+            }
+            try { playSound('click'); } catch(err) {}
+        };
+    }
+
+    if (btnCloseDec) {
+        btnCloseDec.onclick = (e) => {
+            if (e) e.preventDefault();
+            const modal = document.getElementById('decorations-modal');
+            if (modal) modal.classList.remove('active');
+            try { playSound('click'); } catch(err) {}
+        };
+    }
+
+    // 2. Journey Map Toggle
+    const btnJourney = document.getElementById('btn-journey-trigger');
+    const journeyOv = document.getElementById('journey-overlay');
+    const btnCloseJourney = document.getElementById('btn-close-journey-view');
+    const encounterOv = document.getElementById('journey-encounter-overlay');
+
+    if (btnJourney) {
+        btnJourney.onclick = (e) => {
+            if (e) e.preventDefault();
+            try { playSound('click'); } catch(err) {}
+            openJourney();
+        };
+    }
+
+    if (btnCloseJourney) {
+        btnCloseJourney.onclick = (e) => {
+            if (e) e.preventDefault();
+            try { playSound('click'); } catch(err) {}
+            if (journeyOv) journeyOv.classList.remove('active');
+        };
+    }
+
+    // 3. Map Nodes (Capítulo 1 & Capítulo 2)
+    const mapNodes = [
+        { id: 'node-fase1', encounter: 'kleber', unlockKey: null, reqMsg: '' },
+        { id: 'node-fase2', encounter: 'gwen', unlockKey: 'mandamau_journey_fase1_completed', reqMsg: 'Derrote Kleber na Fase 1 primeiro!' },
+        { id: 'node-fase3', encounter: 'sam', unlockKey: 'mandamau_journey_fase2_completed', reqMsg: 'Derrote Gwen na Fase 2 primeiro!' },
+        { id: 'node-fase4', encounter: 'claudio', unlockKey: 'mandamau_journey_fase3_completed', reqMsg: 'Derrote Sam na Fase 3 primeiro!' },
+        { id: 'node-ggopa', encounter: 'felifep', unlockKey: 'mandamau_journey_fase4_completed', reqMsg: 'Derrote Cláudio na Fase 4 primeiro!' },
+        { id: 'node-fase6', encounter: 'volibear', unlockKey: null, reqMsg: '' },
+        { id: 'node-fase7', encounter: 'warwick', unlockKey: 'mandamau_journey_fase6_completed', reqMsg: 'Derrote Volibear na Fase 6 primeiro!' }
+    ];
+
+    mapNodes.forEach(nodeData => {
+        const el = document.getElementById(nodeData.id);
+        if (el) {
+            el.onclick = (e) => {
+                if (e) e.preventDefault();
+                const isUnlocked = !nodeData.unlockKey || localStorage.getItem(nodeData.unlockKey) === 'true';
+                if (isUnlocked) {
+                    try { playSound('click'); } catch(err) {}
+                    currentBossEncounter = nodeData.encounter;
+                    setupBossEncounterUI();
+                    const enc = document.getElementById('journey-encounter-overlay');
+                    if (enc) enc.classList.add('active');
+                } else {
+                    try { playSound('click'); } catch(err) {}
+                    showAchievementToast({ icon: '🔒', title: 'FASE BLOQUEADA', desc: nodeData.reqMsg });
+                }
+            };
+        }
+    });
+
+    // 4. Accept Challenge Button
+    const btnAccept = document.getElementById('btn-accept-challenge');
+    if (btnAccept) {
+        btnAccept.onclick = (e) => {
+            if (e) e.preventDefault();
+            const enc = document.getElementById('journey-encounter-overlay');
+            const jOv = document.getElementById('journey-overlay');
+            if (enc) enc.classList.remove('active');
+            if (jOv) jOv.classList.remove('active');
+            try { playSound('click'); } catch(err) {}
+
+            if (currentBossEncounter === 'volibear') {
+                closeWarwickGame();
+                openVolibearGame();
+            } else if (currentBossEncounter === 'warwick') {
+                closeVolibearGame();
+                openWarwickGame();
+            } else if (currentBossEncounter === 'kleber') {
+                const armOv = document.getElementById('arm-wrestling-overlay');
+                const armTut = document.getElementById('arm-tutorial-modal');
+                if (armOv) armOv.classList.add('active');
+                if (armTut) armTut.classList.add('active');
+                isTutorialOpen = true;
+                isArmGameActive = false;
+                armWrestlingState = 0;
+                updateArmWrestlingUI();
+            } else if (currentBossEncounter === 'gwen') {
+                const gwenOv = document.getElementById('gwen-quiz-overlay');
+                const gwenTut = document.getElementById('gwen-tutorial-modal');
+                if (gwenOv) gwenOv.classList.add('active');
+                if (gwenTut) gwenTut.classList.add('active');
+                isGwenTutorialOpen = true;
+                gwenActive = false;
+                gwenScore = 0;
+                gwenLives = 3;
+                updateGwenUI();
+            } else if (currentBossEncounter === 'sam') {
+                const samOv = document.getElementById('sam-smash-overlay');
+                const samTut = document.getElementById('sam-tutorial-modal');
+                if (samOv) samOv.classList.add('active');
+                if (samTut) samTut.classList.add('active');
+                isSamTutorialOpen = true;
+                samGameActive = false;
+                samTugProgress = 50;
+                samTimeLeft = 15;
+                updateSamTugUI();
+            } else if (currentBossEncounter === 'claudio') {
+                const cOv = document.getElementById('claudio-genius-overlay');
+                const cTut = document.getElementById('claudio-tutorial-modal');
+                if (cOv) cOv.classList.add('active');
+                if (cTut) cTut.classList.add('active');
+                isClaudioTutorialOpen = true;
+                claudioGameActive = false;
+                resetClaudioGame();
+            } else if (currentBossEncounter === 'felifep') {
+                openBlackjack();
+            }
+        };
+    }
+}
+
+// Auto-run bindAllGlobalEvents immediately and on DOMReady
+bindAllGlobalEvents();
+if (document.readyState !== 'complete') {
+    document.addEventListener('DOMContentLoaded', bindAllGlobalEvents);
+    window.addEventListener('load', bindAllGlobalEvents);
+}
