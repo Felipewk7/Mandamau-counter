@@ -6032,27 +6032,49 @@ if (dbgLaunchWarwick) {
 
 
 // ================================================================
-// INDEPENDENT DECORATION BUTTON DELEGATOR (100% UNLINKED FROM MAP)
+
+
+// ================================================================
+// MASTER TOP BUTTONS & NAVIGATION CONTROLLER
 // ================================================================
 document.addEventListener('click', (e) => {
-    const btnDec = e.target.closest('#btn-decorations-top');
-    if (btnDec) {
+    // 🗺️ Map Button (btn-journey-trigger)
+    if (e.target.closest('#btn-journey-trigger')) {
         e.preventDefault();
-        const modal = document.getElementById('decorations-modal');
-        if (modal) {
-            if (typeof renderDecorationsModal === 'function') renderDecorationsModal();
-            modal.classList.add('active');
+        try { playSound('click'); } catch(err) {}
+        openJourney();
+        return;
+    }
+
+    // 🖼️ Decoration Top Button
+    if (e.target.closest('#btn-decorations-top')) {
+        e.preventDefault();
+        const modalDec = document.getElementById('decorations-modal');
+        if (modalDec) {
+            renderDecorationsModal();
+            modalDec.classList.add('active');
         }
         try { playSound('click'); } catch(err) {}
         return;
     }
 
-    const btnCloseDec = e.target.closest('#btn-close-decorations');
-    if (btnCloseDec) {
+    // 🖼️ Close Decoration Button
+    if (e.target.closest('#btn-close-decorations')) {
         e.preventDefault();
-        const modal = document.getElementById('decorations-modal');
-        if (modal) {
-            modal.classList.remove('active');
+        const modalDec = document.getElementById('decorations-modal');
+        if (modalDec) {
+            modalDec.classList.remove('active');
+        }
+        try { playSound('click'); } catch(err) {}
+        return;
+    }
+
+    // 🗺️ Close Journey View Button
+    if (e.target.closest('#btn-close-journey-view')) {
+        e.preventDefault();
+        const jOv = document.getElementById('journey-overlay');
+        if (jOv) {
+            jOv.classList.remove('active');
         }
         try { playSound('click'); } catch(err) {}
         return;
