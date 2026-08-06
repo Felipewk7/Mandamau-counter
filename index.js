@@ -1,58 +1,3 @@
-
-// ================================================================
-// IMMEDIATE TOP BUTTONS INITIALIZER
-// ================================================================
-(function initTopButtonsImmediately() {
-    function setupButtons() {
-        const btnJourney = document.getElementById('btn-journey-trigger');
-        const btnDecTop = document.getElementById('btn-decorations-top');
-        const modalDec = document.getElementById('decorations-modal');
-        const btnCloseDec = document.getElementById('btn-close-decorations');
-        const journeyOverlay = document.getElementById('journey-overlay');
-        const btnCloseJourney = document.getElementById('btn-close-journey-view');
-
-        if (btnJourney) {
-            btnJourney.style.display = 'flex';
-            btnJourney.classList.add('active');
-            btnJourney.onclick = function(e) {
-                if (e) e.preventDefault();
-                try { playSound('click'); } catch(err) {}
-                openJourney();
-            };
-        }
-
-        if (btnDecTop && modalDec) {
-            btnDecTop.onclick = function(e) {
-                if (e) e.preventDefault();
-                try { if (typeof renderDecorationsModal === 'function') renderDecorationsModal(); } catch(err) {}
-                modalDec.classList.add('active');
-                try { playSound('click'); } catch(err) {}
-            };
-        }
-
-        if (btnCloseDec && modalDec) {
-            btnCloseDec.onclick = function(e) {
-                if (e) e.preventDefault();
-                modalDec.classList.remove('active');
-                try { playSound('click'); } catch(err) {}
-            };
-        }
-
-        if (btnCloseJourney && journeyOverlay) {
-            btnCloseJourney.onclick = function(e) {
-                if (e) e.preventDefault();
-                journeyOverlay.classList.remove('active');
-                try { playSound('click'); } catch(err) {}
-            };
-        }
-    }
-    setupButtons();
-    if (document.readyState !== 'complete') {
-        document.addEventListener('DOMContentLoaded', setupButtons);
-        window.addEventListener('load', setupButtons);
-    }
-})();
-
 // ================================================================
 // THEME MUSIC SYSTEM
 // ================================================================
@@ -1396,29 +1341,24 @@ function renderDecorationsModal() {
     });
 }
 
-function bindUIDOMListeners() {
+document.addEventListener('DOMContentLoaded', () => {
     const btnDecTop = document.getElementById('btn-decorations-top');
     const modalDec = document.getElementById('decorations-modal');
     const btnCloseDec = document.getElementById('btn-close-decorations');
 
     if (btnDecTop && modalDec) {
-        btnDecTop.onclick = () => {
+        btnDecTop.addEventListener('click', () => {
             renderDecorationsModal();
             modalDec.classList.add('active');
-            try { playSound('click'); } catch(e) {}
-        };
+            playSound('click');
+        });
     }
     if (btnCloseDec && modalDec) {
-        btnCloseDec.onclick = () => {
+        btnCloseDec.addEventListener('click', () => {
             modalDec.classList.remove('active');
-            try { playSound('click'); } catch(e) {}
-        };
+            playSound('click');
+        });
     }
-}
-bindUIDOMListeners();
-
-document.addEventListener('DOMContentLoaded', () => {
-    bindUIDOMListeners();
     
     const modalUnlock = document.getElementById('cosmetic-unlock-modal');
     const btnUnlockClose = document.getElementById('btn-cosmetic-unlock-close');
@@ -3097,32 +3037,29 @@ function switchMapChapter(chapterNum) {
         if (mapCap1) { mapCap1.style.display = 'none'; mapCap1.classList.remove('active'); }
         if (mapCap2) { mapCap2.style.display = 'block'; mapCap2.classList.add('active'); }
         if (titleEl) titleEl.textContent = 'Capítulo 2: O Caos Deselegante';
-        if (subtitleEl) subtitleEl.textContent = 'Enfrente as ameaças do Capítulo 2 e avance rumo ao Confronto Final!';
+        if (subtitleEl) subtitleEl.textContent = 'O Deus da Mentira foi libertado! Enfrente as novas ameaças e restabeleça a ordem!';
         
-        // Show "⬅️ Capítulo 1" button, hide Next button
         if (btnNavPrev) btnNavPrev.style.display = 'inline-flex';
         if (btnNavNext) btnNavNext.style.display = 'none';
 
         const isFase6Completed = localStorage.getItem('mandamau_journey_fase6_completed') === 'true';
 
-        // NODE FASE 6 (VOLIBEAR)
         const nodeFase6 = document.getElementById('node-fase6');
         const lineFase6 = document.querySelector('.line-fase6');
         if (nodeFase6) {
             nodeFase6.className = 'map-node node-active';
-            nodeFase6.title = 'Fase 6 - Volibear (O Urso da Tempestade)';
+            nodeFase6.title = 'Fase 6 - O Urso da Tempestade (Volibear)';
             const iconSpan = nodeFase6.querySelector('.node-icon');
             if (iconSpan) iconSpan.textContent = '⚡';
         }
         if (lineFase6) lineFase6.classList.add('line-active');
 
-        // NODE FASE 7 (WARWICK) - LOCKED UNTIL FASE 6 BEATEN
         const nodeFase7 = document.getElementById('node-fase7');
         const lineFase7 = document.querySelector('.line-fase7');
         if (isFase6Completed) {
             if (nodeFase7) {
                 nodeFase7.className = 'map-node node-active';
-                nodeFase7.title = 'Fase 7 - Warwick (O Caçador Furtivo)';
+                nodeFase7.title = 'Fase 7 - Warwick';
                 const iconSpan = nodeFase7.querySelector('.node-icon');
                 if (iconSpan) iconSpan.textContent = '🐺';
             }
@@ -3137,7 +3074,6 @@ function switchMapChapter(chapterNum) {
             if (lineFase7) lineFase7.classList.remove('line-active');
         }
 
-        // PLAYER TOKEN POSITIONING ON CHAPTER 2
         if (journeyPlayerToken) {
             if (isFase6Completed) {
                 journeyPlayerToken.style.left = '40%';
@@ -3148,16 +3084,187 @@ function switchMapChapter(chapterNum) {
             }
         }
     } else {
+
         if (mapCap2) { mapCap2.style.display = 'none'; mapCap2.classList.remove('active'); }
         if (mapCap1) { mapCap1.style.display = 'block'; mapCap1.classList.add('active'); }
         if (titleEl) titleEl.textContent = 'A Jornada pelo Remédio Supremo (Capítulo 1)';
         if (subtitleEl) subtitleEl.textContent = 'Desbrave o caminho até a sede do GGOPA para curar a maldição do Bako';
         
-        // Hide Prev button. Show "Capítulo 2 ➡️" button ONLY if Chapter 1 (Fase 5) is completed!
         if (btnNavPrev) btnNavPrev.style.display = 'none';
         if (btnNavNext) btnNavNext.style.display = isCap1Completed ? 'inline-flex' : 'none';
     }
 }
+
+const journeyOverlay = document.getElementById('journey-overlay');
+const btnCloseJourneyView = document.getElementById('btn-close-journey-view');
+const journeyPlayerToken = document.getElementById('journey-player-token');
+const journeyEncounterOverlay = document.getElementById('journey-encounter-overlay');
+const btnAcceptChallenge = document.getElementById('btn-accept-challenge');
+const nodeFase1 = document.getElementById('node-fase1');
+const pathLineFase1 = document.querySelector('.line-fase1');
+
+btnJourneyTrigger.addEventListener('click', () => {
+    playSound('click');
+    openJourney();
+});
+
+if (btnCloseJourneyView) {
+    btnCloseJourneyView.addEventListener('click', () => {
+        journeyOverlay.classList.remove('active');
+        playSound('click');
+    });
+}
+
+let currentBossEncounter = 'kleber';
+let isGwenTutorialOpen = false;
+let isSamTutorialOpen = false;
+
+function setupBossEncounterUI() {
+    const portrait = document.querySelector('.encounter-portrait');
+    const nameText = document.querySelector('.encounter-name');
+    const titleText = document.querySelector('.encounter-title');
+    const authorText = document.querySelector('.dialog-author');
+    const bubblePara = document.querySelector('.encounter-dialog-bubble p');
+    
+    if (currentBossEncounter === 'kleber') {
+        portrait.src = "img/kleber_clown.jpg";
+        portrait.alt = "Kleber O palhaço dos mil dentes";
+        nameText.textContent = "Kleber";
+        titleText.textContent = "O palhaço dos mil dentes";
+        authorText.textContent = "Kleber";
+        bubblePara.textContent = "pra passar de mim terá que me vencer numa queda de braço krl";
+    } else if (currentBossEncounter === 'warwick') {
+        portrait.onerror = function() { this.src = 'img/kleber_clown.jpg'; };
+        portrait.src = "img/warwick.png";
+        portrait.alt = "Warwick O Caçador da Noite";
+        nameText.textContent = "Warwick";
+        titleText.textContent = "O Caçador da Noite — Capítulo 2: Fase 7";
+        authorText.textContent = "Warwick";
+        bubblePara.textContent = "sinto cheiro de cu virgem , é o seu ?";
+    } else if (currentBossEncounter === 'volibear') {
+        portrait.onerror = function() { this.src = 'img/kleber_clown.jpg'; };
+        portrait.src = "img/volibear.png";
+        portrait.alt = "Volibear O Urso da Tempestade";
+        nameText.textContent = "Volibear";
+        titleText.textContent = "O Urso da Tempestade — Capítulo 2: Fase 6";
+        authorText.textContent = "Volibear";
+        bubblePara.textContent = "Para chegar no meu mestre terá que passar por mim, que o boga do bako é só meu!";
+    } else if (currentBossEncounter === 'gwen') {
+        portrait.src = "img/gwen.jpg";
+        portrait.alt = "Gwen";
+        nameText.textContent = "Gwen";
+        titleText.textContent = "A mestre do quiz";
+        authorText.textContent = "Gwen";
+        bubblePara.textContent = "Eai porra, vc é bom em matematica ? Não ? que pena vai ter que ser pra passar Hahahaha!!!";
+    } else if (currentBossEncounter === 'sam') {
+        portrait.onerror = function() {
+            if (!this.src.endsWith('img/kleber_clown.jpg')) {
+                this.onerror = function() { this.src = 'img/kleber_clown.jpg'; this.onerror = null; };
+                this.src = 'img/sam.jpg';
+            }
+        };
+        portrait.src = '';
+        portrait.src = 'img/sam.png';
+        portrait.alt = 'Sam';
+        nameText.textContent = 'Sam';
+        titleText.textContent = 'O Gordão do Esmaga';
+        authorText.textContent = 'Sam';
+        bubblePara.textContent = 'Eai porra, vc é bom em esmagar comida? Não? que pena vai ter que ser pra passar Hahahaha!!!';
+    } else if (currentBossEncounter === 'claudio') {
+        portrait.src = 'img/claudio.png';
+        portrait.alt = 'Cláudio O Cubo Gey';
+        portrait.onerror = function() { this.src = 'img/kleber_clown.jpg'; };
+        nameText.textContent = 'Cláudio';
+        titleText.textContent = 'O Cubo Gey';
+        authorText.textContent = 'Cláudio';
+        bubblePara.textContent = 'Eu sou um cubo gey, me vença se for capaz!';
+
+    } else if (currentBossEncounter === 'fase6_fakenews') {
+        portrait.src = "img/kleber_clown.jpg";
+        portrait.alt = "Fake News Kleber";
+        nameText.textContent = "Kleber Fake News";
+        titleText.textContent = "Capítulo 2 - Fase 6";
+        authorText.textContent = "Kleber Fake News";
+        bubblePara.textContent = "Eu voltei no Capítulo 2 e agora espalho FAKE NEWS pelo mundo todo! Tente me parar se for capaz!";
+    } else if (currentBossEncounter === 'felifep') {
+
+        portrait.onerror = function() { if (!this.src.endsWith('img/kleber_clown.jpg')) this.src = 'img/kleber_clown.jpg'; };
+        portrait.src = '';
+        portrait.src = 'img/felifep.png';
+        portrait.alt = 'Felifep';
+        nameText.textContent  = 'Felifep';
+        titleText.textContent = 'O Deus da Etiqueta e da Verdade';
+        authorText.textContent= 'Felifep';
+        bubblePara.textContent= 'Você chegou até aqui? Impressionante. Prepare-se para o Julgamento Final!';
+    }
+}
+
+btnAcceptChallenge.addEventListener('click', () => {
+    journeyEncounterOverlay.classList.remove('active');
+    playSound('click');
+    
+    if (currentBossEncounter === 'kleber') {
+        closeGwenQuiz();
+        closeSamGame();
+        
+        armWrestlingOverlay.classList.add('active');
+        armTutorialModal.classList.add('active');
+        isTutorialOpen = true;
+        isArmGameActive = false;
+        armWrestlingState = 0;
+        updateArmWrestlingUI();
+    } else if (currentBossEncounter === 'gwen') {
+        cleanupArmWrestlingEffects();
+        closeSamGame();
+        
+        gwenQuizOverlay.classList.add('active');
+        gwenTutorialModal.classList.add('active');
+        isGwenTutorialOpen = true;
+        gwenActive = false;
+        gwenScore = 0;
+        gwenLives = 3;
+        isPrankQuestion = false;
+        updateGwenUI();
+    } else if (currentBossEncounter === 'sam') {
+        cleanupArmWrestlingEffects();
+        closeGwenQuiz();
+        
+        samSmashOverlay.classList.add('active');
+        samTutorialModal.classList.add('active');
+        isSamTutorialOpen = true;
+        samGameActive = false;
+        samTugProgress = 50;
+        samTimeLeft = 15;
+        lastPressedKey = '';
+        updateSamTugUI();
+    } else if (currentBossEncounter === 'claudio') {
+        cleanupArmWrestlingEffects();
+        closeGwenQuiz();
+        closeSamGame();
+
+        claudioGeniusOverlay.classList.add('active');
+        claudioTutorialModal.classList.add('active');
+        isClaudioTutorialOpen = true;
+        claudioGameActive = false;
+        resetClaudioGame();
+    } else if (currentBossEncounter === 'felifep') {
+        cleanupArmWrestlingEffects();
+        closeGwenQuiz();
+        closeSamGame();
+        openBlackjack();
+    } else if (currentBossEncounter === 'volibear') {
+        cleanupArmWrestlingEffects();
+        closeGwenQuiz();
+        closeSamGame();
+        openVolibearGame();
+    } else if (currentBossEncounter === 'warwick') {
+        cleanupArmWrestlingEffects();
+        closeGwenQuiz();
+        closeSamGame();
+        openWarwickGame();
+    }
+});
+
 
 function openJourney() {
     journeyOverlay.classList.add('active');
@@ -3167,7 +3274,14 @@ function openJourney() {
     if (volibearStormOverlay) volibearStormOverlay.classList.remove('active');
     
     // If Chapter 1 (Fase 5) is completed, open directly on Chapter 2 map!
-    switchMapChapter(currentMapChapter || 1);
+    const isCap1Completed = localStorage.getItem('mandamau_journey_fase5_completed') === 'true';
+    if (isCap1Completed) {
+        currentMapChapter = 2;
+        switchMapChapter(2);
+    } else {
+        currentMapChapter = 1;
+        switchMapChapter(1);
+    }
     journeyEncounterOverlay.classList.remove('active');
     pathLineFase1.classList.remove('line-active');
     nodeFase1.classList.remove('node-active');
@@ -5945,9 +6059,10 @@ btnBjCh2Close.addEventListener('click', () => {
     bjChapter2.classList.remove('active');
     playSound('rank_up_high');
     localStorage.setItem('mandamau_journey_fase5_completed', 'true');
+    // Ensure Chapter 2 starts cleanly at Volibear (Fase 6)
     localStorage.removeItem('mandamau_journey_fase6_completed');
     localStorage.removeItem('mandamau_journey_fase7_completed');
-    currentMapChapter = 1;
+    currentMapChapter = 2;
     openJourney();
 });
 
@@ -6076,122 +6191,3 @@ if (dbgLaunchWarwick) {
 }
 
 
-
-
-// ================================================================
-
-
-// ================================================================
-// MASTER TOP BUTTONS & NAVIGATION CONTROLLER
-// ================================================================
-document.addEventListener('click', (e) => {
-    // 🗺️ Map Button (btn-journey-trigger)
-    if (e.target.closest('#btn-journey-trigger')) {
-        e.preventDefault();
-        try { playSound('click'); } catch(err) {}
-        openJourney();
-        return;
-    }
-
-    // 🖼️ Decoration Top Button
-    if (e.target.closest('#btn-decorations-top')) {
-        e.preventDefault();
-        const modalDec = document.getElementById('decorations-modal');
-        if (modalDec) {
-            renderDecorationsModal();
-            modalDec.classList.add('active');
-        }
-        try { playSound('click'); } catch(err) {}
-        return;
-    }
-
-    // 🖼️ Close Decoration Button
-    if (e.target.closest('#btn-close-decorations')) {
-        e.preventDefault();
-        const modalDec = document.getElementById('decorations-modal');
-        if (modalDec) {
-            modalDec.classList.remove('active');
-        }
-        try { playSound('click'); } catch(err) {}
-        return;
-    }
-
-    // 🗺️ Close Journey View Button
-    if (e.target.closest('#btn-close-journey-view')) {
-        e.preventDefault();
-        const jOv = document.getElementById('journey-overlay');
-        if (jOv) {
-            jOv.classList.remove('active');
-        }
-        try { playSound('click'); } catch(err) {}
-        return;
-    }
-});
-
-
-const btnAcceptChallenge = document.getElementById('btn-accept-challenge');
-if (btnAcceptChallenge) {
-    btnAcceptChallenge.onclick = (e) => {
-        if (e) e.preventDefault();
-        const journeyEncounterOverlay = document.getElementById('journey-encounter-overlay');
-        if (journeyEncounterOverlay) journeyEncounterOverlay.classList.remove('active');
-        try { playSound('click'); } catch(err) {}
-
-        if (currentBossEncounter === 'kleber') {
-            if (typeof closeGwenQuiz === 'function') closeGwenQuiz();
-            if (typeof closeSamGame === 'function') closeSamGame();
-            if (armWrestlingOverlay) armWrestlingOverlay.classList.add('active');
-            if (armTutorialModal) armTutorialModal.classList.add('active');
-            isTutorialOpen = true;
-            isArmGameActive = false;
-            armWrestlingState = 0;
-            if (typeof updateArmWrestlingUI === 'function') updateArmWrestlingUI();
-        } else if (currentBossEncounter === 'gwen') {
-            if (typeof cleanupArmWrestlingEffects === 'function') cleanupArmWrestlingEffects();
-            if (typeof closeSamGame === 'function') closeSamGame();
-            if (gwenQuizOverlay) gwenQuizOverlay.classList.add('active');
-            if (gwenTutorialModal) gwenTutorialModal.classList.add('active');
-            isGwenTutorialOpen = true;
-            gwenActive = false;
-            gwenScore = 0;
-            gwenLives = 3;
-            isPrankQuestion = false;
-            if (typeof updateGwenUI === 'function') updateGwenUI();
-        } else if (currentBossEncounter === 'sam') {
-            if (typeof cleanupArmWrestlingEffects === 'function') cleanupArmWrestlingEffects();
-            if (typeof closeGwenQuiz === 'function') closeGwenQuiz();
-            if (samSmashOverlay) samSmashOverlay.classList.add('active');
-            if (samTutorialModal) samTutorialModal.classList.add('active');
-            isSamTutorialOpen = true;
-            samGameActive = false;
-            samTugProgress = 50;
-            samTimeLeft = 15;
-            lastPressedKey = '';
-            if (typeof updateSamTugUI === 'function') updateSamTugUI();
-        } else if (currentBossEncounter === 'claudio') {
-            if (typeof cleanupArmWrestlingEffects === 'function') cleanupArmWrestlingEffects();
-            if (typeof closeGwenQuiz === 'function') closeGwenQuiz();
-            if (typeof closeSamGame === 'function') closeSamGame();
-            if (claudioGeniusOverlay) claudioGeniusOverlay.classList.add('active');
-            if (claudioTutorialModal) claudioTutorialModal.classList.add('active');
-            isClaudioTutorialOpen = true;
-            claudioGameActive = false;
-            if (typeof resetClaudioGame === 'function') resetClaudioGame();
-        } else if (currentBossEncounter === 'felifep') {
-            if (typeof cleanupArmWrestlingEffects === 'function') cleanupArmWrestlingEffects();
-            if (typeof closeGwenQuiz === 'function') closeGwenQuiz();
-            if (typeof closeSamGame === 'function') closeSamGame();
-            if (typeof openBlackjack === 'function') openBlackjack();
-        } else if (currentBossEncounter === 'volibear') {
-            if (typeof cleanupArmWrestlingEffects === 'function') cleanupArmWrestlingEffects();
-            if (typeof closeGwenQuiz === 'function') closeGwenQuiz();
-            if (typeof closeSamGame === 'function') closeSamGame();
-            if (typeof openVolibearGame === 'function') openVolibearGame();
-        } else if (currentBossEncounter === 'warwick') {
-            if (typeof cleanupArmWrestlingEffects === 'function') cleanupArmWrestlingEffects();
-            if (typeof closeGwenQuiz === 'function') closeGwenQuiz();
-            if (typeof closeSamGame === 'function') closeSamGame();
-            if (typeof openWarwickGame === 'function') openWarwickGame();
-        }
-    };
-}
