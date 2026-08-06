@@ -3167,14 +3167,7 @@ function openJourney() {
     if (volibearStormOverlay) volibearStormOverlay.classList.remove('active');
     
     // If Chapter 1 (Fase 5) is completed, open directly on Chapter 2 map!
-    const isCap1Completed = localStorage.getItem('mandamau_journey_fase5_completed') === 'true';
-    if (isCap1Completed) {
-        currentMapChapter = 2;
-        switchMapChapter(2);
-    } else {
-        currentMapChapter = 1;
-        switchMapChapter(1);
-    }
+    switchMapChapter(currentMapChapter || 1);
     journeyEncounterOverlay.classList.remove('active');
     pathLineFase1.classList.remove('line-active');
     nodeFase1.classList.remove('node-active');
@@ -5952,10 +5945,9 @@ btnBjCh2Close.addEventListener('click', () => {
     bjChapter2.classList.remove('active');
     playSound('rank_up_high');
     localStorage.setItem('mandamau_journey_fase5_completed', 'true');
-    // Ensure Chapter 2 starts cleanly at Volibear (Fase 6)
     localStorage.removeItem('mandamau_journey_fase6_completed');
     localStorage.removeItem('mandamau_journey_fase7_completed');
-    currentMapChapter = 2;
+    currentMapChapter = 1;
     openJourney();
 });
 
@@ -6135,3 +6127,71 @@ document.addEventListener('click', (e) => {
         return;
     }
 });
+
+
+const btnAcceptChallenge = document.getElementById('btn-accept-challenge');
+if (btnAcceptChallenge) {
+    btnAcceptChallenge.onclick = (e) => {
+        if (e) e.preventDefault();
+        const journeyEncounterOverlay = document.getElementById('journey-encounter-overlay');
+        if (journeyEncounterOverlay) journeyEncounterOverlay.classList.remove('active');
+        try { playSound('click'); } catch(err) {}
+
+        if (currentBossEncounter === 'kleber') {
+            if (typeof closeGwenQuiz === 'function') closeGwenQuiz();
+            if (typeof closeSamGame === 'function') closeSamGame();
+            if (armWrestlingOverlay) armWrestlingOverlay.classList.add('active');
+            if (armTutorialModal) armTutorialModal.classList.add('active');
+            isTutorialOpen = true;
+            isArmGameActive = false;
+            armWrestlingState = 0;
+            if (typeof updateArmWrestlingUI === 'function') updateArmWrestlingUI();
+        } else if (currentBossEncounter === 'gwen') {
+            if (typeof cleanupArmWrestlingEffects === 'function') cleanupArmWrestlingEffects();
+            if (typeof closeSamGame === 'function') closeSamGame();
+            if (gwenQuizOverlay) gwenQuizOverlay.classList.add('active');
+            if (gwenTutorialModal) gwenTutorialModal.classList.add('active');
+            isGwenTutorialOpen = true;
+            gwenActive = false;
+            gwenScore = 0;
+            gwenLives = 3;
+            isPrankQuestion = false;
+            if (typeof updateGwenUI === 'function') updateGwenUI();
+        } else if (currentBossEncounter === 'sam') {
+            if (typeof cleanupArmWrestlingEffects === 'function') cleanupArmWrestlingEffects();
+            if (typeof closeGwenQuiz === 'function') closeGwenQuiz();
+            if (samSmashOverlay) samSmashOverlay.classList.add('active');
+            if (samTutorialModal) samTutorialModal.classList.add('active');
+            isSamTutorialOpen = true;
+            samGameActive = false;
+            samTugProgress = 50;
+            samTimeLeft = 15;
+            lastPressedKey = '';
+            if (typeof updateSamTugUI === 'function') updateSamTugUI();
+        } else if (currentBossEncounter === 'claudio') {
+            if (typeof cleanupArmWrestlingEffects === 'function') cleanupArmWrestlingEffects();
+            if (typeof closeGwenQuiz === 'function') closeGwenQuiz();
+            if (typeof closeSamGame === 'function') closeSamGame();
+            if (claudioGeniusOverlay) claudioGeniusOverlay.classList.add('active');
+            if (claudioTutorialModal) claudioTutorialModal.classList.add('active');
+            isClaudioTutorialOpen = true;
+            claudioGameActive = false;
+            if (typeof resetClaudioGame === 'function') resetClaudioGame();
+        } else if (currentBossEncounter === 'felifep') {
+            if (typeof cleanupArmWrestlingEffects === 'function') cleanupArmWrestlingEffects();
+            if (typeof closeGwenQuiz === 'function') closeGwenQuiz();
+            if (typeof closeSamGame === 'function') closeSamGame();
+            if (typeof openBlackjack === 'function') openBlackjack();
+        } else if (currentBossEncounter === 'volibear') {
+            if (typeof cleanupArmWrestlingEffects === 'function') cleanupArmWrestlingEffects();
+            if (typeof closeGwenQuiz === 'function') closeGwenQuiz();
+            if (typeof closeSamGame === 'function') closeSamGame();
+            if (typeof openVolibearGame === 'function') openVolibearGame();
+        } else if (currentBossEncounter === 'warwick') {
+            if (typeof cleanupArmWrestlingEffects === 'function') cleanupArmWrestlingEffects();
+            if (typeof closeGwenQuiz === 'function') closeGwenQuiz();
+            if (typeof closeSamGame === 'function') closeSamGame();
+            if (typeof openWarwickGame === 'function') openWarwickGame();
+        }
+    };
+}
